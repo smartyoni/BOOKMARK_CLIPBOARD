@@ -1148,11 +1148,11 @@
                 console.log('데이터를 Firebase에 저장했습니다.');
                 
                 // 로컬스토리지에도 백업 저장
-                await saveToFirebase();
+                saveToLocalStorage();
                 
             } catch (error) {
                 console.error('Firebase 저장 실패, 로컬스토리지 사용:', error);
-                await saveToFirebase();
+                saveToLocalStorage();
             }
         }
         
@@ -1262,7 +1262,7 @@
                 console.log('로컬 데이터를 Firebase로 마이그레이션 중...');
                 allProjectsData = localData.projects;
                 currentProject = localData.currentProject;
-                await saveToFirebase();
+                saveToFirebase();
                 console.log('마이그레이션 완료');
                 return localData;
             }
@@ -1288,7 +1288,7 @@
                         currentProject = '가계약';
                         console.log('기본 데이터로 앱 초기화');
                         // 첫 실행시 Firebase 및 로컬스토리지에 저장
-                        await saveToFirebase();
+                        saveToFirebase();
                     }
                 }
                 
@@ -1337,7 +1337,7 @@
         let activeProject = null;
         let colorChangeItem = null;
 
-        function renderProject(projectName) {
+        async function renderProject(projectName) {
             currentProject = projectName;
             const projectData = allProjectsData[projectName];
             
@@ -1421,7 +1421,7 @@
             renderFavorites();
             renderStatistics();
             
-            await saveToFirebase();
+            saveToFirebase();
         }
 
         function addTooltipEvents() {
@@ -1646,7 +1646,7 @@
                 renderProject(currentProject);
                 contextMenu.style.display = 'none';
                 activeItem = null;
-                await saveToFirebase();
+                saveToFirebase();
             }
         });
 
@@ -1688,7 +1688,7 @@
                 renderProject(currentProject);
                 contextMenu.style.display = 'none';
                 activeItem = null;
-                await saveToFirebase();
+                saveToFirebase();
             }
         });
 
@@ -1731,7 +1731,7 @@
             }
             renderProject(currentProject);
             addBookmarkModal.style.display = 'none';
-            await saveToFirebase();
+            saveToFirebase();
         });
         
         addBookmarkCancel.addEventListener('click', () => {
@@ -1770,7 +1770,7 @@
             }
             renderProject(currentProject);
             addClipboardModal.style.display = 'none';
-            await saveToFirebase();
+            saveToFirebase();
         });
         
         addClipboardCancel.addEventListener('click', () => {
@@ -1820,7 +1820,7 @@
             renderProject(name);
             
             addProjectModal.style.display = 'none';
-            await saveToFirebase();
+            saveToFirebase();
         });
         
         addProjectCancel.addEventListener('click', () => {
@@ -2152,7 +2152,7 @@
         // 복원 완료 공통 처리
         function finalizeRestore(projectCount, mode, customMessage = null) {
             // 로컬스토리지에 저장
-            await saveToFirebase();
+            saveToFirebase();
             
             // 화면 업데이트
             renderProjectList();
@@ -2186,7 +2186,7 @@
                     
                     renderProjectList();
                     renderProject(trimmedName);
-                    await saveToFirebase();
+                    saveToFirebase();
                 }
                 projectContextMenu.style.display = 'none';
                 activeProject = null;
@@ -2209,7 +2209,7 @@
                     
                     renderProjectList();
                     renderProject(currentProject);
-                    await saveToFirebase();
+                    saveToFirebase();
                 }
                 projectContextMenu.style.display = 'none';
                 activeProject = null;
@@ -2399,7 +2399,7 @@
                     Object.assign(allProjectsData, newProjectData);
                     
                     renderProjectList();
-                    await saveToFirebase();
+                    saveToFirebase();
                 }
             }
         }
@@ -2527,7 +2527,7 @@
                         data.splice(newIndex, 0, itemToMove);
                         
                         renderProject(currentProject);
-                        await saveToFirebase();
+                        saveToFirebase();
                         
                         delete targetButton.dataset.insertBefore;
                     }
@@ -2542,7 +2542,7 @@
                         data.push(itemToMove);
                         
                         renderProject(currentProject);
-                        await saveToFirebase();
+                        saveToFirebase();
                     }
                 }
             }
