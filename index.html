@@ -1,0 +1,2626 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>상황별 부동산 업무 허브</title>
+    <style>
+        /* 기본 스타일 및 레이아웃 설정 */
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol";
+            background-color: #ffffff;
+            color: #37352f;
+            overflow: hidden;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        .app-container {
+            display: flex;
+            height: 100vh;
+        }
+
+        /* 왼쪽 사이드바 스타일 */
+        #project-sidebar {
+            width: 240px;
+            background-color: #f7f6f3;
+            padding: 12px 0;
+            border-right: 1px solid rgba(55, 53, 47, 0.09);
+            overflow-y: auto;
+            flex-shrink: 0;
+        }
+        .sidebar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 14px;
+            margin-bottom: 8px;
+        }
+        
+        #project-sidebar h3 {
+            margin: 4px 0 0 0;
+            color: rgba(55, 53, 47, 0.65);
+            font-size: 12px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.02em;
+        }
+        
+        .add-project-btn {
+            background-color: transparent;
+            color: rgba(55, 53, 47, 0.45);
+            border: none;
+            border-radius: 3px;
+            width: 20px;
+            height: 20px;
+            font-size: 14px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: background-color 0.1s ease-in-out, color 0.1s ease-in-out;
+            padding: 0;
+        }
+        
+        .add-project-btn:hover {
+            background-color: rgba(55, 53, 47, 0.08);
+            color: #37352f;
+        }
+        #project-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        #project-list li {
+            padding: 4px 14px;
+            cursor: pointer;
+            transition: background-color 0.1s ease-in-out;
+            border-radius: 3px;
+            margin: 1px 6px;
+            font-size: 14px;
+            color: #37352f;
+            position: relative;
+            min-height: 27px;
+            display: flex;
+            align-items: center;
+        }
+        #project-list li:hover {
+            background-color: rgba(55, 53, 47, 0.08);
+        }
+        #project-list li.active {
+            background-color: rgba(46, 170, 220, 0.15);
+            color: #2ea2dc;
+        }
+
+        /* 메인 영역 스타일 */
+        .main-area {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
+        /* 메인 콘텐츠 영역 스타일 */
+        .main-content {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 24px 20px;
+            width: 100%;
+            height: calc(100vh - 60px);
+            box-sizing: border-box;
+        }
+        .content-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 32px;
+            background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
+            border-radius: 0;
+            box-shadow: 0 2px 8px rgba(30, 58, 138, 0.15);
+            border-bottom: 3px solid #1d4ed8;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .content-header h1 {
+            font-size: 28px;
+            line-height: 1.2;
+            font-weight: 700;
+            color: #ffffff;
+            margin: 0;
+            letter-spacing: -0.01em;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+        .content-header .icon-button {
+            color: rgba(255, 255, 255, 0.8);
+            background-color: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .content-header .icon-button:hover {
+            color: #ffffff;
+            background-color: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+        .content-panels {
+            display: flex;
+            gap: 16px;
+            flex-grow: 1;
+            margin-top: 0;
+            justify-content: flex-start;
+            align-items: stretch;
+            height: 100%;
+        }
+        .content-panel {
+            flex: 0 0 400px;
+            max-width: 400px;
+            background-color: #ffffff;
+            padding: 12px;
+            border-radius: 6px;
+            border: 2px solid #2c2c2c;
+            overflow-y: auto;
+            box-shadow: rgba(15, 15, 15, 0.1) 0px 2px 4px;
+        }
+        .content-panel h4 {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: -12px -12px 12px -12px;
+            padding: 12px;
+            background-color: #f8f9fa;
+            border-bottom: 1px solid #dee2e6;
+            border-radius: 4px 4px 0 0;
+            font-size: 16px;
+            font-weight: 600;
+            color: #37352f;
+            line-height: 1.3;
+        }
+
+        .bookmark-header {
+            background-color: #e8d5f2 !important;
+            border-bottom: 1px solid #b19cd9 !important;
+            color: #6a4c93 !important;
+        }
+
+        .clipboard-header {
+            background-color: #d4edda !important;
+            border-bottom: 1px solid #a3d5a3 !important;
+            color: #28a745 !important;
+        }
+        .add-section-btn {
+            background-color: transparent;
+            color: rgba(55, 53, 47, 0.6);
+            border: 2px solid rgba(55, 53, 47, 0.3);
+            border-radius: 50%;
+            width: 33px;
+            height: 33px;
+            font-size: 18px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            flex-shrink: 0;
+            margin-left: 6px;
+            transition: all 0.2s ease;
+        }
+        .add-section-btn:hover {
+            background-color: rgba(55, 53, 47, 0.1);
+            color: #37352f;
+            border-color: rgba(55, 53, 47, 0.5);
+            transform: scale(1.05);
+        }
+        .icon-button {
+            background: none;
+            border: none;
+            font-size: 16px;
+            cursor: pointer;
+            color: rgba(55, 53, 47, 0.45);
+            padding: 4px;
+            border-radius: 3px;
+            transition: background-color 0.1s ease-in-out, color 0.1s ease-in-out;
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .icon-button:hover {
+            background-color: rgba(55, 53, 47, 0.08);
+            color: #37352f;
+        }
+        .item-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            word-break: break-all; /* 긴 URL도 줄바꿈 */
+        }
+        .item-button {
+            flex-shrink: 0;
+            min-width: 80px;
+            max-width: 200px;
+            height: 32px;
+            background-color: rgba(242, 241, 238, 0.6);
+            padding: 6px 8px;
+            border-radius: 3px;
+            border: 2px solid #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 14px;
+            color: #37352f;
+            cursor: pointer;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            transition: background-color 0.1s ease-in-out;
+            box-sizing: border-box;
+            font-weight: 400;
+        }
+        .item-button:hover {
+            background-color: rgba(55, 53, 47, 0.08);
+        }
+        .item-button.bookmark-button {
+            color: #37352f;
+            background-color: rgba(46, 170, 220, 0.1);
+        }
+        .item-button.bookmark-button:hover {
+            background-color: rgba(46, 170, 220, 0.2);
+        }
+        .item-button.clipboard-button {
+            color: #37352f;
+            background-color: rgba(100, 71, 58, 0.1);
+        }
+        
+
+        /* Context Menu Styles */
+        .context-menu {
+            display: none;
+            position: fixed;
+            background-color: #ffffff;
+            border: 1px solid rgba(55, 53, 47, 0.16);
+            box-shadow: rgba(15, 15, 15, 0.05) 0px 0px 0px 1px, rgba(15, 15, 15, 0.1) 0px 3px 6px, rgba(15, 15, 15, 0.2) 0px 9px 24px;
+            z-index: 1000;
+            border-radius: 6px;
+            overflow: hidden;
+            min-width: 180px;
+        }
+
+        .context-menu ul {
+            list-style: none;
+            padding: 6px 0;
+            margin: 0;
+        }
+
+        .context-menu ul li {
+            padding: 8px 14px;
+            cursor: pointer;
+            font-size: 14px;
+            color: #37352f;
+            border-bottom: none;
+            transition: background-color 0.1s ease-in-out;
+            line-height: 1.3;
+        }
+
+        .context-menu ul li:hover {
+            background-color: rgba(55, 53, 47, 0.08);
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1001;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(15, 15, 15, 0.6);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: #ffffff;
+            margin: auto;
+            padding: 40px;
+            border: none;
+            width: 90%;
+            max-width: 480px;
+            border-radius: 8px;
+            box-shadow: rgba(15, 15, 15, 0.05) 0px 0px 0px 1px, rgba(15, 15, 15, 0.1) 0px 3px 6px, rgba(15, 15, 15, 0.2) 0px 9px 24px;
+            position: relative;
+        }
+
+        .close-button {
+            color: rgba(55, 53, 47, 0.45);
+            float: right;
+            font-size: 20px;
+            font-weight: 400;
+            position: absolute;
+            right: 20px;
+            top: 20px;
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 3px;
+            transition: background-color 0.1s ease-in-out, color 0.1s ease-in-out;
+        }
+
+        .close-button:hover,
+        .close-button:focus {
+            background-color: rgba(55, 53, 47, 0.08);
+            color: #37352f;
+            text-decoration: none;
+        }
+
+        .modal-content h2 {
+            margin: 0 0 24px 0;
+            color: #37352f;
+            border-bottom: none;
+            padding-bottom: 0;
+            font-size: 20px;
+            font-weight: 600;
+            line-height: 1.3;
+        }
+
+        .settings-section {
+            margin-bottom: 24px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(55, 53, 47, 0.09);
+        }
+
+        .settings-section:last-child {
+            border-bottom: none;
+        }
+
+        .settings-section h3 {
+            color: #37352f;
+            margin: 0 0 12px 0;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .action-button {
+            background-color: #2ea2dc;
+            color: white;
+            padding: 8px 12px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-right: 8px;
+            margin-bottom: 8px;
+            transition: background-color 0.1s ease-in-out;
+            font-weight: 500;
+        }
+
+        .action-button:hover {
+            background-color: #1e8bb8;
+        }
+
+        .settings-section label {
+            margin-right: 8px;
+            font-size: 14px;
+            color: #37352f;
+            font-weight: 400;
+        }
+
+        .settings-section select,
+        .settings-section input[type="checkbox"] {
+            margin-top: 4px;
+        }
+
+        .settings-section select {
+            padding: 6px 8px;
+            border: 1px solid rgba(55, 53, 47, 0.25);
+            border-radius: 3px;
+            background-color: #ffffff;
+            color: #37352f;
+            font-size: 14px;
+        }
+
+        /* Modal Form Specific Styles */
+        .modal-form-group {
+            margin-bottom: 16px;
+        }
+
+        .modal-form-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 500;
+            color: #37352f;
+            font-size: 14px;
+        }
+
+        .modal-form-group input[type="text"],
+        .modal-form-group textarea {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid rgba(55, 53, 47, 0.25);
+            border-radius: 3px;
+            font-size: 14px;
+            box-sizing: border-box;
+            color: #37352f;
+            background-color: #ffffff;
+            transition: border-color 0.1s ease-in-out, box-shadow 0.1s ease-in-out;
+        }
+
+        .modal-form-group input[type="text"]:focus,
+        .modal-form-group textarea:focus {
+            outline: none;
+            border-color: #2ea2dc;
+            box-shadow: rgba(46, 170, 220, 0.15) 0px 0px 0px 1px;
+        }
+
+        .modal-form-group textarea {
+            resize: vertical;
+            min-height: 360px;
+            font-family: inherit;
+            line-height: 1.5;
+        }
+
+        .modal-actions {
+            text-align: right;
+            margin-top: 24px;
+        }
+
+        .secondary-button {
+            background-color: rgba(55, 53, 47, 0.09);
+            color: #37352f;
+        }
+
+        .secondary-button:hover {
+            background-color: rgba(55, 53, 47, 0.16);
+        }
+
+        /* Color Palette Styles */
+        .color-palette-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 8px;
+            margin-top: 16px;
+        }
+
+        .color-option {
+            width: 40px;
+            height: 40px;
+            border-radius: 6px;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: border-color 0.1s ease-in-out, transform 0.1s ease-in-out;
+            position: relative;
+        }
+
+        .color-option:hover {
+            border-color: rgba(55, 53, 47, 0.25);
+            transform: scale(1.05);
+        }
+
+        .color-option.selected {
+            border-color: #2ea2dc;
+            box-shadow: 0 0 0 1px #2ea2dc;
+        }
+
+        .color-option::after {
+            content: attr(title);
+            position: absolute;
+            bottom: -24px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 11px;
+            color: rgba(55, 53, 47, 0.65);
+            white-space: nowrap;
+            opacity: 0;
+            transition: opacity 0.1s ease-in-out;
+        }
+
+        .color-option:hover::after {
+            opacity: 1;
+        }
+
+        /* Dashboard Styles */
+        .dashboard-area {
+            flex: 0 0 300px;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            max-width: 300px;
+        }
+
+        .dashboard-widget {
+            background-color: #ffffff;
+            border: 1px solid rgba(55, 53, 47, 0.16);
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .dashboard-header {
+            background-color: #f1f3f4;
+            color: #37352f;
+            font-size: 14px;
+            font-weight: 600;
+            padding: 12px;
+            margin: 0;
+            border-bottom: 1px solid rgba(55, 53, 47, 0.1);
+        }
+
+        .dashboard-content {
+            padding: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .favorite-item {
+            display: flex;
+            align-items: center;
+            padding: 6px 8px;
+            margin-bottom: 4px;
+            background-color: rgba(242, 241, 238, 0.6);
+            border-radius: 3px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: background-color 0.1s ease-in-out;
+        }
+
+        .favorite-item:hover {
+            background-color: rgba(55, 53, 47, 0.08);
+        }
+
+        .favorite-item.bookmark-fav {
+            background-color: rgba(46, 170, 220, 0.1);
+        }
+
+        .favorite-item.clipboard-fav {
+            background-color: rgba(100, 71, 58, 0.1);
+        }
+
+        .favorite-icon {
+            margin-right: 6px;
+            font-size: 12px;
+        }
+
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 4px 0;
+            font-size: 13px;
+        }
+
+        .stat-label {
+            color: rgba(55, 53, 47, 0.8);
+        }
+
+        .stat-value {
+            font-weight: 600;
+            color: #37352f;
+        }
+
+        .activity-placeholder {
+            text-align: center;
+            color: rgba(55, 53, 47, 0.5);
+            font-size: 12px;
+            padding: 20px 0;
+        }
+
+        /* Drag and Drop Styles */
+        .draggable {
+            cursor: move;
+            transition: opacity 0.2s ease;
+        }
+
+        .dragging {
+            opacity: 0.5;
+            transform: rotate(2deg);
+        }
+
+        .drag-over {
+            background-color: rgba(59, 130, 246, 0.1) !important;
+            border: 2px dashed #3b82f6 !important;
+        }
+
+        .drop-zone {
+            min-height: 50px;
+            transition: background-color 0.2s ease, border 0.2s ease;
+        }
+
+        .project-item.drag-over {
+            background-color: rgba(59, 130, 246, 0.1);
+            border-left: 4px solid #3b82f6;
+        }
+
+        /* Custom Tooltip Styles */
+        .custom-tooltip {
+            position: absolute;
+            background-color: #37352f;
+            color: #ffffff;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 13px;
+            white-space: nowrap;
+            z-index: 1000;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.2s ease-in-out;
+            box-shadow: rgba(15, 15, 15, 0.1) 0px 3px 6px, rgba(15, 15, 15, 0.2) 0px 9px 24px;
+            max-width: 300px;
+            white-space: normal;
+            word-wrap: break-word;
+            line-height: 1.4;
+        }
+
+        .custom-tooltip.show {
+            opacity: 1;
+        }
+
+        .custom-tooltip::before {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 5px solid transparent;
+            border-top-color: #37352f;
+        }
+
+        .custom-tooltip.bottom::before {
+            top: -10px;
+            border-top-color: transparent;
+            border-bottom-color: #37352f;
+        }
+
+        /* 모바일 탭 네비게이션 */
+        .mobile-tabs {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: #ffffff;
+            border-top: 1px solid rgba(55, 53, 47, 0.16);
+            z-index: 1000;
+            height: 60px;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .mobile-tab {
+            flex: 1;
+            background: none;
+            border: none;
+            padding: 8px 4px;
+            font-size: 11px;
+            color: rgba(55, 53, 47, 0.6);
+            cursor: pointer;
+            transition: color 0.2s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 2px;
+        }
+
+        .mobile-tab.active {
+            color: #2ea2dc;
+            font-weight: 600;
+        }
+
+        .mobile-tab:hover {
+            color: #37352f;
+        }
+
+        /* 모바일 반응형 디자인 */
+        @media (max-width: 768px) {
+            .mobile-tabs {
+                display: flex;
+            }
+
+            body {
+                padding-bottom: 60px; /* 탭 네비게이션 공간 확보 */
+            }
+
+            .app-container {
+                flex-direction: column;
+                height: calc(100vh - 60px);
+            }
+
+            /* 데스크톱 사이드바 숨김 */
+            #project-sidebar {
+                display: none;
+            }
+
+            #project-sidebar.mobile-visible {
+                display: block;
+                width: 100%;
+                height: 100%;
+                border-right: none;
+                border-bottom: 1px solid rgba(55, 53, 47, 0.09);
+            }
+
+            .main-area {
+                width: 100%;
+                height: 100%;
+            }
+
+            .main-content {
+                height: calc(100% - 60px); /* 헤더 높이 제외 */
+                padding: 12px 8px; /* 좌우 패딩 줄임 */
+            }
+
+            .content-panels {
+                flex-direction: column;
+                height: 100%;
+                gap: 0;
+            }
+
+            .content-panel {
+                flex: none;
+                max-width: none;
+                width: calc(100% - 8px); /* 패딩 고려 */
+                margin-bottom: 16px;
+                min-height: 200px;
+                padding: 12px 8px; /* 내부 패딩 조정 */
+                box-sizing: border-box;
+            }
+
+            /* 모바일에서 각 패널별 표시/숨김 */
+            .content-panel.bookmark-panel {
+                display: none;
+            }
+
+            .content-panel.bookmark-panel.mobile-visible {
+                display: block;
+                height: calc(100% - 32px);
+                margin-bottom: 0;
+            }
+
+            .content-panel.clipboard-panel {
+                display: none;
+            }
+
+            .content-panel.clipboard-panel.mobile-visible {
+                display: block;
+                height: calc(100% - 32px);
+                margin-bottom: 0;
+            }
+
+            .dashboard-area {
+                display: none;
+                flex: none;
+                max-width: none;
+                width: 100%;
+                height: calc(100% - 32px);
+                padding: 16px;
+                overflow-y: auto;
+            }
+
+            .dashboard-area.mobile-visible {
+                display: flex;
+            }
+
+            /* 모바일에서 버튼 크기 조정 */
+            .item-button {
+                min-width: 100px;
+                max-width: calc(100vw - 40px); /* 화면 너비에 맞춤 */
+                height: auto; /* 높이 자동 조정 */
+                min-height: 36px;
+                font-size: 13px;
+                margin: 4px;
+                word-wrap: break-word;
+                white-space: normal; /* 텍스트 줄바꿈 허용 */
+                padding: 8px;
+                line-height: 1.3;
+            }
+
+            /* 모바일에서 추가 버튼 크기 조정 */
+            .add-section-btn {
+                width: 36px;
+                height: 36px;
+                font-size: 20px;
+            }
+
+            /* 모바일에서 헤더 크기 조정 */
+            .content-header {
+                padding: 12px 16px;
+                min-height: 48px;
+            }
+
+            .content-header h1 {
+                font-size: 20px;
+            }
+
+            /* 모바일에서 모달 크기 조정 */
+            .modal-content {
+                width: 95%;
+                max-width: 400px;
+                margin: 20px;
+            }
+
+            /* 툴팁 모바일 최적화 */
+            .custom-tooltip {
+                max-width: 280px;
+                font-size: 12px;
+            }
+
+            /* 대시보드 위젯 모바일 최적화 */
+            .dashboard-widget {
+                margin-bottom: 16px;
+            }
+
+            .dashboard-content {
+                max-height: 300px;
+            }
+
+            /* 컨텍스트 메뉴 모바일 최적화 */
+            .context-menu {
+                min-width: 150px;
+            }
+
+            .context-menu ul li {
+                padding: 12px 16px;
+                font-size: 14px;
+            }
+        }
+
+        /* 태블릿 사이즈 */
+        @media (max-width: 1024px) and (min-width: 769px) {
+            #project-sidebar {
+                width: 200px;
+            }
+
+            .content-panel {
+                flex: 0 0 300px;
+                max-width: 300px;
+            }
+
+            .dashboard-area {
+                max-width: 250px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 모바일 탭 네비게이션 -->
+    <div class="mobile-tabs">
+        <button class="mobile-tab active" data-tab="projects">📁 프로젝트</button>
+        <button class="mobile-tab" data-tab="bookmarks">📌 북마크</button>
+        <button class="mobile-tab" data-tab="clipboard">📋 클립보드</button>
+        <button class="mobile-tab" data-tab="dashboard">📊 대시보드</button>
+    </div>
+
+    <div class="app-container">
+        <div id="project-sidebar">
+            <div class="sidebar-header">
+                <h3>프로젝트</h3>
+                <button id="add-project-btn" class="add-project-btn">+</button>
+            </div>
+            <ul id="project-list">
+            </ul>
+        </div>
+
+        <div class="main-area">
+            <div class="content-header">
+                <h1 id="current-project-title"></h1>
+                <button id="settings-btn" class="icon-button">⚙️</button>
+            </div>
+            
+            <div class="main-content">
+                <div class="content-panels">
+                <div class="content-panel bookmark-panel">
+                    <h4 class="bookmark-header">북마크 <button id="add-bookmark-btn" class="add-section-btn">+</button></h4>
+                    <ul id="bookmark-list" class="item-list"></ul>
+                </div>
+
+                <div class="content-panel clipboard-panel">
+                    <h4 class="clipboard-header">클립보드 <button id="add-clipboard-btn" class="add-section-btn">+</button></h4>
+                    <ul id="clipboard-list" class="item-list"></ul>
+                </div>
+                
+                <div class="dashboard-area">
+                <div class="dashboard-widget">
+                    <h4 class="dashboard-header">⭐ 즐겨찾기</h4>
+                    <div id="favorites-list" class="dashboard-content"></div>
+                </div>
+                
+                <div class="dashboard-widget">
+                    <h4 class="dashboard-header">📊 통계</h4>
+                    <div id="stats-content" class="dashboard-content">
+                        <div class="stat-item">
+                            <span class="stat-label">총 북마크:</span>
+                            <span id="total-bookmarks" class="stat-value">0</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">총 클립보드:</span>
+                            <span id="total-clipboard" class="stat-value">0</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">즐겨찾기:</span>
+                            <span id="total-favorites" class="stat-value">0</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="dashboard-widget">
+                    <h4 class="dashboard-header">🕒 최근 활동</h4>
+                    <div id="recent-activity" class="dashboard-content">
+                        <div class="activity-placeholder">활동 기록이 없습니다</div>
+                    </div>
+                </div>
+                </div>
+            </div>
+        </div>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="settings-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <h2>설정</h2>
+            
+            <div class="settings-section">
+                <h3>데이터 관리</h3>
+                <button id="export-data-btn" class="action-button">데이터 내보내기 (JSON)</button>
+                <input type="file" id="import-data-input" accept=".json" style="display: none;">
+                <button id="import-data-btn" class="action-button">데이터 불러오기 (JSON)</button>
+            </div>
+
+            <div class="settings-section">
+                <h3>북마크 설정</h3>
+                <label for="link-target-select">링크 열기 방식:</label>
+                <select id="link-target-select">
+                    <option value="_blank">새 탭</option>
+                    <option value="_self">현재 탭</option>
+                </select>
+            </div>
+
+            <div class="settings-section">
+                <h3>클립보드 설정</h3>
+                <input type="checkbox" id="copy-alert-checkbox">
+                <label for="copy-alert-checkbox">복사 완료 알림 표시</label>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Bookmark Modal -->
+    <div id="add-bookmark-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-button add-bookmark-close">&times;</span>
+            <h2>북마크 추가</h2>
+            <div class="modal-form-group">
+                <label for="add-bookmark-name">이름 (8글자 이내):</label>
+                <input type="text" id="add-bookmark-name" maxlength="8">
+            </div>
+            <div class="modal-form-group">
+                <label for="add-bookmark-url">URL:</label>
+                <input type="text" id="add-bookmark-url">
+            </div>
+            <div class="modal-actions">
+                <button id="add-bookmark-save" class="action-button">저장</button>
+                <button id="add-bookmark-cancel" class="action-button secondary-button">취소</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Clipboard Modal -->
+    <div id="add-clipboard-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-button add-clipboard-close">&times;</span>
+            <h2>클립보드 추가</h2>
+            <div class="modal-form-group">
+                <label for="add-clipboard-title">제목 (10글자 이내):</label>
+                <input type="text" id="add-clipboard-title" maxlength="10">
+            </div>
+            <div class="modal-form-group">
+                <label for="add-clipboard-content">내용:</label>
+                <textarea id="add-clipboard-content"></textarea>
+            </div>
+            <div class="modal-actions">
+                <button id="add-clipboard-save" class="action-button">저장</button>
+                <button id="add-clipboard-cancel" class="action-button secondary-button">취소</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Project Modal -->
+    <div id="add-project-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-button add-project-close">&times;</span>
+            <h2>프로젝트 추가</h2>
+            <div class="modal-form-group">
+                <label for="add-project-name">프로젝트 이름:</label>
+                <input type="text" id="add-project-name" placeholder="새 프로젝트 이름을 입력하세요">
+            </div>
+            <div class="modal-actions">
+                <button id="add-project-save" class="action-button">저장</button>
+                <button id="add-project-cancel" class="action-button secondary-button">취소</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="context-menu" class="context-menu">
+        <ul>
+            <li id="context-edit">편집</li>
+            <li id="context-favorite">즐겨찾기</li>
+            <li id="context-color">색상 변경</li>
+            <li id="context-delete">삭제</li>
+            <li id="context-cancel">취소</li>
+        </ul>
+    </div>
+
+    <div id="project-context-menu" class="context-menu">
+        <ul>
+            <li id="project-context-rename">이름 수정</li>
+            <li id="project-context-delete">삭제</li>
+            <li id="project-context-cancel">취소</li>
+        </ul>
+    </div>
+
+    <!-- Custom Tooltip -->
+    <div id="custom-tooltip" class="custom-tooltip"></div>
+
+    <!-- Color Palette Modal -->
+    <div id="color-palette-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-button color-palette-close">&times;</span>
+            <h2>색상 선택</h2>
+            <div class="color-palette-grid">
+                <div class="color-option" data-color="rgba(242, 241, 238, 0.6)" style="background-color: rgba(242, 241, 238, 0.6);" title="기본"></div>
+                <div class="color-option" data-color="rgba(255, 235, 235, 0.8)" style="background-color: rgba(255, 235, 235, 0.8);" title="빨강"></div>
+                <div class="color-option" data-color="rgba(255, 244, 235, 0.8)" style="background-color: rgba(255, 244, 235, 0.8);" title="주황"></div>
+                <div class="color-option" data-color="rgba(255, 251, 235, 0.8)" style="background-color: rgba(255, 251, 235, 0.8);" title="노랑"></div>
+                <div class="color-option" data-color="rgba(235, 251, 238, 0.8)" style="background-color: rgba(235, 251, 238, 0.8);" title="초록"></div>
+                <div class="color-option" data-color="rgba(235, 251, 255, 0.8)" style="background-color: rgba(235, 251, 255, 0.8);" title="하늘"></div>
+                <div class="color-option" data-color="rgba(235, 241, 255, 0.8)" style="background-color: rgba(235, 241, 255, 0.8);" title="파랑"></div>
+                <div class="color-option" data-color="rgba(245, 235, 255, 0.8)" style="background-color: rgba(245, 235, 255, 0.8);" title="보라"></div>
+                <div class="color-option" data-color="rgba(255, 235, 245, 0.8)" style="background-color: rgba(255, 235, 245, 0.8);" title="핑크"></div>
+                <div class="color-option" data-color="rgba(245, 245, 245, 0.8)" style="background-color: rgba(245, 245, 245, 0.8);" title="회색"></div>
+                <div class="color-option" data-color="rgba(240, 228, 217, 0.8)" style="background-color: rgba(240, 228, 217, 0.8);" title="갈색"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- View Clipboard Modal -->
+    <div id="view-clipboard-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-button view-clipboard-close">&times;</span>
+            <h2 id="view-clipboard-title"></h2>
+            <div id="view-clipboard-content" style="white-space: pre-wrap; word-wrap: break-word; max-height: 400px; overflow-y: auto; margin-bottom: 20px;"></div>
+            <div class="modal-actions">
+                <button id="view-clipboard-copy-btn" class="action-button">복사</button>
+            </div>
+        </div>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+        
+        // 로컬스토리지 관련 함수들
+        const STORAGE_KEY = 'bookmark-clipboard-app-data';
+        
+        function saveToLocalStorage() {
+            try {
+                const dataToSave = {
+                    projects: allProjectsData,
+                    currentProject: currentProject
+                };
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(dataToSave));
+                console.log('데이터를 로컬스토리지에 저장했습니다.');
+            } catch (error) {
+                console.error('로컬스토리지 저장 실패:', error);
+            }
+        }
+        
+        function loadFromLocalStorage() {
+            try {
+                const savedData = localStorage.getItem(STORAGE_KEY);
+                if (savedData) {
+                    const parsedData = JSON.parse(savedData);
+                    if (parsedData.projects && Object.keys(parsedData.projects).length > 0) {
+                        console.log('로컬스토리지에서 데이터를 불러왔습니다.');
+                        return parsedData;
+                    }
+                }
+            } catch (error) {
+                console.error('로컬스토리지 불러오기 실패:', error);
+            }
+            return null;
+        }
+        
+        function getDefaultData() {
+            return {
+                "가계약": {
+                    bookmarks: [
+                        { name: "가계약금 반환 법률", url: "https://www.example.com/law-deposit", color: "#f8f9fa", favorite: true },
+                        { name: "주택도시기금 안내", url: "https://www.example.com/fund", color: "#f8f9fa", favorite: false }
+                    ],
+                    clipboard: [
+                        { title: "인적사항 요청", text: "인적사항 요청: 성함, 연락처, 주민번호 앞자리", color: "#f8f9fa", favorite: true },
+                        { title: "특약사항", text: "계약서에 포함할 특약사항", color: "#f8f9fa", favorite: false },
+                    ]
+                },
+                "잔금": {
+                    bookmarks: [
+                        { name: "잔금 준비서류 목록", url: "https://www.example.com/final-docs", color: "#f8f9fa", favorite: false }
+                    ],
+                    clipboard: [
+                        { title: "잔금 계좌번호", text: "잔금 계좌번호: 000-00000-000 (예금주: ㅇㅇㅇ)", color: "#f8f9fa", favorite: false },
+                        { title: "잔금 처리 완료", text: "오늘 잔금 처리 완료. 등기 접수 예정.", color: "#f8f9fa", favorite: false }
+                    ]
+                },
+                "임대차": {
+                    bookmarks: [
+                        { name: "임대차 계약 법률", url: "https://www.example.com/rental-law", color: "#f8f9fa", favorite: false }
+                    ],
+                    clipboard: [
+                        { title: "계약 연장 안내", text: "계약 연장 관련 안내 문구", color: "#f8f9fa", favorite: false },
+                    ]
+                },
+                "매매": {
+                    bookmarks: [
+                        { name: "매매 절차 안내", url: "https://www.example.com/sale-process", color: "#f8f9fa", favorite: true }
+                    ],
+                    clipboard: [
+                        { title: "매매 계약 유의사항", text: "매매 계약 시 유의사항", color: "#f8f9fa", favorite: false },
+                    ]
+                }
+            };
+        }
+        
+        // 로컬스토리지에서 데이터 불러오기 또는 기본 데이터 사용
+        const savedData = loadFromLocalStorage();
+        let allProjectsData, currentProject;
+        
+        if (savedData) {
+            allProjectsData = savedData.projects;
+            currentProject = savedData.currentProject || Object.keys(savedData.projects)[0];
+        } else {
+            allProjectsData = getDefaultData();
+            currentProject = '가계약';
+            // 첫 실행시 기본 데이터를 로컬스토리지에 저장
+            saveToLocalStorage();
+        }
+
+        // UI 요소 가져오기
+        const projectList = document.getElementById('project-list');
+        const bookmarkList = document.getElementById('bookmark-list');
+        const clipboardList = document.getElementById('clipboard-list');
+        const currentProjectTitle = document.getElementById('current-project-title');
+        
+        const addBookmarkBtn = document.getElementById('add-bookmark-btn');
+        const addClipboardBtn = document.getElementById('add-clipboard-btn');
+
+        const contextMenu = document.getElementById('context-menu');
+        const contextEdit = document.getElementById('context-edit');
+        const contextFavorite = document.getElementById('context-favorite');
+        const contextColor = document.getElementById('context-color');
+        const contextDelete = document.getElementById('context-delete');
+        const contextCancel = document.getElementById('context-cancel');
+
+        const projectContextMenu = document.getElementById('project-context-menu');
+        const projectContextRename = document.getElementById('project-context-rename');
+        const projectContextDelete = document.getElementById('project-context-delete');
+        const projectContextCancel = document.getElementById('project-context-cancel');
+
+        let activeItem = null;
+        let activeProject = null;
+        let colorChangeItem = null;
+
+        function renderProject(projectName) {
+            currentProject = projectName;
+            const projectData = allProjectsData[projectName];
+            
+            currentProjectTitle.textContent = projectName;
+            bookmarkList.innerHTML = '';
+            clipboardList.innerHTML = '';
+
+            projectData.bookmarks.forEach((item, index) => {
+                const button = document.createElement('button');
+                button.className = 'item-button bookmark-button draggable';
+                
+                const favoriteIcon = item.favorite ? '⭐ ' : '';
+                button.textContent = favoriteIcon + item.name.substring(0, 8 - favoriteIcon.length);
+                
+                button.style.backgroundColor = item.color || '#f8f9fa';
+                button.dataset.index = index;
+                button.dataset.type = 'bookmark';
+                button.dataset.fullName = item.name;
+                button.dataset.url = item.url;
+                button.draggable = true;
+                
+                let isDragging = false;
+                button.addEventListener('mousedown', () => { isDragging = false; });
+                button.addEventListener('dragstart', () => { isDragging = true; });
+                button.addEventListener('mouseup', (e) => {
+                    setTimeout(() => {
+                        if (!isDragging && e.button === 0) {
+                            window.open(item.url, '_blank');
+                        }
+                    }, 50);
+                });
+                bookmarkList.appendChild(button);
+            });
+
+            projectData.clipboard.forEach((item, index) => {
+                const button = document.createElement('button');
+                button.className = 'item-button clipboard-button draggable';
+                
+                const favoriteIcon = item.favorite ? '⭐ ' : '';
+                const buttonText = item.title || item.text || '';
+                button.textContent = favoriteIcon + buttonText.substring(0, 10 - favoriteIcon.length);
+                
+                button.style.backgroundColor = item.color || '#f8f9fa';
+                button.dataset.index = index;
+                button.dataset.type = 'clipboard';
+                button.dataset.fullText = item.text;
+                button.dataset.title = item.title || '';
+                button.draggable = true;
+                
+                let isDragging = false;
+                button.addEventListener('mousedown', () => { isDragging = false; });
+                button.addEventListener('dragstart', () => { isDragging = true; });
+                button.addEventListener('mouseup', (e) => {
+                    setTimeout(() => {
+                        if (!isDragging && e.button === 0) {
+                            const modal = document.getElementById('view-clipboard-modal');
+                            const titleEl = document.getElementById('view-clipboard-title');
+                            const contentEl = document.getElementById('view-clipboard-content');
+                            const copyBtn = document.getElementById('view-clipboard-copy-btn');
+
+                            titleEl.textContent = item.title || '';
+                            contentEl.textContent = item.text;
+                            
+                            copyBtn.dataset.clipboardText = item.text;
+
+                            modal.style.display = 'flex';
+                        }
+                    }, 50);
+                });
+                clipboardList.appendChild(button);
+            });
+
+            addTooltipEvents();
+            setupDropZones();
+
+            document.querySelectorAll('#project-list li').forEach(li => {
+                li.classList.remove('active');
+            });
+            document.getElementById(`project-${projectName}`).classList.add('active');
+            
+            renderFavorites();
+            renderStatistics();
+            
+            saveToLocalStorage();
+        }
+
+        function addTooltipEvents() {
+            const tooltip = document.getElementById('custom-tooltip');
+            
+            document.querySelectorAll('.item-button').forEach(button => {
+                button.addEventListener('mouseenter', (e) => {
+                    const target = e.target;
+                    let tooltipText = '';
+                    
+                    if (target.classList.contains('bookmark-button')) {
+                        tooltipText = `${target.dataset.fullName}\n${target.dataset.url}`;
+                    }
+                    
+                    if (tooltipText) {
+                        tooltip.innerHTML = tooltipText.replace(/\n/g, '<br>');
+                        showTooltip(tooltip, target);
+                    }
+                });
+                
+                button.addEventListener('mouseleave', () => {
+                    hideTooltip(tooltip);
+                });
+            });
+        }
+
+        function showTooltip(tooltip, target) {
+            const rect = target.getBoundingClientRect();
+            const tooltipRect = tooltip.getBoundingClientRect();
+            
+            let left = rect.left + (rect.width / 2) - (tooltipRect.width / 2);
+            let top = rect.top - tooltipRect.height - 10;
+            
+            const padding = 10;
+            if (left < padding) {
+                left = padding;
+            } else if (left + tooltipRect.width > window.innerWidth - padding) {
+                left = window.innerWidth - tooltipRect.width - padding;
+            }
+            
+            if (top < padding) {
+                top = rect.bottom + 10;
+                tooltip.classList.add('bottom');
+            } else {
+                tooltip.classList.remove('bottom');
+            }
+            
+            tooltip.style.left = left + 'px';
+            tooltip.style.top = top + 'px';
+            tooltip.classList.add('show');
+        }
+
+        function hideTooltip(tooltip) {
+            tooltip.classList.remove('show');
+        }
+        
+        function addBookmark() {
+            const modal = document.getElementById('add-bookmark-modal');
+            document.querySelector('#add-bookmark-modal h2').textContent = '북마크 추가';
+            modal.style.display = 'flex';
+            
+            document.getElementById('add-bookmark-name').value = '';
+            document.getElementById('add-bookmark-url').value = '';
+            
+            delete modal.dataset.editMode;
+            delete modal.dataset.editIndex;
+        }
+
+        function addClipboard() {
+            const modal = document.getElementById('add-clipboard-modal');
+            document.querySelector('#add-clipboard-modal h2').textContent = '클립보드 추가';
+            modal.style.display = 'flex';
+            
+            document.getElementById('add-clipboard-title').value = '';
+            document.getElementById('add-clipboard-content').value = '';
+            
+            delete modal.dataset.editMode;
+            delete modal.dataset.editIndex;
+        }
+
+        function addProject() {
+            const modal = document.getElementById('add-project-modal');
+            modal.style.display = 'flex';
+            
+            document.getElementById('add-project-name').value = '';
+        }
+
+        function renderProjectList() {
+            const projectList = document.getElementById('project-list');
+            projectList.innerHTML = '';
+            
+            Object.keys(allProjectsData).forEach((projectName, index) => {
+                const li = document.createElement('li');
+                li.id = `project-${projectName}`;
+                li.textContent = projectName;
+                li.classList.add('draggable', 'project-item');
+                li.draggable = true;
+                li.dataset.projectName = projectName;
+                li.dataset.index = index;
+                
+                if (projectName === currentProject) {
+                    li.classList.add('active');
+                }
+                
+                li.addEventListener('dragstart', handleProjectDragStart);
+                li.addEventListener('dragover', handleProjectDragOver);
+                li.addEventListener('drop', handleProjectDrop);
+                li.addEventListener('dragend', handleProjectDragEnd);
+                li.addEventListener('dragenter', handleProjectDragEnter);
+                li.addEventListener('dragleave', handleProjectDragLeave);
+                
+                projectList.appendChild(li);
+            });
+        }
+
+        function showContextMenu(e, itemType, itemIndex) {
+            e.preventDefault();
+            contextMenu.style.display = 'block';
+            contextMenu.style.left = e.clientX + 'px';
+            contextMenu.style.top = e.clientY + 'px';
+            activeItem = { type: itemType, index: itemIndex };
+        }
+
+        function showProjectContextMenu(e, projectName) {
+            e.preventDefault();
+            projectContextMenu.style.display = 'block';
+            projectContextMenu.style.left = e.clientX + 'px';
+            projectContextMenu.style.top = e.clientY + 'px';
+            activeProject = projectName;
+        }
+
+        let projectDragStarted = false;
+        projectList.addEventListener('mousedown', (e) => {
+            projectDragStarted = false;
+        });
+        projectList.addEventListener('dragstart', () => {
+            projectDragStarted = true;
+        });
+        projectList.addEventListener('mouseup', (e) => {
+            setTimeout(() => {
+                if (!projectDragStarted && e.target.tagName === 'LI') {
+                    const projectName = e.target.id.replace('project-', '');
+                    renderProject(projectName);
+                }
+            }, 50);
+        });
+
+        projectList.addEventListener('contextmenu', (e) => {
+            if (e.target.tagName === 'LI') {
+                const projectName = e.target.id.replace('project-', '');
+                showProjectContextMenu(e, projectName);
+            }
+        });
+        
+        bookmarkList.addEventListener('contextmenu', (e) => {
+            const button = e.target.closest('.item-button.bookmark-button');
+            if (button) {
+                const index = parseInt(button.dataset.index);
+                showContextMenu(e, 'bookmark', index);
+            }
+        });
+
+        clipboardList.addEventListener('contextmenu', (e) => {
+            const button = e.target.closest('.item-button.clipboard-button');
+            if (button) {
+                const index = parseInt(button.dataset.index);
+                showContextMenu(e, 'clipboard', index);
+            }
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!contextMenu.contains(e.target)) {
+                contextMenu.style.display = 'none';
+                activeItem = null;
+            }
+            if (!projectContextMenu.contains(e.target)) {
+                projectContextMenu.style.display = 'none';
+                activeProject = null;
+            }
+        });
+
+        contextEdit.addEventListener('click', () => {
+            if (activeItem) {
+                const { type, index } = activeItem;
+                const projectData = allProjectsData[currentProject];
+                
+                if (type === 'bookmark') {
+                    const item = projectData.bookmarks[index];
+                    const modal = document.getElementById('add-bookmark-modal');
+                    document.querySelector('#add-bookmark-modal h2').textContent = '북마크 편집';
+                    document.getElementById('add-bookmark-name').value = item.name;
+                    document.getElementById('add-bookmark-url').value = item.url;
+                    modal.style.display = 'flex';
+                    modal.dataset.editMode = 'true';
+                    modal.dataset.editIndex = index;
+                } else if (type === 'clipboard') {
+                    const item = projectData.clipboard[index];
+                    const modal = document.getElementById('add-clipboard-modal');
+                    document.querySelector('#add-clipboard-modal h2').textContent = '클립보드 편집';
+                    document.getElementById('add-clipboard-title').value = item.title || '';
+                    document.getElementById('add-clipboard-content').value = item.text;
+                    modal.style.display = 'flex';
+                    modal.dataset.editMode = 'true';
+                    modal.dataset.editIndex = index;
+                }
+                contextMenu.style.display = 'none';
+                activeItem = null;
+            }
+        });
+
+        contextFavorite.addEventListener('click', () => {
+            if (activeItem) {
+                const { type, index } = activeItem;
+                const projectData = allProjectsData[currentProject];
+                
+                if (type === 'bookmark') {
+                    projectData.bookmarks[index].favorite = !projectData.bookmarks[index].favorite;
+                } else if (type === 'clipboard') {
+                    projectData.clipboard[index].favorite = !projectData.clipboard[index].favorite;
+                }
+                
+                renderProject(currentProject);
+                contextMenu.style.display = 'none';
+                activeItem = null;
+                saveToLocalStorage();
+            }
+        });
+
+        contextColor.addEventListener('click', () => {
+            if (activeItem) {
+                colorChangeItem = activeItem;
+                const colorPaletteModal = document.getElementById('color-palette-modal');
+                colorPaletteModal.style.display = 'flex';
+                
+                const { type, index } = activeItem;
+                const projectData = allProjectsData[currentProject];
+                let currentColor = '';
+                if (type === 'bookmark') {
+                    currentColor = projectData.bookmarks[index].color || 'rgba(242, 241, 238, 0.6)';
+                } else if (type === 'clipboard') {
+                    currentColor = projectData.clipboard[index].color || 'rgba(242, 241, 238, 0.6)';
+                }
+                
+                document.querySelectorAll('.color-option').forEach(option => {
+                    option.classList.remove('selected');
+                    if (option.dataset.color === currentColor) {
+                        option.classList.add('selected');
+                    }
+                });
+                
+                contextMenu.style.display = 'none';
+                activeItem = null;
+            }
+        });
+
+        contextDelete.addEventListener('click', () => {
+            if (activeItem) {
+                const { type, index } = activeItem;
+                if (type === 'bookmark') {
+                    allProjectsData[currentProject].bookmarks.splice(index, 1);
+                } else if (type === 'clipboard') {
+                    allProjectsData[currentProject].clipboard.splice(index, 1);
+                }
+                renderProject(currentProject);
+                contextMenu.style.display = 'none';
+                activeItem = null;
+                saveToLocalStorage();
+            }
+        });
+
+        contextCancel.addEventListener('click', () => {
+            contextMenu.style.display = 'none';
+            activeItem = null;
+        });
+        
+        addBookmarkBtn.addEventListener('click', addBookmark);
+        addClipboardBtn.addEventListener('click', addClipboard);
+        
+        const addProjectBtn = document.getElementById('add-project-btn');
+        addProjectBtn.addEventListener('click', addProject);
+
+        const addBookmarkModal = document.getElementById('add-bookmark-modal');
+        const addBookmarkSave = document.getElementById('add-bookmark-save');
+        const addBookmarkCancel = document.getElementById('add-bookmark-cancel');
+        const addBookmarkClose = document.querySelector('.add-bookmark-close');
+        
+        addBookmarkSave.addEventListener('click', () => {
+            const name = document.getElementById('add-bookmark-name').value.trim();
+            const url = document.getElementById('add-bookmark-url').value.trim();
+            
+            if (!name || !url) {
+                alert('이름과 URL을 모두 입력해주세요.');
+                return;
+            }
+            
+            if (addBookmarkModal.dataset.editMode === 'true') {
+                const index = parseInt(addBookmarkModal.dataset.editIndex);
+                allProjectsData[currentProject].bookmarks[index].name = name;
+                allProjectsData[currentProject].bookmarks[index].url = url;
+            } else {
+                allProjectsData[currentProject].bookmarks.push({ 
+                    name: name, 
+                    url: url, 
+                    color: '#f8f9fa',
+                    favorite: false
+                });
+            }
+            renderProject(currentProject);
+            addBookmarkModal.style.display = 'none';
+            saveToLocalStorage();
+        });
+        
+        addBookmarkCancel.addEventListener('click', () => {
+            addBookmarkModal.style.display = 'none';
+        });
+        
+        addBookmarkClose.addEventListener('click', () => {
+            addBookmarkModal.style.display = 'none';
+        });
+
+        const addClipboardModal = document.getElementById('add-clipboard-modal');
+        const addClipboardSave = document.getElementById('add-clipboard-save');
+        const addClipboardCancel = document.getElementById('add-clipboard-cancel');
+        const addClipboardClose = document.querySelector('.add-clipboard-close');
+        
+        addClipboardSave.addEventListener('click', () => {
+            const title = document.getElementById('add-clipboard-title').value.trim();
+            const content = document.getElementById('add-clipboard-content').value.trim();
+            
+            if (!title || !content) {
+                alert('제목과 내용을 모두 입력해주세요.');
+                return;
+            }
+            
+            if (addClipboardModal.dataset.editMode === 'true') {
+                const index = parseInt(addClipboardModal.dataset.editIndex);
+                allProjectsData[currentProject].clipboard[index].title = title;
+                allProjectsData[currentProject].clipboard[index].text = content;
+            } else {
+                allProjectsData[currentProject].clipboard.push({ 
+                    title: title,
+                    text: content, 
+                    color: '#f8f9fa',
+                    favorite: false
+                });
+            }
+            renderProject(currentProject);
+            addClipboardModal.style.display = 'none';
+            saveToLocalStorage();
+        });
+        
+        addClipboardCancel.addEventListener('click', () => {
+            addClipboardModal.style.display = 'none';
+        });
+        
+        addClipboardClose.addEventListener('click', () => {
+            addClipboardModal.style.display = 'none';
+        });
+
+        addBookmarkModal.addEventListener('click', (e) => {
+            if (e.target === addBookmarkModal) {
+                addBookmarkModal.style.display = 'none';
+            }
+        });
+        
+        addClipboardModal.addEventListener('click', (e) => {
+            if (e.target === addClipboardModal) {
+                addClipboardModal.style.display = 'none';
+            }
+        });
+
+        const addProjectModal = document.getElementById('add-project-modal');
+        const addProjectSave = document.getElementById('add-project-save');
+        const addProjectCancel = document.getElementById('add-project-cancel');
+        const addProjectClose = document.querySelector('.add-project-close');
+        
+        addProjectSave.addEventListener('click', () => {
+            const name = document.getElementById('add-project-name').value.trim();
+            
+            if (!name) {
+                alert('프로젝트 이름을 입력해주세요.');
+                return;
+            }
+            
+            if (allProjectsData[name]) {
+                alert('이미 존재하는 프로젝트 이름입니다.');
+                return;
+            }
+            
+            allProjectsData[name] = {
+                bookmarks: [],
+                clipboard: []
+            };
+            
+            renderProjectList();
+            renderProject(name);
+            
+            addProjectModal.style.display = 'none';
+            saveToLocalStorage();
+        });
+        
+        addProjectCancel.addEventListener('click', () => {
+            addProjectModal.style.display = 'none';
+        });
+        
+        addProjectClose.addEventListener('click', () => {
+            addProjectModal.style.display = 'none';
+        });
+        
+        addProjectModal.addEventListener('click', (e) => {
+            if (e.target === addProjectModal) {
+                addProjectModal.style.display = 'none';
+            }
+        });
+
+        const settingsBtn = document.getElementById('settings-btn');
+        const settingsModal = document.getElementById('settings-modal');
+        const settingsCloseBtn = settingsModal.querySelector('.close-button');
+        const exportDataBtn = document.getElementById('export-data-btn');
+        const importDataBtn = document.getElementById('import-data-btn');
+        const importDataInput = document.getElementById('import-data-input');
+        
+        settingsBtn.addEventListener('click', () => {
+            settingsModal.style.display = 'flex';
+        });
+        
+        settingsCloseBtn.addEventListener('click', () => {
+            settingsModal.style.display = 'none';
+        });
+        
+        settingsModal.addEventListener('click', (e) => {
+            if (e.target === settingsModal) {
+                settingsModal.style.display = 'none';
+            }
+        });
+
+        // 데이터 내보내기 (백업)
+        exportDataBtn.addEventListener('click', () => {
+            try {
+                const dataToExport = {
+                    projects: allProjectsData,
+                    currentProject: currentProject,
+                    exportDate: new Date().toISOString(),
+                    version: '1.0'
+                };
+                
+                const jsonString = JSON.stringify(dataToExport, null, 2);
+                const blob = new Blob([jsonString], { type: 'application/json' });
+                
+                // 파일명 생성 (현재 날짜와 시간 포함)
+                const now = new Date();
+                const dateString = now.getFullYear() + 
+                    String(now.getMonth() + 1).padStart(2, '0') + 
+                    String(now.getDate()).padStart(2, '0') + '_' +
+                    String(now.getHours()).padStart(2, '0') + 
+                    String(now.getMinutes()).padStart(2, '0');
+                const filename = `북마크클립보드_백업_${dateString}.json`;
+                
+                // 다운로드 링크 생성 및 실행
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                
+                alert(`데이터가 성공적으로 내보내졌습니다.\n파일명: ${filename}`);
+            } catch (error) {
+                console.error('데이터 내보내기 실패:', error);
+                alert('데이터 내보내기에 실패했습니다.');
+            }
+        });
+
+        // 데이터 불러오기 버튼 클릭 시 파일 선택 창 열기
+        importDataBtn.addEventListener('click', () => {
+            importDataInput.click();
+        });
+
+        // 파일 선택 시 데이터 불러오기
+        importDataInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            if (file.type !== 'application/json') {
+                alert('JSON 파일만 지원됩니다.');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                try {
+                    const importedData = JSON.parse(event.target.result);
+                    
+                    // 데이터 유효성 검사
+                    if (!importedData.projects || typeof importedData.projects !== 'object') {
+                        throw new Error('올바르지 않은 백업 파일 형식입니다.');
+                    }
+
+                    // 데이터 구조 검증
+                    for (const [projectName, projectData] of Object.entries(importedData.projects)) {
+                        if (!projectData.bookmarks || !projectData.clipboard || 
+                            !Array.isArray(projectData.bookmarks) || !Array.isArray(projectData.clipboard)) {
+                            throw new Error(`프로젝트 '${projectName}'의 데이터 구조가 올바르지 않습니다.`);
+                        }
+                    }
+
+                    // 복원 방식 선택
+                    const choice = confirm('데이터 복원 방식을 선택해주세요.\n\n' +
+                                         '확인: 병합 모드 (기존 데이터 보존 + 백업 데이터 추가)\n' +
+                                         '취소: 완전 교체 (기존 데이터 삭제 + 백업 데이터로 교체)');
+                    
+                    if (choice) {
+                        // 병합 모드
+                        performDataMerge(importedData);
+                    } else {
+                        // 완전 교체 모드
+                        if (confirm('⚠️ 완전 교체 모드입니다.\n현재 모든 데이터가 삭제되고 백업 데이터로 교체됩니다.\n정말 진행하시겠습니까?')) {
+                            performDataReplace(importedData);
+                        }
+                    }
+                } catch (error) {
+                    console.error('데이터 불러오기 실패:', error);
+                    alert(`데이터 불러오기에 실패했습니다.\n오류: ${error.message}`);
+                }
+            };
+            
+            reader.onerror = () => {
+                alert('파일 읽기에 실패했습니다.');
+            };
+            
+            reader.readAsText(file);
+            
+            // 파일 입력 초기화 (같은 파일 재선택 가능하도록)
+            e.target.value = '';
+        });
+
+        // 데이터 병합 처리 함수
+        function performDataMerge(importedData) {
+            const conflictProjects = [];
+            const newProjects = [];
+            
+            // 충돌 프로젝트와 새 프로젝트 분류
+            for (const [projectName, projectData] of Object.entries(importedData.projects)) {
+                if (allProjectsData[projectName]) {
+                    conflictProjects.push(projectName);
+                } else {
+                    newProjects.push(projectName);
+                }
+            }
+            
+            // 충돌이 있는 경우 일괄 처리 옵션 제공
+            if (conflictProjects.length > 0) {
+                const conflictMessage = `${conflictProjects.length}개의 기존 프로젝트와 이름이 중복됩니다:\n` +
+                                      `${conflictProjects.map(name => `• ${name}`).join('\n')}\n\n` +
+                                      `어떻게 처리하시겠습니까?`;
+                
+                const choice = confirm(conflictMessage + '\n\n' +
+                                     '확인: 모든 충돌 프로젝트를 병합 (기존 + 백업 데이터)\n' +
+                                     '취소: 개별 선택 (프로젝트별로 확인)');
+                
+                if (choice) {
+                    // 일괄 병합
+                    performBatchMerge(importedData, conflictProjects, newProjects);
+                } else {
+                    // 개별 선택
+                    performIndividualMerge(importedData, conflictProjects, newProjects);
+                }
+            } else {
+                // 충돌이 없으면 바로 병합
+                performBatchMerge(importedData, [], newProjects);
+            }
+        }
+
+        // 일괄 병합 처리
+        function performBatchMerge(importedData, conflictProjects, newProjects) {
+            const mergeResults = {
+                newProjects: [],
+                conflictProjects: [],
+                addedBookmarks: 0,
+                addedClipboard: 0
+            };
+
+            // 새 프로젝트 추가
+            newProjects.forEach(projectName => {
+                const projectData = importedData.projects[projectName];
+                allProjectsData[projectName] = {
+                    bookmarks: [...projectData.bookmarks],
+                    clipboard: [...projectData.clipboard]
+                };
+                mergeResults.newProjects.push(projectName);
+                mergeResults.addedBookmarks += projectData.bookmarks.length;
+                mergeResults.addedClipboard += projectData.clipboard.length;
+            });
+
+            // 충돌 프로젝트 일괄 병합
+            conflictProjects.forEach(projectName => {
+                const projectData = importedData.projects[projectName];
+                
+                // 북마크 병합 (중복 제거)
+                const existingBookmarks = allProjectsData[projectName].bookmarks;
+                const newBookmarks = projectData.bookmarks.filter(newBookmark => {
+                    return !existingBookmarks.some(existing => 
+                        existing.name === newBookmark.name && existing.url === newBookmark.url
+                    );
+                });
+                existingBookmarks.push(...newBookmarks);
+                mergeResults.addedBookmarks += newBookmarks.length;
+
+                // 클립보드 병합 (중복 제거)
+                const existingClipboard = allProjectsData[projectName].clipboard;
+                const newClipboard = projectData.clipboard.filter(newClip => {
+                    return !existingClipboard.some(existing => 
+                        existing.text === newClip.text
+                    );
+                });
+                existingClipboard.push(...newClipboard);
+                mergeResults.addedClipboard += newClipboard.length;
+
+                mergeResults.conflictProjects.push(projectName);
+            });
+
+            // 병합 완료 처리
+            finalizeMerge(importedData, mergeResults);
+        }
+
+        // 개별 선택 병합 처리
+        function performIndividualMerge(importedData, conflictProjects, newProjects) {
+            const mergeResults = {
+                newProjects: [],
+                conflictProjects: [],
+                addedBookmarks: 0,
+                addedClipboard: 0
+            };
+
+            // 새 프로젝트 먼저 추가
+            newProjects.forEach(projectName => {
+                const projectData = importedData.projects[projectName];
+                allProjectsData[projectName] = {
+                    bookmarks: [...projectData.bookmarks],
+                    clipboard: [...projectData.clipboard]
+                };
+                mergeResults.newProjects.push(projectName);
+                mergeResults.addedBookmarks += projectData.bookmarks.length;
+                mergeResults.addedClipboard += projectData.clipboard.length;
+            });
+
+            // 충돌 프로젝트 개별 처리
+            for (const projectName of conflictProjects) {
+                const projectData = importedData.projects[projectName];
+                const bookmarkCount = projectData.bookmarks.length;
+                const clipboardCount = projectData.clipboard.length;
+                
+                const userChoice = confirm(`프로젝트: ${projectName}\n` +
+                                         `백업 데이터: 북마크 ${bookmarkCount}개, 클립보드 ${clipboardCount}개\n\n` +
+                                         `확인: 이 프로젝트를 병합 (기존 데이터 유지 + 백업 데이터 추가)\n` +
+                                         `취소: 이 프로젝트는 건너뛰기`);
+                
+                if (userChoice) {
+                    // 북마크 병합
+                    const existingBookmarks = allProjectsData[projectName].bookmarks;
+                    const newBookmarks = projectData.bookmarks.filter(newBookmark => {
+                        return !existingBookmarks.some(existing => 
+                            existing.name === newBookmark.name && existing.url === newBookmark.url
+                        );
+                    });
+                    existingBookmarks.push(...newBookmarks);
+                    mergeResults.addedBookmarks += newBookmarks.length;
+
+                    // 클립보드 병합
+                    const existingClipboard = allProjectsData[projectName].clipboard;
+                    const newClipboard = projectData.clipboard.filter(newClip => {
+                        return !existingClipboard.some(existing => 
+                            existing.text === newClip.text
+                        );
+                    });
+                    existingClipboard.push(...newClipboard);
+                    mergeResults.addedClipboard += newClipboard.length;
+
+                    mergeResults.conflictProjects.push(projectName);
+                }
+            }
+
+            // 병합 완료 처리
+            finalizeMerge(importedData, mergeResults);
+        }
+
+        // 데이터 완전 교체 처리 함수
+        function performDataReplace(importedData) {
+            // 기존 데이터 완전 삭제
+            Object.keys(allProjectsData).forEach(key => delete allProjectsData[key]);
+            
+            // 백업 데이터로 교체
+            Object.assign(allProjectsData, importedData.projects);
+            
+            const availableProjects = Object.keys(allProjectsData);
+            if (availableProjects.length > 0) {
+                currentProject = importedData.currentProject && 
+                               allProjectsData[importedData.currentProject] ? 
+                               importedData.currentProject : availableProjects[0];
+            }
+
+            // 완료 처리
+            finalizeRestore(availableProjects.length, '완전 교체');
+        }
+
+        // 병합 완료 처리
+        function finalizeMerge(importedData, results) {
+            // 현재 프로젝트 설정 (기존 프로젝트 유지 또는 새 프로젝트로 설정)
+            if (importedData.currentProject && allProjectsData[importedData.currentProject]) {
+                currentProject = importedData.currentProject;
+            }
+
+            // 완료 처리
+            const totalProjects = Object.keys(allProjectsData).length;
+            const message = `✅ 병합이 완료되었습니다!\n\n` +
+                          `📊 병합 결과:\n` +
+                          `• 새 프로젝트: ${results.newProjects.length}개\n` +
+                          `• 병합된 프로젝트: ${results.conflictProjects.length}개\n` +
+                          `• 추가된 북마크: ${results.addedBookmarks}개\n` +
+                          `• 추가된 클립보드: ${results.addedClipboard}개\n` +
+                          `• 전체 프로젝트: ${totalProjects}개`;
+            
+            finalizeRestore(totalProjects, '병합', message);
+        }
+
+        // 복원 완료 공통 처리
+        function finalizeRestore(projectCount, mode, customMessage = null) {
+            // 로컬스토리지에 저장
+            saveToLocalStorage();
+            
+            // 화면 업데이트
+            renderProjectList();
+            renderProject(currentProject);
+            
+            // 모달 닫기
+            settingsModal.style.display = 'none';
+            
+            // 완료 메시지
+            const defaultMessage = `데이터 ${mode}이 완료되었습니다!\n프로젝트 ${projectCount}개가 처리되었습니다.`;
+            alert(customMessage || defaultMessage);
+        }
+
+        projectContextRename.addEventListener('click', () => {
+            if (activeProject) {
+                const newName = prompt('새 프로젝트 이름을 입력해주세요:', activeProject);
+                if (newName && newName.trim() !== '' && newName.trim() !== activeProject) {
+                    const trimmedName = newName.trim();
+                    
+                    if (allProjectsData[trimmedName]) {
+                        alert('이미 존재하는 프로젝트 이름입니다.');
+                        return;
+                    }
+                    
+                    allProjectsData[trimmedName] = allProjectsData[activeProject];
+                    delete allProjectsData[activeProject];
+                    
+                    if (currentProject === activeProject) {
+                        currentProject = trimmedName;
+                    }
+                    
+                    renderProjectList();
+                    renderProject(trimmedName);
+                    saveToLocalStorage();
+                }
+                projectContextMenu.style.display = 'none';
+                activeProject = null;
+            }
+        });
+
+        projectContextDelete.addEventListener('click', () => {
+            if (activeProject) {
+                if (Object.keys(allProjectsData).length <= 1) {
+                    alert('최소 하나의 프로젝트는 필요합니다.');
+                    return;
+                }
+                
+                if (confirm(`'${activeProject}' 프로젝트를 삭제하시겠습니까?`)) {
+                    delete allProjectsData[activeProject];
+                    
+                    if (currentProject === activeProject) {
+                        currentProject = Object.keys(allProjectsData)[0];
+                    }
+                    
+                    renderProjectList();
+                    renderProject(currentProject);
+                    saveToLocalStorage();
+                }
+                projectContextMenu.style.display = 'none';
+                activeProject = null;
+            }
+        });
+
+        projectContextCancel.addEventListener('click', () => {
+            projectContextMenu.style.display = 'none';
+            activeProject = null;
+        });
+
+        const colorPaletteModal = document.getElementById('color-palette-modal');
+        const colorPaletteClose = document.querySelector('.color-palette-close');
+        
+        colorPaletteClose.addEventListener('click', () => {
+            colorPaletteModal.style.display = 'none';
+            colorChangeItem = null;
+        });
+        
+        colorPaletteModal.addEventListener('click', (e) => {
+            if (e.target === colorPaletteModal) {
+                colorPaletteModal.style.display = 'none';
+                colorChangeItem = null;
+            }
+        });
+        
+        document.querySelectorAll('.color-option').forEach(option => {
+            option.addEventListener('click', () => {
+                if (colorChangeItem) {
+                    const selectedColor = option.dataset.color;
+                    const { type, index } = colorChangeItem;
+                    const projectData = allProjectsData[currentProject];
+                    
+                    if (type === 'bookmark') {
+                        projectData.bookmarks[index].color = selectedColor;
+                    } else if (type === 'clipboard') {
+                        projectData.clipboard[index].color = selectedColor;
+                    }
+                    
+                    renderProject(currentProject);
+                    
+                    colorPaletteModal.style.display = 'none';
+                    colorChangeItem = null;
+                }
+            });
+        });
+
+        function renderFavorites() {
+            const favoritesList = document.getElementById('favorites-list');
+            favoritesList.innerHTML = '';
+            
+            let allFavorites = [];
+            
+            Object.keys(allProjectsData).forEach(projectName => {
+                const projectData = allProjectsData[projectName];
+                
+                projectData.bookmarks.forEach((bookmark, index) => {
+                    if (bookmark.favorite) {
+                        allFavorites.push({
+                            type: 'bookmark',
+                            name: bookmark.name,
+                            url: bookmark.url,
+                            color: bookmark.color,
+                            project: projectName,
+                            index: index
+                        });
+                    }
+                });
+                
+                projectData.clipboard.forEach((clip, index) => {
+                    if (clip.favorite) {
+                        allFavorites.push({
+                            type: 'clipboard',
+                            name: clip.title || clip.text.substring(0, 20) + (clip.text.length > 20 ? '...' : ''),
+                            text: clip.text,
+                            color: clip.color,
+                            project: projectName,
+                            index: index
+                        });
+                    }
+                });
+            });
+            
+            if (allFavorites.length === 0) {
+                favoritesList.innerHTML = '<div class="activity-placeholder">즐겨찾기가 없습니다</div>';
+                return;
+            }
+            
+            allFavorites.forEach(item => {
+                const favoriteItem = document.createElement('div');
+                favoriteItem.className = 'favorite-item';
+                favoriteItem.style.backgroundColor = item.color || '#f8f9fa';
+                
+                const itemContent = document.createElement('div');
+                itemContent.className = 'favorite-item-content';
+                
+                const itemName = document.createElement('div');
+                itemName.className = 'favorite-item-name';
+                itemName.textContent = item.name;
+                
+                const itemProject = document.createElement('div');
+                itemProject.className = 'favorite-item-project';
+                itemProject.textContent = item.project;
+                
+                itemContent.appendChild(itemName);
+                itemContent.appendChild(itemProject);
+                favoriteItem.appendChild(itemContent);
+                
+                favoriteItem.style.cursor = 'pointer';
+                favoriteItem.addEventListener('click', () => {
+                    if (item.type === 'bookmark') {
+                        window.open(item.url, '_blank');
+                    } else if (item.type === 'clipboard') {
+                        copyToClipboard(item.text).then(success => {
+                            if (success) {
+                                alert('내용이 클립보드에 복사되었습니다.');
+                            } else {
+                                alert('복사에 실패했습니다. 수동으로 복사해 주세요.');
+                            }
+                        });
+                    }
+                });
+                
+                favoritesList.appendChild(favoriteItem);
+            });
+        }
+        
+        function renderStatistics() {
+            const currentProjectData = allProjectsData[currentProject];
+            
+            document.getElementById('total-bookmarks').textContent = currentProjectData.bookmarks.length;
+            document.getElementById('total-clipboard').textContent = currentProjectData.clipboard.length;
+            
+            let totalFavorites = 0;
+            Object.values(allProjectsData).forEach(projectData => {
+                totalFavorites += projectData.bookmarks.filter(b => b.favorite).length;
+                totalFavorites += projectData.clipboard.filter(c => c.favorite).length;
+            });
+            
+            document.getElementById('total-favorites').textContent = totalFavorites;
+        }
+
+        let draggedProject = null;
+
+        function handleProjectDragStart(e) {
+            draggedProject = e.target;
+            e.target.classList.add('dragging');
+            e.dataTransfer.effectAllowed = 'move';
+            e.dataTransfer.setData('text/html', e.target.outerHTML);
+        }
+
+        function handleProjectDragOver(e) {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+        }
+
+        function handleProjectDragEnter(e) {
+            e.target.classList.add('drag-over');
+        }
+
+        function handleProjectDragLeave(e) {
+            e.target.classList.remove('drag-over');
+        }
+
+        function handleProjectDrop(e) {
+            e.preventDefault();
+            e.target.classList.remove('drag-over');
+            
+            if (draggedProject && draggedProject !== e.target && e.target.tagName === 'LI') {
+                const draggedProjectName = draggedProject.dataset.projectName;
+                const targetProjectName = e.target.dataset.projectName;
+                
+                const projectNames = Object.keys(allProjectsData);
+                const draggedIndex = projectNames.indexOf(draggedProjectName);
+                const targetIndex = projectNames.indexOf(targetProjectName);
+                
+                if (draggedIndex !== -1 && targetIndex !== -1 && draggedIndex !== targetIndex) {
+                    projectNames.splice(draggedIndex, 1);
+                    projectNames.splice(targetIndex, 0, draggedProjectName);
+                    
+                    const newProjectData = {};
+                    projectNames.forEach(name => {
+                        newProjectData[name] = allProjectsData[name];
+                    });
+                    
+                    Object.keys(allProjectsData).forEach(key => delete allProjectsData[key]);
+                    Object.assign(allProjectsData, newProjectData);
+                    
+                    renderProjectList();
+                    saveToLocalStorage();
+                }
+            }
+        }
+
+        function handleProjectDragEnd(e) {
+            e.target.classList.remove('dragging');
+            document.querySelectorAll('.project-item').forEach(item => {
+                item.classList.remove('drag-over');
+            });
+            draggedProject = null;
+        }
+
+        function setupDropZones() {
+            const bookmarkList = document.getElementById('bookmark-list');
+            const clipboardList = document.getElementById('clipboard-list');
+            
+            [bookmarkList, clipboardList].forEach(list => {
+                list.classList.add('drop-zone');
+                list.addEventListener('dragover', handleItemDragOver);
+                list.addEventListener('drop', handleItemDrop);
+                list.addEventListener('dragenter', handleItemDragEnter);
+                list.addEventListener('dragleave', handleItemDragLeave);
+            });
+        }
+
+        let draggedItem = null;
+        let draggedItemType = null;
+        let draggedItemIndex = null;
+
+        function handleItemDragStart(e) {
+            draggedItem = e.target;
+            draggedItemType = e.target.dataset.type;
+            draggedItemIndex = parseInt(e.target.dataset.index);
+            e.target.classList.add('dragging');
+            e.dataTransfer.effectAllowed = 'move';
+            e.dataTransfer.setData('text/html', e.target.outerHTML);
+        }
+
+        function handleItemDragOver(e) {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+            
+            if (e.target.classList.contains('item-button')) {
+                const targetType = e.target.dataset.type;
+                if (draggedItemType === targetType) {
+                    const rect = e.target.getBoundingClientRect();
+                    const midY = rect.top + rect.height / 2;
+                    
+                    document.querySelectorAll('.drop-indicator').forEach(el => el.remove());
+                    
+                    const indicator = document.createElement('div');
+                    indicator.className = 'drop-indicator';
+                    indicator.style.cssText = `
+                        position: absolute;
+                        left: ${rect.left - 5}px;
+                        width: ${rect.width + 10}px;
+                        height: 2px;
+                        background-color: #3b82f6;
+                        z-index: 1000;
+                        pointer-events: none;
+                    `;
+                    
+                    if (e.clientY < midY) {
+                        indicator.style.top = `${rect.top - 1}px`;
+                        e.target.dataset.insertBefore = 'true';
+                    } else {
+                        indicator.style.top = `${rect.bottom - 1}px`;
+                        e.target.dataset.insertBefore = 'false';
+                    }
+                    
+                    document.body.appendChild(indicator);
+                }
+            }
+        }
+
+        function handleItemDragEnter(e) {
+            if (e.target.classList.contains('item-list')) {
+                e.target.classList.add('drag-over');
+            } else if (e.target.closest('.item-list')) {
+                e.target.closest('.item-list').classList.add('drag-over');
+            }
+        }
+
+        function handleItemDragLeave(e) {
+            if (e.target.classList.contains('item-list')) {
+                e.target.classList.remove('drag-over');
+            } else if (e.target.closest('.item-list')) {
+                e.target.closest('.item-list').classList.remove('drag-over');
+            }
+        }
+
+        function handleItemDrop(e) {
+            e.preventDefault();
+            
+            document.querySelectorAll('.drop-indicator').forEach(el => el.remove());
+            
+            document.querySelectorAll('.drag-over').forEach(el => {
+                el.classList.remove('drag-over');
+            });
+            
+            if (draggedItem && draggedItemType && draggedItemIndex !== null) {
+                const targetButton = e.target.closest('.item-button');
+                const targetList = e.target.closest('.item-list');
+                
+                if (targetButton && targetButton !== draggedItem) {
+                    const targetType = targetButton.dataset.type;
+                    const targetIndex = parseInt(targetButton.dataset.index);
+                    
+                    if (draggedItemType === targetType) {
+                        const data = allProjectsData[currentProject][draggedItemType === 'bookmark' ? 'bookmarks' : 'clipboard'];
+                        const itemToMove = data[draggedItemIndex];
+                        
+                        data.splice(draggedItemIndex, 1);
+                        
+                        let newIndex = targetIndex;
+                        if (draggedItemIndex < targetIndex) {
+                            newIndex = targetIndex - 1;
+                        }
+                        
+                        const insertBefore = targetButton.dataset.insertBefore === 'true';
+                        if (!insertBefore) {
+                            newIndex += 1;
+                        }
+                        
+                        data.splice(newIndex, 0, itemToMove);
+                        
+                        renderProject(currentProject);
+                        saveToLocalStorage();
+                        
+                        delete targetButton.dataset.insertBefore;
+                    }
+                } else if (targetList && !targetButton) {
+                    const targetType = targetList.id === 'bookmark-list' ? 'bookmark' : 'clipboard';
+                    
+                    if (draggedItemType === targetType) {
+                        const data = allProjectsData[currentProject][draggedItemType === 'bookmark' ? 'bookmarks' : 'clipboard'];
+                        const itemToMove = data[draggedItemIndex];
+                        
+                        data.splice(draggedItemIndex, 1);
+                        data.push(itemToMove);
+                        
+                        renderProject(currentProject);
+                        saveToLocalStorage();
+                    }
+                }
+            }
+        }
+
+        function handleItemDragEnd(e) {
+            e.target.classList.remove('dragging');
+            
+            document.querySelectorAll('.item-list, .content-panel').forEach(element => {
+                element.classList.remove('drag-over');
+            });
+            document.querySelectorAll('.drop-indicator').forEach(el => el.remove());
+            document.querySelectorAll('.item-button').forEach(button => {
+                delete button.dataset.insertBefore;
+            });
+            
+            draggedItem = null;
+            draggedItemType = null;
+            draggedItemIndex = null;
+        }
+
+        // View Clipboard Modal
+        const viewClipboardModal = document.getElementById('view-clipboard-modal');
+        const viewClipboardCloseBtn = viewClipboardModal.querySelector('.view-clipboard-close');
+        const viewClipboardCopyBtn = document.getElementById('view-clipboard-copy-btn');
+
+        viewClipboardCloseBtn.addEventListener('click', () => {
+            viewClipboardModal.style.display = 'none';
+        });
+
+        viewClipboardModal.addEventListener('click', (e) => {
+            if (e.target === viewClipboardModal) {
+                viewClipboardModal.style.display = 'none';
+            }
+        });
+
+        // 모바일 호환 복사 함수
+        function copyToClipboard(text) {
+            // 먼저 modern API 시도
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                return navigator.clipboard.writeText(text)
+                    .then(() => true)
+                    .catch(() => false);
+            }
+            
+            // 대체 방법: 임시 textarea 생성
+            return new Promise((resolve) => {
+                const textArea = document.createElement('textarea');
+                textArea.value = text;
+                textArea.style.position = 'fixed';
+                textArea.style.top = '-9999px';
+                textArea.style.left = '-9999px';
+                textArea.setAttribute('readonly', '');
+                textArea.style.contain = 'strict';
+                
+                document.body.appendChild(textArea);
+                
+                // iOS Safari 대응
+                if (/ipad|iphone/i.test(navigator.userAgent)) {
+                    textArea.contentEditable = 'true';
+                    textArea.readOnly = false;
+                    const range = document.createRange();
+                    range.selectNodeContents(textArea);
+                    const selection = window.getSelection();
+                    selection.removeAllRanges();
+                    selection.addRange(range);
+                    textArea.setSelectionRange(0, 999999);
+                } else {
+                    textArea.select();
+                }
+                
+                try {
+                    const successful = document.execCommand('copy');
+                    document.body.removeChild(textArea);
+                    resolve(successful);
+                } catch (err) {
+                    document.body.removeChild(textArea);
+                    resolve(false);
+                }
+            });
+        }
+
+        viewClipboardCopyBtn.addEventListener('click', (e) => {
+            const textToCopy = e.target.dataset.clipboardText;
+            copyToClipboard(textToCopy).then(success => {
+                if (success) {
+                    alert('내용이 클립보드에 복사되었습니다.');
+                    viewClipboardModal.style.display = 'none';
+                } else {
+                    alert('복사에 실패했습니다. 수동으로 복사해 주세요.');
+                }
+            });
+        });
+
+        // 모바일 탭 네비게이션 처리
+        function initMobileTabs() {
+            const mobileTabs = document.querySelectorAll('.mobile-tab');
+            const projectSidebar = document.getElementById('project-sidebar');
+            const bookmarkPanel = document.querySelector('.bookmark-panel');
+            const clipboardPanel = document.querySelector('.clipboard-panel');
+            const dashboardArea = document.querySelector('.dashboard-area');
+            
+            mobileTabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    // 모든 탭 비활성화
+                    mobileTabs.forEach(t => t.classList.remove('active'));
+                    
+                    // 클릭된 탭 활성화
+                    tab.classList.add('active');
+                    
+                    // 모든 패널 숨김
+                    projectSidebar.classList.remove('mobile-visible');
+                    bookmarkPanel.classList.remove('mobile-visible');
+                    clipboardPanel.classList.remove('mobile-visible');
+                    dashboardArea.classList.remove('mobile-visible');
+                    
+                    // 선택된 탭에 따라 패널 표시
+                    const tabType = tab.dataset.tab;
+                    switch(tabType) {
+                        case 'projects':
+                            projectSidebar.classList.add('mobile-visible');
+                            break;
+                        case 'bookmarks':
+                            bookmarkPanel.classList.add('mobile-visible');
+                            break;
+                        case 'clipboard':
+                            clipboardPanel.classList.add('mobile-visible');
+                            break;
+                        case 'dashboard':
+                            dashboardArea.classList.add('mobile-visible');
+                            break;
+                    }
+                });
+            });
+            
+            // 초기 상태: 프로젝트 탭 활성화
+            if (window.innerWidth <= 768) {
+                projectSidebar.classList.add('mobile-visible');
+            }
+        }
+
+        // 화면 크기 변경 감지
+        function handleResize() {
+            if (window.innerWidth <= 768) {
+                // 모바일 모드
+                const activeTab = document.querySelector('.mobile-tab.active');
+                if (activeTab) {
+                    const event = new Event('click');
+                    activeTab.dispatchEvent(event);
+                }
+            } else {
+                // 데스크톱 모드: 모든 mobile-visible 클래스 제거
+                document.getElementById('project-sidebar').classList.remove('mobile-visible');
+                document.querySelector('.bookmark-panel').classList.remove('mobile-visible');
+                document.querySelector('.clipboard-panel').classList.remove('mobile-visible');
+                document.querySelector('.dashboard-area').classList.remove('mobile-visible');
+            }
+        }
+
+        // 터치 스와이프 지원 (옵션)
+        let touchStartX = 0;
+        let touchEndX = 0;
+        
+        function handleSwipe() {
+            if (window.innerWidth > 768) return; // 모바일에서만 작동
+            
+            const swipeThreshold = 100;
+            const difference = touchStartX - touchEndX;
+            
+            if (Math.abs(difference) > swipeThreshold) {
+                const currentActiveTab = document.querySelector('.mobile-tab.active');
+                const allTabs = Array.from(document.querySelectorAll('.mobile-tab'));
+                const currentIndex = allTabs.indexOf(currentActiveTab);
+                
+                let nextIndex;
+                if (difference > 0) {
+                    // 왼쪽으로 스와이프 (다음 탭)
+                    nextIndex = currentIndex + 1 < allTabs.length ? currentIndex + 1 : 0;
+                } else {
+                    // 오른쪽으로 스와이프 (이전 탭)
+                    nextIndex = currentIndex - 1 >= 0 ? currentIndex - 1 : allTabs.length - 1;
+                }
+                
+                allTabs[nextIndex].click();
+            }
+        }
+
+        // 터치 이벤트 리스너
+        document.addEventListener('touchstart', e => {
+            touchStartX = e.changedTouches[0].screenX;
+        });
+
+        document.addEventListener('touchend', e => {
+            touchEndX = e.changedTouches[0].screenX;
+            handleSwipe();
+        });
+
+        // 리사이즈 이벤트 리스너
+        window.addEventListener('resize', handleResize);
+
+        // 초기 화면 렌더링
+        renderProjectList();
+        renderProject(currentProject);
+        initMobileTabs();
+        handleResize(); // 초기 화면 크기에 따른 설정
+    });
+    </script>
+</body>
+</html>
