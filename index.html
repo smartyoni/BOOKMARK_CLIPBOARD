@@ -3,7 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>상황별 부동산 업무 허브</title>
+    <title>북마크 클립보드 관리자</title>
+    
+    <!-- PWA Meta Tags -->
+    <meta name="description" content="프로젝트별 북마크와 클립보드를 효율적으로 관리하는 PWA 앱">
+    <meta name="theme-color" content="#37352f">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="북마크앱">
+    <meta name="msapplication-TileColor" content="#37352f">
+    <meta name="msapplication-config" content="browserconfig.xml">
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+    
+    <!-- PWA Icons -->
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect width='192' height='192' fill='%2337352f'/><text x='96' y='120' font-size='80' text-anchor='middle' fill='white'>📋</text></svg>">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect width='192' height='192' fill='%2337352f'/><text x='96' y='120' font-size='80' text-anchor='middle' fill='white'>📋</text></svg>">
     
     <!-- Firebase SDK v9 (최신 안정 버전) -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -2831,6 +2847,89 @@
 
         // 리사이즈 이벤트 리스너
         window.addEventListener('resize', handleResize);
+
+        // PWA Service Worker 등록
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js')
+                    .then(registration => {
+                        console.log('PWA: Service Worker 등록 성공', registration.scope);
+                        
+                        // Service Worker 업데이트 확인
+                        registration.addEventListener('updatefound', () => {
+                            const newWorker = registration.installing;
+                            newWorker.addEventListener('statechange', () => {
+                                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                    // 새 버전 사용 가능 알림
+                                    if (confirm('새로운 버전이 사용 가능합니다. 지금 새로고침하시겠습니까?')) {
+                                        window.location.reload();
+                                    }
+                                }
+                            });
+                        });
+                    })
+                    .catch(error => {
+                        console.log('PWA: Service Worker 등록 실패', error);
+                    });
+            });
+        }
+
+        // PWA 설치 프롬프트
+        let deferredPrompt;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            console.log('PWA: 설치 프롬프트 준비됨');
+            e.preventDefault();
+            deferredPrompt = e;
+            showInstallButton();
+        });
+
+        function showInstallButton() {
+            // 모바일 탭 영역에 설치 버튼 추가
+            const mobileTabs = document.querySelector('.mobile-tabs');
+            if (mobileTabs && !document.getElementById('install-btn')) {
+                const installBtn = document.createElement('button');
+                installBtn.id = 'install-btn';
+                installBtn.innerHTML = '📱 앱 설치';
+                installBtn.style.cssText = `
+                    background: #007acc;
+                    color: white;
+                    border: none;
+                    padding: 8px 16px;
+                    border-radius: 4px;
+                    font-size: 12px;
+                    cursor: pointer;
+                    margin: 4px;
+                `;
+                
+                installBtn.addEventListener('click', async () => {
+                    if (deferredPrompt) {
+                        deferredPrompt.prompt();
+                        const result = await deferredPrompt.userChoice;
+                        
+                        if (result.outcome === 'accepted') {
+                            console.log('PWA: 사용자가 앱을 설치했습니다');
+                        } else {
+                            console.log('PWA: 사용자가 앱 설치를 거부했습니다');
+                        }
+                        
+                        deferredPrompt = null;
+                        installBtn.remove();
+                    }
+                });
+                
+                mobileTabs.appendChild(installBtn);
+            }
+        }
+
+        // 앱이 설치되면 설치 버튼 제거
+        window.addEventListener('appinstalled', () => {
+            console.log('PWA: 앱이 성공적으로 설치되었습니다');
+            const installBtn = document.getElementById('install-btn');
+            if (installBtn) {
+                installBtn.remove();
+            }
+            deferredPrompt = null;
+        });
 
         // 초기 화면 렌더링 - Firebase 초기화 후 실행
         initializeApp().then(() => {
