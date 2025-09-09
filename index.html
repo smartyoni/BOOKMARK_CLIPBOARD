@@ -4,6 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>상황별 부동산 업무 허브</title>
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"></script>
+    
     <style>
         /* 기본 스타일 및 레이아웃 설정 */
         body, html {
@@ -1098,8 +1103,58 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
         
-        // 로컬스토리지 관련 함수들
+        // Firebase 설정 - 본인의 Firebase 프로젝트 설정으로 교체하세요
+        const firebaseConfig = {
+            apiKey: "AIzaSyDKjKvRCw-j4b-1W4MhRc-uZ21zbAnTFM8",
+            authDomain: "bookmarkclipboard.firebaseapp.com",
+            projectId: "bookmarkclipboard",
+            storageBucket: "bookmarkclipboard.firebasestorage.app",
+            messagingSenderId: "969969481293",
+            appId: "1:969969481293:web:08ae0008ac1b590c43ce04"
+        };
+        
+        // Firebase 초기화
+        let db = null;
+        let firebaseInitialized = false;
+        
+        try {
+            firebase.initializeApp(firebaseConfig);
+            db = firebase.firestore();
+            firebaseInitialized = true;
+            console.log('Firebase 초기화 성공');
+        } catch (error) {
+            console.warn('Firebase 초기화 실패, 로컬스토리지 사용:', error);
+            firebaseInitialized = false;
+        }
+        
+        // 데이터 저장 함수들 (Firebase + 로컬스토리지 백업)
         const STORAGE_KEY = 'bookmark-clipboard-app-data';
+        
+        // Firebase에 데이터 저장 (개인용 단일 문서)
+        async function saveToFirebase() {
+            if (!firebaseInitialized || !db) {
+                console.log('Firebase 미초기화, 로컬스토리지 사용');
+                return saveToLocalStorage();
+            }
+            
+            try {
+                const dataToSave = {
+                    projects: allProjectsData,
+                    currentProject: currentProject,
+                    lastUpdated: new Date().toISOString()
+                };
+                
+                await db.collection('userdata').doc('bookmark-app').set(dataToSave);
+                console.log('데이터를 Firebase에 저장했습니다.');
+                
+                // 로컬스토리지에도 백업 저장
+                await saveToFirebase();
+                
+            } catch (error) {
+                console.error('Firebase 저장 실패, 로컬스토리지 사용:', error);
+                await saveToFirebase();
+            }
+        }
         
         function saveToLocalStorage() {
             try {
@@ -1111,6 +1166,36 @@
                 console.log('데이터를 로컬스토리지에 저장했습니다.');
             } catch (error) {
                 console.error('로컬스토리지 저장 실패:', error);
+            }
+        }
+        
+        // Firebase에서 데이터 불러오기
+        async function loadFromFirebase() {
+            if (!firebaseInitialized || !db) {
+                console.log('Firebase 미초기화, 로컬스토리지 사용');
+                return loadFromLocalStorage();
+            }
+            
+            try {
+                const doc = await db.collection('userdata').doc('bookmark-app').get();
+                if (doc.exists) {
+                    const data = doc.data();
+                    console.log('Firebase에서 데이터를 불러왔습니다.');
+                    
+                    // 로컬스토리지에도 동기화
+                    if (data.projects && data.currentProject) {
+                        const localData = { projects: data.projects, currentProject: data.currentProject };
+                        localStorage.setItem(STORAGE_KEY, JSON.stringify(localData));
+                    }
+                    
+                    return data;
+                } else {
+                    console.log('Firebase에 데이터 없음, 로컬스토리지 확인');
+                    return loadFromLocalStorage();
+                }
+            } catch (error) {
+                console.error('Firebase 불러오기 실패, 로컬스토리지 사용:', error);
+                return loadFromLocalStorage();
             }
         }
         
@@ -1170,18 +1255,61 @@
             };
         }
         
-        // 로컬스토리지에서 데이터 불러오기 또는 기본 데이터 사용
-        const savedData = loadFromLocalStorage();
+        // 로컬 데이터를 Firebase로 마이그레이션
+        async function migrateLocalToFirebase() {
+            const localData = loadFromLocalStorage();
+            if (localData && localData.projects) {
+                console.log('로컬 데이터를 Firebase로 마이그레이션 중...');
+                allProjectsData = localData.projects;
+                currentProject = localData.currentProject;
+                await saveToFirebase();
+                console.log('마이그레이션 완료');
+                return localData;
+            }
+            return null;
+        }
+
+        // 앱 초기화 - Firebase 우선, 로컬스토리지 백업
         let allProjectsData, currentProject;
         
-        if (savedData) {
-            allProjectsData = savedData.projects;
-            currentProject = savedData.currentProject || Object.keys(savedData.projects)[0];
-        } else {
-            allProjectsData = getDefaultData();
-            currentProject = '가계약';
-            // 첫 실행시 기본 데이터를 로컬스토리지에 저장
-            saveToLocalStorage();
+        async function initializeApp() {
+            try {
+                const savedData = await loadFromFirebase();
+                
+                if (savedData && savedData.projects) {
+                    allProjectsData = savedData.projects;
+                    currentProject = savedData.currentProject || Object.keys(savedData.projects)[0];
+                    console.log('Firebase 데이터로 앱 초기화');
+                } else {
+                    // Firebase에 데이터가 없으면 로컬 데이터 마이그레이션 시도
+                    const migratedData = await migrateLocalToFirebase();
+                    if (!migratedData) {
+                        allProjectsData = getDefaultData();
+                        currentProject = '가계약';
+                        console.log('기본 데이터로 앱 초기화');
+                        // 첫 실행시 Firebase 및 로컬스토리지에 저장
+                        await saveToFirebase();
+                    }
+                }
+                
+                // UI 렌더링
+                renderProjectList();
+                renderProject(currentProject);
+                
+            } catch (error) {
+                console.error('앱 초기화 실패:', error);
+                // 에러 발생시 로컬스토리지 백업으로 시도
+                const localData = loadFromLocalStorage();
+                if (localData) {
+                    allProjectsData = localData.projects;
+                    currentProject = localData.currentProject || Object.keys(localData.projects)[0];
+                } else {
+                    allProjectsData = getDefaultData();
+                    currentProject = '가계약';
+                }
+                renderProjectList();
+                renderProject(currentProject);
+            }
         }
 
         // UI 요소 가져오기
@@ -1293,7 +1421,7 @@
             renderFavorites();
             renderStatistics();
             
-            saveToLocalStorage();
+            await saveToFirebase();
         }
 
         function addTooltipEvents() {
@@ -1518,7 +1646,7 @@
                 renderProject(currentProject);
                 contextMenu.style.display = 'none';
                 activeItem = null;
-                saveToLocalStorage();
+                await saveToFirebase();
             }
         });
 
@@ -1560,7 +1688,7 @@
                 renderProject(currentProject);
                 contextMenu.style.display = 'none';
                 activeItem = null;
-                saveToLocalStorage();
+                await saveToFirebase();
             }
         });
 
@@ -1603,7 +1731,7 @@
             }
             renderProject(currentProject);
             addBookmarkModal.style.display = 'none';
-            saveToLocalStorage();
+            await saveToFirebase();
         });
         
         addBookmarkCancel.addEventListener('click', () => {
@@ -1642,7 +1770,7 @@
             }
             renderProject(currentProject);
             addClipboardModal.style.display = 'none';
-            saveToLocalStorage();
+            await saveToFirebase();
         });
         
         addClipboardCancel.addEventListener('click', () => {
@@ -1692,7 +1820,7 @@
             renderProject(name);
             
             addProjectModal.style.display = 'none';
-            saveToLocalStorage();
+            await saveToFirebase();
         });
         
         addProjectCancel.addEventListener('click', () => {
@@ -2024,7 +2152,7 @@
         // 복원 완료 공통 처리
         function finalizeRestore(projectCount, mode, customMessage = null) {
             // 로컬스토리지에 저장
-            saveToLocalStorage();
+            await saveToFirebase();
             
             // 화면 업데이트
             renderProjectList();
@@ -2058,7 +2186,7 @@
                     
                     renderProjectList();
                     renderProject(trimmedName);
-                    saveToLocalStorage();
+                    await saveToFirebase();
                 }
                 projectContextMenu.style.display = 'none';
                 activeProject = null;
@@ -2081,7 +2209,7 @@
                     
                     renderProjectList();
                     renderProject(currentProject);
-                    saveToLocalStorage();
+                    await saveToFirebase();
                 }
                 projectContextMenu.style.display = 'none';
                 activeProject = null;
@@ -2271,7 +2399,7 @@
                     Object.assign(allProjectsData, newProjectData);
                     
                     renderProjectList();
-                    saveToLocalStorage();
+                    await saveToFirebase();
                 }
             }
         }
@@ -2399,7 +2527,7 @@
                         data.splice(newIndex, 0, itemToMove);
                         
                         renderProject(currentProject);
-                        saveToLocalStorage();
+                        await saveToFirebase();
                         
                         delete targetButton.dataset.insertBefore;
                     }
@@ -2414,7 +2542,7 @@
                         data.push(itemToMove);
                         
                         renderProject(currentProject);
-                        saveToLocalStorage();
+                        await saveToFirebase();
                     }
                 }
             }
@@ -2615,11 +2743,11 @@
         // 리사이즈 이벤트 리스너
         window.addEventListener('resize', handleResize);
 
-        // 초기 화면 렌더링
-        renderProjectList();
-        renderProject(currentProject);
-        initMobileTabs();
-        handleResize(); // 초기 화면 크기에 따른 설정
+        // 초기 화면 렌더링 - Firebase 초기화 후 실행
+        initializeApp().then(() => {
+            initMobileTabs();
+            handleResize(); // 초기 화면 크기에 따른 설정
+        });
     });
     </script>
 </body>
