@@ -2874,35 +2874,86 @@
             });
         }
 
-        // PWA 설치 프롬프트
+        // PWA 설치 관리
         let deferredPrompt;
+        let installButton = null;
+
+        // PWA 설치 가능 여부 확인 및 버튼 표시
+        function checkPWAInstallability() {
+            console.log('PWA: 설치 가능성 확인 중...');
+            
+            // 이미 설치된 앱인지 확인
+            if (window.matchMedia('(display-mode: standalone)').matches) {
+                console.log('PWA: 이미 설치된 앱에서 실행 중');
+                return false;
+            }
+            
+            // iOS Safari 확인
+            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+            const isInStandaloneMode = ('standalone' in window.navigator) && window.navigator.standalone;
+            
+            if (isIOS && !isInStandaloneMode) {
+                console.log('PWA: iOS Safari에서 실행 중 - 수동 설치 가이드 표시');
+                showIOSInstallGuide();
+                return false;
+            }
+            
+            // 일반적인 경우 - beforeinstallprompt 이벤트 대기 중
+            // 5초 후에도 이벤트가 없으면 수동으로 버튼 표시
+            setTimeout(() => {
+                if (!deferredPrompt && !installButton) {
+                    console.log('PWA: beforeinstallprompt 이벤트 없음 - 수동 버튼 표시');
+                    showManualInstallButton();
+                }
+            }, 5000);
+            
+            return true;
+        }
+
+        // beforeinstallprompt 이벤트 처리
         window.addEventListener('beforeinstallprompt', (e) => {
-            console.log('PWA: 설치 프롬프트 준비됨');
+            console.log('PWA: beforeinstallprompt 이벤트 발생');
             e.preventDefault();
             deferredPrompt = e;
             showInstallButton();
         });
 
-        function showInstallButton() {
-            // 모바일 탭 영역에 설치 버튼 추가
-            const mobileTabs = document.querySelector('.mobile-tabs');
-            if (mobileTabs && !document.getElementById('install-btn')) {
-                const installBtn = document.createElement('button');
-                installBtn.id = 'install-btn';
-                installBtn.innerHTML = '📱 앱 설치';
-                installBtn.style.cssText = `
+        // iOS Safari용 설치 가이드
+        function showIOSInstallGuide() {
+            const iosGuide = document.createElement('div');
+            iosGuide.id = 'ios-install-guide';
+            iosGuide.innerHTML = `
+                <div style="
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    right: 0;
                     background: #007acc;
                     color: white;
-                    border: none;
-                    padding: 8px 16px;
-                    border-radius: 4px;
-                    font-size: 12px;
-                    cursor: pointer;
-                    margin: 4px;
-                `;
-                
-                installBtn.addEventListener('click', async () => {
-                    if (deferredPrompt) {
+                    padding: 12px;
+                    text-align: center;
+                    font-size: 14px;
+                    z-index: 9999;
+                ">
+                    📱 iOS 설치: Safari 메뉴 → "홈 화면에 추가" 
+                    <button onclick="this.parentElement.parentElement.remove()" style="
+                        background: none;
+                        border: none;
+                        color: white;
+                        font-size: 16px;
+                        float: right;
+                        cursor: pointer;
+                    ">×</button>
+                </div>
+            `;
+            document.body.appendChild(iosGuide);
+        }
+
+        // 자동 설치 버튼 (beforeinstallprompt 이벤트 있을 때)
+        function showInstallButton() {
+            createInstallButton('📱 앱 설치', async () => {
+                if (deferredPrompt) {
+                    try {
                         deferredPrompt.prompt();
                         const result = await deferredPrompt.userChoice;
                         
@@ -2913,11 +2964,67 @@
                         }
                         
                         deferredPrompt = null;
-                        installBtn.remove();
+                        if (installButton) {
+                            installButton.remove();
+                            installButton = null;
+                        }
+                    } catch (error) {
+                        console.error('PWA: 설치 중 오류:', error);
                     }
-                });
+                }
+            });
+        }
+
+        // 수동 설치 버튼 (beforeinstallprompt 이벤트 없을 때)
+        function showManualInstallButton() {
+            createInstallButton('📱 설치 방법', () => {
+                const isChrome = /Chrome/.test(navigator.userAgent);
+                const isEdge = /Edge/.test(navigator.userAgent);
                 
-                mobileTabs.appendChild(installBtn);
+                let message = '이 앱을 설치하려면:\\n\\n';
+                
+                if (isChrome) {
+                    message += 'Chrome: 주소창 오른쪽 "앱 설치" 아이콘 클릭';
+                } else if (isEdge) {
+                    message += 'Edge: 주소창 오른쪽 "앱 설치" 아이콘 클릭';
+                } else {
+                    message += '1. Chrome 또는 Edge 브라우저 사용\\n2. 주소창에서 설치 옵션 찾기\\n3. 또는 브라우저 메뉴에서 "앱 설치" 선택';
+                }
+                
+                alert(message);
+            });
+        }
+
+        // 설치 버튼 생성 공통 함수
+        function createInstallButton(text, clickHandler) {
+            if (installButton) return; // 이미 존재하면 중단
+            
+            // 데스크톱: 헤더에 추가
+            const header = document.querySelector('.main-header') || document.querySelector('.sidebar-header');
+            // 모바일: 탭 영역에 추가  
+            const mobileTabs = document.querySelector('.mobile-tabs');
+            const targetContainer = window.innerWidth <= 768 ? mobileTabs : header;
+            
+            if (targetContainer) {
+                installButton = document.createElement('button');
+                installButton.id = 'install-btn';
+                installButton.innerHTML = text;
+                installButton.style.cssText = `
+                    background: #007acc;
+                    color: white;
+                    border: none;
+                    padding: 8px 12px;
+                    border-radius: 4px;
+                    font-size: 12px;
+                    cursor: pointer;
+                    margin: 4px;
+                    z-index: 1000;
+                `;
+                
+                installButton.addEventListener('click', clickHandler);
+                targetContainer.appendChild(installButton);
+                
+                console.log('PWA: 설치 버튼 생성됨');
             }
         }
 
@@ -2935,6 +3042,11 @@
         initializeApp().then(() => {
             initMobileTabs();
             handleResize(); // 초기 화면 크기에 따른 설정
+            
+            // PWA 설치 가능성 확인
+            setTimeout(() => {
+                checkPWAInstallability();
+            }, 2000); // 2초 후 확인 (UI 로딩 완료 후)
         });
     });
     </script>
