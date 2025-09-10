@@ -357,6 +357,25 @@
             background-color: rgba(100, 71, 58, 0.1);
         }
         
+        /* 구분선 스타일 */
+        .divider {
+            width: 100%;
+            height: 2px;
+            background-color: rgba(55, 53, 47, 0.3);
+            margin: 8px 0;
+            border-radius: 1px;
+            cursor: grab;
+            position: relative;
+        }
+        
+        .divider:hover {
+            background-color: rgba(55, 53, 47, 0.5);
+        }
+        
+        .divider.dragging {
+            opacity: 0.5;
+        }
+        
 
         /* Context Menu Styles */
         .context-menu {
@@ -1081,7 +1100,7 @@
                 </div>
 
                 <div class="content-panel clipboard-panel">
-                    <h4 class="clipboard-header">클립보드 <button id="add-clipboard-btn" class="add-section-btn">+</button></h4>
+                    <h4 class="clipboard-header">클립보드 <button id="add-clipboard-btn" class="add-section-btn">+</button> <button id="add-divider-btn" class="add-section-btn">|</button></h4>
                     <ul id="clipboard-list" class="item-list"></ul>
                 </div>
                 
@@ -1621,6 +1640,7 @@
         
         const addBookmarkBtn = document.getElementById('add-bookmark-btn');
         const addClipboardBtn = document.getElementById('add-clipboard-btn');
+        const addDividerBtn = document.getElementById('add-divider-btn');
 
         const contextMenu = document.getElementById('context-menu');
         const contextEdit = document.getElementById('context-edit');
@@ -1685,46 +1705,60 @@
             });
 
             projectData.clipboard.forEach((item, index) => {
-                const button = document.createElement('button');
-                button.className = 'item-button clipboard-button draggable';
-                
-                const favoriteIcon = item.favorite ? '⭐ ' : '';
-                const buttonText = item.title || item.text || '';
-                button.textContent = favoriteIcon + buttonText.substring(0, 10 - favoriteIcon.length);
-                
-                button.style.backgroundColor = item.color || '#f8f9fa';
-                button.dataset.index = index;
-                button.dataset.type = 'clipboard';
-                button.dataset.fullText = item.text;
-                button.dataset.title = item.title || '';
-                button.draggable = true;
-                
-                let isDragging = false;
-                button.addEventListener('mousedown', () => { isDragging = false; });
-                button.addEventListener('dragstart', (e) => { 
-                    isDragging = true; 
-                    handleItemDragStart(e);
-                });
-                button.addEventListener('mouseup', (e) => {
-                    setTimeout(() => {
-                        if (!isDragging && e.button === 0) {
-                            const modal = document.getElementById('view-clipboard-modal');
-                            const titleEl = document.getElementById('view-clipboard-title');
-                            const contentEl = document.getElementById('view-clipboard-content');
-                            const copyBtn = document.getElementById('view-clipboard-copy-btn');
-                            const editBtn = document.getElementById('view-clipboard-edit-btn');
+                if (item.type === 'divider') {
+                    // 구분선 생성
+                    const divider = document.createElement('div');
+                    divider.className = 'divider draggable';
+                    divider.dataset.index = index;
+                    divider.dataset.type = 'clipboard';
+                    divider.draggable = true;
+                    
+                    divider.addEventListener('dragstart', handleItemDragStart);
+                    
+                    clipboardList.appendChild(divider);
+                } else {
+                    // 일반 클립보드 버튼 생성
+                    const button = document.createElement('button');
+                    button.className = 'item-button clipboard-button draggable';
+                    
+                    const favoriteIcon = item.favorite ? '⭐ ' : '';
+                    const buttonText = item.title || item.text || '';
+                    button.textContent = favoriteIcon + buttonText.substring(0, 10 - favoriteIcon.length);
+                    
+                    button.style.backgroundColor = item.color || '#f8f9fa';
+                    button.dataset.index = index;
+                    button.dataset.type = 'clipboard';
+                    button.dataset.fullText = item.text;
+                    button.dataset.title = item.title || '';
+                    button.draggable = true;
+                    
+                    let isDragging = false;
+                    button.addEventListener('mousedown', () => { isDragging = false; });
+                    button.addEventListener('dragstart', (e) => { 
+                        isDragging = true; 
+                        handleItemDragStart(e);
+                    });
+                    button.addEventListener('mouseup', (e) => {
+                        setTimeout(() => {
+                            if (!isDragging && e.button === 0) {
+                                const modal = document.getElementById('view-clipboard-modal');
+                                const titleEl = document.getElementById('view-clipboard-title');
+                                const contentEl = document.getElementById('view-clipboard-content');
+                                const copyBtn = document.getElementById('view-clipboard-copy-btn');
+                                const editBtn = document.getElementById('view-clipboard-edit-btn');
 
-                            titleEl.textContent = item.title || '';
-                            contentEl.innerHTML = convertUrlsToLinks(item.text);
-                            
-                            copyBtn.dataset.clipboardText = item.text;
-                            editBtn.dataset.clipboardIndex = index;
+                                titleEl.textContent = item.title || '';
+                                contentEl.innerHTML = convertUrlsToLinks(item.text);
+                                
+                                copyBtn.dataset.clipboardText = item.text;
+                                editBtn.dataset.clipboardIndex = index;
 
-                            modal.style.display = 'flex';
-                        }
-                    }, 50);
-                });
-                clipboardList.appendChild(button);
+                                modal.style.display = 'flex';
+                            }
+                        }, 50);
+                    });
+                    clipboardList.appendChild(button);
+                }
             });
 
             addTooltipEvents();
@@ -1819,6 +1853,23 @@
             delete modal.dataset.editIndex;
         }
 
+        function addDivider() {
+            if (!currentProject) {
+                alert('프로젝트를 먼저 선택해주세요.');
+                return;
+            }
+            
+            const projectData = allProjectsData[currentProject];
+            const divider = {
+                type: 'divider',
+                id: 'divider_' + Date.now()
+            };
+            
+            projectData.clipboard.push(divider);
+            saveToFirebase();
+            renderProject(currentProject);
+        }
+
         function addProject() {
             const modal = document.getElementById('add-project-modal');
             modal.style.display = 'flex';
@@ -1888,6 +1939,17 @@
             contextMenu.style.left = x + 'px';
             contextMenu.style.top = y + 'px';
             activeItem = { type: itemType, index: itemIndex };
+            
+            // 구분선인 경우 편집/즐겨찾기/색상 옵션 숨기기
+            if (itemType === 'divider') {
+                contextEdit.style.display = 'none';
+                contextFavorite.style.display = 'none';
+                contextColor.style.display = 'none';
+            } else {
+                contextEdit.style.display = 'block';
+                contextFavorite.style.display = 'block';
+                contextColor.style.display = 'block';
+            }
         }
 
         function showProjectContextMenu(e, projectName) {
@@ -2033,9 +2095,13 @@
                 }
             } else if (contextType === 'clipboard') {
                 const button = e.target.closest('.item-button.clipboard-button');
+                const divider = e.target.closest('.divider');
                 if (button) {
                     const index = parseInt(button.dataset.index);
                     showContextMenu(e, 'clipboard', index);
+                } else if (divider) {
+                    const index = parseInt(divider.dataset.index);
+                    showContextMenu(e, 'divider', index);
                 }
             }
         }
@@ -2137,6 +2203,8 @@
                     allProjectsData[currentProject].bookmarks.splice(index, 1);
                 } else if (type === 'clipboard') {
                     allProjectsData[currentProject].clipboard.splice(index, 1);
+                } else if (type === 'divider') {
+                    allProjectsData[currentProject].clipboard.splice(index, 1);
                 }
                 renderProject(currentProject);
                 contextMenu.style.display = 'none';
@@ -2152,6 +2220,7 @@
         
         addBookmarkBtn.addEventListener('click', addBookmark);
         addClipboardBtn.addEventListener('click', addClipboard);
+        addDividerBtn.addEventListener('click', addDivider);
         
         const addProjectBtn = document.getElementById('add-project-btn');
         addProjectBtn.addEventListener('click', addProject);
