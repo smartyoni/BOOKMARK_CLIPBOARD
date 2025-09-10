@@ -209,6 +209,67 @@
             border-bottom: 1px solid #a3d5a3 !important;
             color: #28a745 !important;
         }
+        .practice-header {
+            background-color: #fff3cd !important;
+            border-bottom: 1px solid #ffc107 !important;
+            color: #ff8c00 !important;
+            display: flex !important;
+            justify-content: space-between !important;
+            align-items: center !important;
+            margin: -12px -12px 12px -12px !important;
+            padding: 12px !important;
+            border-radius: 4px 4px 0 0 !important;
+            font-size: 16px !important;
+            font-weight: 600 !important;
+            line-height: 1.3 !important;
+        }
+        .header-spacer {
+            width: 33px;
+            height: 33px;
+            display: inline-block;
+        }
+        .practice-container {
+            display: flex;
+            flex-direction: column;
+            height: calc(100% - 60px);
+        }
+        .practice-text {
+            width: 100%;
+            flex: 1;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 12px;
+            font-family: inherit;
+            font-size: 14px;
+            resize: none;
+            box-sizing: border-box;
+            background-color: #ffffff;
+            margin-bottom: 8px;
+        }
+        .practice-text:focus {
+            outline: none;
+            border-color: #ff8c00;
+            box-shadow: 0 0 0 2px rgba(255, 140, 0, 0.1);
+        }
+        .practice-buttons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+        }
+        .practice-btn {
+            padding: 6px 12px;
+            border: 1px solid #ff8c00;
+            border-radius: 4px;
+            background-color: #ffffff;
+            color: #ff8c00;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.2s;
+        }
+        .practice-btn:hover {
+            background-color: #ff8c00;
+            color: #ffffff;
+        }
         .add-section-btn {
             background-color: transparent;
             color: rgba(55, 53, 47, 0.6);
@@ -809,6 +870,16 @@
                 margin-bottom: 0;
             }
 
+            .content-panel.practice-panel {
+                display: none;
+            }
+
+            .content-panel.practice-panel.mobile-visible {
+                display: block;
+                height: calc(100% - 32px);
+                margin-bottom: 0;
+            }
+
             .dashboard-area {
                 display: none;
                 flex: none;
@@ -948,6 +1019,7 @@
         <button class="mobile-tab active" data-tab="projects">📁 프로젝트</button>
         <button class="mobile-tab" data-tab="bookmarks">📌 북마크</button>
         <button class="mobile-tab" data-tab="clipboard">📋 클립보드</button>
+        <button class="mobile-tab" data-tab="practice">📝 연습장</button>
         <button class="mobile-tab" data-tab="dashboard">📊 대시보드</button>
     </div>
 
@@ -977,6 +1049,17 @@
                 <div class="content-panel clipboard-panel">
                     <h4 class="clipboard-header">클립보드 <button id="add-clipboard-btn" class="add-section-btn">+</button></h4>
                     <ul id="clipboard-list" class="item-list"></ul>
+                </div>
+                
+                <div class="content-panel practice-panel">
+                    <h4 class="practice-header">연습장 <span class="header-spacer"></span></h4>
+                    <div class="practice-container">
+                        <textarea id="practice-textarea" class="practice-text" placeholder="자유롭게 텍스트를 입력하세요..."></textarea>
+                        <div class="practice-buttons">
+                            <button id="copy-practice-btn" class="practice-btn">복사</button>
+                            <button id="clear-practice-btn" class="practice-btn">초기화</button>
+                        </div>
+                    </div>
                 </div>
                 
                 <div class="dashboard-area">
@@ -1207,6 +1290,59 @@
             } catch (error) {
                 console.error('Firebase 저장 실패, 로컬스토리지 사용:', error);
                 saveToLocalStorage();
+            }
+        }
+
+        // Firebase에 연습장 내용 저장
+        async function savePracticeToFirebase(content) {
+            if (!firebaseInitialized || !db) {
+                console.log('Firebase 미초기화, 로컬스토리지에 연습장 저장');
+                localStorage.setItem('practice-content', content);
+                return;
+            }
+            
+            try {
+                await db.collection('userdata').doc('practice').set({
+                    content: content,
+                    lastUpdated: new Date().toISOString()
+                });
+                console.log('연습장 내용을 Firebase에 저장했습니다.');
+                
+                // 로컬스토리지에도 백업 저장
+                localStorage.setItem('practice-content', content);
+                
+            } catch (error) {
+                console.error('Firebase 연습장 저장 실패, 로컬스토리지 사용:', error);
+                localStorage.setItem('practice-content', content);
+            }
+        }
+
+        // Firebase에서 연습장 내용 로드
+        async function loadPracticeFromFirebase() {
+            const practiceTextarea = document.getElementById('practice-textarea');
+            
+            if (!firebaseInitialized || !db) {
+                console.log('Firebase 미초기화, 로컬스토리지에서 연습장 로드');
+                const localContent = localStorage.getItem('practice-content') || '';
+                practiceTextarea.value = localContent;
+                return;
+            }
+            
+            try {
+                const doc = await db.collection('userdata').doc('practice').get();
+                if (doc.exists) {
+                    const data = doc.data();
+                    practiceTextarea.value = data.content || '';
+                    console.log('Firebase에서 연습장 내용을 로드했습니다.');
+                } else {
+                    // Firebase에 문서가 없으면 로컬스토리지에서 로드
+                    const localContent = localStorage.getItem('practice-content') || '';
+                    practiceTextarea.value = localContent;
+                }
+            } catch (error) {
+                console.error('Firebase 연습장 로드 실패, 로컬스토리지 사용:', error);
+                const localContent = localStorage.getItem('practice-content') || '';
+                practiceTextarea.value = localContent;
             }
         }
         
@@ -2771,6 +2907,7 @@
             const projectSidebar = document.getElementById('project-sidebar');
             const bookmarkPanel = document.querySelector('.bookmark-panel');
             const clipboardPanel = document.querySelector('.clipboard-panel');
+            const practicePanel = document.querySelector('.practice-panel');
             const dashboardArea = document.querySelector('.dashboard-area');
             
             mobileTabs.forEach(tab => {
@@ -2785,6 +2922,7 @@
                     projectSidebar.classList.remove('mobile-visible');
                     bookmarkPanel.classList.remove('mobile-visible');
                     clipboardPanel.classList.remove('mobile-visible');
+                    practicePanel.classList.remove('mobile-visible');
                     dashboardArea.classList.remove('mobile-visible');
                     
                     // 선택된 탭에 따라 패널 표시
@@ -2799,6 +2937,9 @@
                         case 'clipboard':
                             clipboardPanel.classList.add('mobile-visible');
                             break;
+                        case 'practice':
+                            practicePanel.classList.add('mobile-visible');
+                            break;
                         case 'dashboard':
                             dashboardArea.classList.add('mobile-visible');
                             break;
@@ -2810,6 +2951,74 @@
             if (window.innerWidth <= 768) {
                 projectSidebar.classList.add('mobile-visible');
             }
+        }
+
+        // 연습장 영역 초기화
+        function initPracticeArea() {
+            const practiceTextarea = document.getElementById('practice-textarea');
+            const copyBtn = document.getElementById('copy-practice-btn');
+            const clearBtn = document.getElementById('clear-practice-btn');
+            
+            // 복사 버튼 이벤트
+            copyBtn.addEventListener('click', async () => {
+                const text = practiceTextarea.value;
+                if (!text.trim()) {
+                    alert('복사할 내용이 없습니다.');
+                    return;
+                }
+                
+                try {
+                    if (navigator.clipboard && navigator.clipboard.writeText) {
+                        await navigator.clipboard.writeText(text);
+                        alert('내용이 클립보드에 복사되었습니다.');
+                    } else {
+                        // 폴백 방식
+                        practiceTextarea.select();
+                        document.execCommand('copy');
+                        alert('내용이 클립보드에 복사되었습니다.');
+                    }
+                } catch (err) {
+                    console.error('복사 실패:', err);
+                    alert('복사에 실패했습니다.');
+                }
+            });
+            
+            // 초기화 버튼 이벤트
+            clearBtn.addEventListener('click', () => {
+                if (practiceTextarea.value.trim() && confirm('연습장의 모든 내용을 초기화하시겠습니까?')) {
+                    practiceTextarea.value = '';
+                    savePracticeToFirebase('');
+                    practiceTextarea.focus();
+                }
+            });
+            
+            // 실시간 저장 (디바운싱 적용)
+            let saveTimeout;
+            practiceTextarea.addEventListener('input', () => {
+                clearTimeout(saveTimeout);
+                saveTimeout = setTimeout(() => {
+                    savePracticeToFirebase(practiceTextarea.value);
+                }, 1000); // 1초 지연
+            });
+            
+            // Firebase에서 연습장 내용 로드
+            loadPracticeFromFirebase();
+            
+            // 실시간 동기화 리스너 설정 (Firebase 초기화 후)
+            setTimeout(() => {
+                if (firebaseInitialized && db) {
+                    db.collection('userdata').doc('practice').onSnapshot((doc) => {
+                        if (doc.exists && document.activeElement !== practiceTextarea) {
+                            // 사용자가 현재 텍스트상자를 편집 중이 아닐 때만 업데이트
+                            const data = doc.data();
+                            if (data.content !== practiceTextarea.value) {
+                                practiceTextarea.value = data.content || '';
+                                console.log('다른 기기에서 연습장 내용이 업데이트되었습니다.');
+                            }
+                        }
+                    });
+                }
+            }, 2000); // Firebase 초기화 완료 후 2초 뒤에 리스너 설정
         }
 
         // 화면 크기 변경 감지
@@ -2826,6 +3035,7 @@
                 document.getElementById('project-sidebar').classList.remove('mobile-visible');
                 document.querySelector('.bookmark-panel').classList.remove('mobile-visible');
                 document.querySelector('.clipboard-panel').classList.remove('mobile-visible');
+                document.querySelector('.practice-panel').classList.remove('mobile-visible');
                 document.querySelector('.dashboard-area').classList.remove('mobile-visible');
             }
         }
@@ -3064,6 +3274,7 @@
         // 초기 화면 렌더링 - Firebase 초기화 후 실행
         initializeApp().then(() => {
             initMobileTabs();
+            initPracticeArea();
             handleResize(); // 초기 화면 크기에 따른 설정
             
             // PWA 설치 가능성 확인
