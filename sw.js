@@ -1,4 +1,4 @@
-const CACHE_NAME = 'bookmark-clipboard-v1';
+const CACHE_NAME = 'bookmark-clipboard-v2';
 const urlsToCache = [
   '/BOOKMARK_CLIPBOARD/',
   '/BOOKMARK_CLIPBOARD/index.html',
@@ -43,7 +43,7 @@ self.addEventListener('activate', event => {
   );
 });
 
-// 네트워크 요청 가로채기 - 캐시 우선 전략
+// 네트워크 요청 가로채기 - 네트워크 우선 전략 (HTML 파일에 대해)
 self.addEventListener('fetch', event => {
   // Firebase API 요청은 항상 네트워크를 통해 처리
   if (event.request.url.includes('firestore.googleapis.com') || 
@@ -51,41 +51,56 @@ self.addEventListener('fetch', event => {
     return;
   }
 
-  event.respondWith(
-    caches.match(event.request)
-      .then(response => {
-        // 캐시에 있으면 캐시에서 반환
-        if (response) {
-          console.log('Service Worker: 캐시에서 반환 -', event.request.url);
-          return response;
-        }
-
-        // 캐시에 없으면 네트워크에서 가져오기
-        console.log('Service Worker: 네트워크에서 가져오기 -', event.request.url);
-        return fetch(event.request)
-          .then(response => {
-            // 유효한 응답인지 확인
-            if (!response || response.status !== 200 || response.type !== 'basic') {
-              return response;
-            }
-
-            // 응답을 복제해서 캐시에 저장
+  // HTML 파일에 대해서는 네트워크 우선 전략 사용
+  if (event.request.destination === 'document' || event.request.url.includes('index.html')) {
+    event.respondWith(
+      fetch(event.request)
+        .then(response => {
+          console.log('Service Worker: 네트워크에서 가져오기 -', event.request.url);
+          // 네트워크에서 성공적으로 가져온 경우 캐시 업데이트
+          if (response && response.status === 200) {
             const responseToCache = response.clone();
             caches.open(CACHE_NAME)
               .then(cache => {
                 cache.put(event.request, responseToCache);
               });
-
+          }
+          return response;
+        })
+        .catch(() => {
+          // 네트워크 실패시 캐시에서 반환
+          console.log('Service Worker: 네트워크 실패, 캐시에서 반환 -', event.request.url);
+          return caches.match(event.request);
+        })
+    );
+  } else {
+    // 다른 리소스는 캐시 우선 전략
+    event.respondWith(
+      caches.match(event.request)
+        .then(response => {
+          if (response) {
+            console.log('Service Worker: 캐시에서 반환 -', event.request.url);
             return response;
-          })
-          .catch(() => {
-            // 네트워크 실패시 기본 오프라인 페이지 반환
-            if (event.request.destination === 'document') {
-              return caches.match('/BOOKMARK_CLIPBOARD/index.html');
-            }
-          });
-      })
-  );
+          }
+
+          console.log('Service Worker: 네트워크에서 가져오기 -', event.request.url);
+          return fetch(event.request)
+            .then(response => {
+              if (!response || response.status !== 200 || response.type !== 'basic') {
+                return response;
+              }
+
+              const responseToCache = response.clone();
+              caches.open(CACHE_NAME)
+                .then(cache => {
+                  cache.put(event.request, responseToCache);
+                });
+
+              return response;
+            });
+        })
+    );
+  }
 });
 
 // 백그라운드 동기화 (PWA 기능)
