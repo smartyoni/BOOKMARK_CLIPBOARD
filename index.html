@@ -1638,7 +1638,10 @@
                 
                 let isDragging = false;
                 button.addEventListener('mousedown', () => { isDragging = false; });
-                button.addEventListener('dragstart', () => { isDragging = true; });
+                button.addEventListener('dragstart', (e) => { 
+                    isDragging = true; 
+                    handleItemDragStart(e);
+                });
                 button.addEventListener('mouseup', (e) => {
                     setTimeout(() => {
                         if (!isDragging && e.button === 0) {
@@ -1666,7 +1669,10 @@
                 
                 let isDragging = false;
                 button.addEventListener('mousedown', () => { isDragging = false; });
-                button.addEventListener('dragstart', () => { isDragging = true; });
+                button.addEventListener('dragstart', (e) => { 
+                    isDragging = true; 
+                    handleItemDragStart(e);
+                });
                 button.addEventListener('mouseup', (e) => {
                     setTimeout(() => {
                         if (!isDragging && e.button === 0) {
