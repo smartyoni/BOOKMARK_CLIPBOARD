@@ -1283,6 +1283,7 @@
                     projectOrder: projectOrder || Object.keys(allProjectsData),
                     lastUpdated: new Date().toISOString()
                 };
+                console.log('Firebase에 저장하는 projectOrder:', dataToSave.projectOrder);
                 
                 await db.collection('userdata').doc('bookmark-app').set(dataToSave);
                 console.log('데이터를 Firebase에 저장했습니다.');
@@ -1475,7 +1476,9 @@
                     allProjectsData = savedData.projects;
                     currentProject = savedData.currentProject || Object.keys(savedData.projects)[0];
                     projectOrder = savedData.projectOrder || Object.keys(savedData.projects);
-                    console.log('Firebase 데이터로 앱 초기화');
+                    console.log('=== Firebase 데이터로 앱 초기화 ===');
+                    console.log('로드된 projectOrder:', projectOrder);
+                    console.log('저장된 데이터의 projectOrder:', savedData.projectOrder);
                 } else {
                     // Firebase에 데이터가 없으면 로컬 데이터 마이그레이션 시도
                     const migratedData = await migrateLocalToFirebase();
@@ -1500,6 +1503,7 @@
                     allProjectsData = localData.projects;
                     currentProject = localData.currentProject || Object.keys(localData.projects)[0];
                     projectOrder = localData.projectOrder || Object.keys(localData.projects);
+                    console.log('로컬스토리지에서 로드된 projectOrder:', projectOrder);
                 } else {
                     allProjectsData = getDefaultData();
                     currentProject = '가계약';
@@ -1715,6 +1719,8 @@
             
             // projectOrder 배열을 사용하여 순서 보장
             const orderedProjects = projectOrder || Object.keys(allProjectsData);
+            console.log('renderProjectList - 현재 projectOrder:', projectOrder);
+            console.log('renderProjectList - orderedProjects:', orderedProjects);
             orderedProjects.forEach((projectName, index) => {
                 // 존재하지 않는 프로젝트는 건너뛰기
                 if (!allProjectsData[projectName]) return;
@@ -2700,6 +2706,7 @@
                     
                     // projectOrder 업데이트
                     projectOrder = [...currentOrder];
+                    console.log('드래그 완료 후 새로운 projectOrder:', projectOrder);
                     
                     renderProjectList();
                     saveToFirebase();
