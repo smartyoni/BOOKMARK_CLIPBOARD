@@ -325,7 +325,7 @@
             min-width: 80px;
             max-width: 200px;
             height: 32px;
-            background-color: rgba(242, 241, 238, 0.6);
+            background-color: #f8f9fa;
             padding: 6px 8px;
             border-radius: 3px;
             border: 2px solid #000;
@@ -649,7 +649,7 @@
         .favorite-item {
             padding: 8px 12px;
             margin-bottom: 6px;
-            background-color: rgba(242, 241, 238, 0.6);
+            background-color: #f8f9fa;
             border-radius: 6px;
             cursor: pointer;
             transition: all 0.2s ease-in-out;
@@ -1225,17 +1225,37 @@
             <span class="close-button color-palette-close">&times;</span>
             <h2>색상 선택</h2>
             <div class="color-palette-grid">
-                <div class="color-option" data-color="rgba(242, 241, 238, 0.6)" style="background-color: rgba(242, 241, 238, 0.6);" title="기본"></div>
-                <div class="color-option" data-color="rgba(255, 235, 235, 0.8)" style="background-color: rgba(255, 235, 235, 0.8);" title="빨강"></div>
-                <div class="color-option" data-color="rgba(255, 244, 235, 0.8)" style="background-color: rgba(255, 244, 235, 0.8);" title="주황"></div>
-                <div class="color-option" data-color="rgba(255, 251, 235, 0.8)" style="background-color: rgba(255, 251, 235, 0.8);" title="노랑"></div>
-                <div class="color-option" data-color="rgba(235, 251, 238, 0.8)" style="background-color: rgba(235, 251, 238, 0.8);" title="초록"></div>
-                <div class="color-option" data-color="rgba(235, 251, 255, 0.8)" style="background-color: rgba(235, 251, 255, 0.8);" title="하늘"></div>
-                <div class="color-option" data-color="rgba(235, 241, 255, 0.8)" style="background-color: rgba(235, 241, 255, 0.8);" title="파랑"></div>
-                <div class="color-option" data-color="rgba(245, 235, 255, 0.8)" style="background-color: rgba(245, 235, 255, 0.8);" title="보라"></div>
-                <div class="color-option" data-color="rgba(255, 235, 245, 0.8)" style="background-color: rgba(255, 235, 245, 0.8);" title="핑크"></div>
-                <div class="color-option" data-color="rgba(245, 245, 245, 0.8)" style="background-color: rgba(245, 245, 245, 0.8);" title="회색"></div>
-                <div class="color-option" data-color="rgba(240, 228, 217, 0.8)" style="background-color: rgba(240, 228, 217, 0.8);" title="갈색"></div>
+                <!-- 첫 번째 줄: 기본 + 빨간 계열 -->
+                <div class="color-option" data-color="#f8f9fa" style="background-color: #f8f9fa;" title="기본"></div>
+                <div class="color-option" data-color="#ffebee" style="background-color: #ffebee;" title="연한 빨강"></div>
+                <div class="color-option" data-color="#ffcdd2" style="background-color: #ffcdd2;" title="빨강"></div>
+                <div class="color-option" data-color="#ef9a9a" style="background-color: #ef9a9a;" title="진한 빨강"></div>
+                <div class="color-option" data-color="#e57373" style="background-color: #e57373;" title="더진한 빨강"></div>
+                <div class="color-option" data-color="#f44336" style="background-color: #f44336;" title="강한 빨강"></div>
+                
+                <!-- 두 번째 줄: 주황 계열 -->
+                <div class="color-option" data-color="#fff3e0" style="background-color: #fff3e0;" title="연한 주황"></div>
+                <div class="color-option" data-color="#ffe0b2" style="background-color: #ffe0b2;" title="주황"></div>
+                <div class="color-option" data-color="#ffcc80" style="background-color: #ffcc80;" title="진한 주황"></div>
+                <div class="color-option" data-color="#ffb74d" style="background-color: #ffb74d;" title="더진한 주황"></div>
+                <div class="color-option" data-color="#ff9800" style="background-color: #ff9800;" title="강한 주황"></div>
+                <div class="color-option" data-color="#e65100" style="background-color: #e65100;" title="깊은 주황"></div>
+                
+                <!-- 세 번째 줄: 노랑 + 초록 계열 -->
+                <div class="color-option" data-color="#fffde7" style="background-color: #fffde7;" title="연한 노랑"></div>
+                <div class="color-option" data-color="#fff176" style="background-color: #fff176;" title="노랑"></div>
+                <div class="color-option" data-color="#e8f5e8" style="background-color: #e8f5e8;" title="연한 초록"></div>
+                <div class="color-option" data-color="#a5d6a7" style="background-color: #a5d6a7;" title="초록"></div>
+                <div class="color-option" data-color="#66bb6a" style="background-color: #66bb6a;" title="진한 초록"></div>
+                <div class="color-option" data-color="#4caf50" style="background-color: #4caf50;" title="강한 초록"></div>
+                
+                <!-- 네 번째 줄: 파랑 계열 -->
+                <div class="color-option" data-color="#e3f2fd" style="background-color: #e3f2fd;" title="연한 파랑"></div>
+                <div class="color-option" data-color="#90caf9" style="background-color: #90caf9;" title="파랑"></div>
+                <div class="color-option" data-color="#64b5f6" style="background-color: #64b5f6;" title="진한 파랑"></div>
+                <div class="color-option" data-color="#42a5f5" style="background-color: #42a5f5;" title="더진한 파랑"></div>
+                <div class="color-option" data-color="#2196f3" style="background-color: #2196f3;" title="강한 파랑"></div>
+                <div class="color-option" data-color="#1976d2" style="background-color: #1976d2;" title="깊은 파랑"></div>
             </div>
         </div>
     </div>
@@ -2085,9 +2105,9 @@
                 const projectData = allProjectsData[currentProject];
                 let currentColor = '';
                 if (type === 'bookmark') {
-                    currentColor = projectData.bookmarks[index].color || 'rgba(242, 241, 238, 0.6)';
+                    currentColor = projectData.bookmarks[index].color || '#f8f9fa';
                 } else if (type === 'clipboard') {
-                    currentColor = projectData.clipboard[index].color || 'rgba(242, 241, 238, 0.6)';
+                    currentColor = projectData.clipboard[index].color || '#f8f9fa';
                 }
                 
                 document.querySelectorAll('.color-option').forEach(option => {
