@@ -1051,9 +1051,9 @@
     <!-- 모바일 탭 네비게이션 -->
     <div class="mobile-tabs">
         <button class="mobile-tab active" data-tab="projects">📁 프로젝트</button>
-        <button class="mobile-tab" data-tab="bookmarks">📌 북마크</button>
         <button class="mobile-tab" data-tab="clipboard">📋 클립보드</button>
         <button class="mobile-tab" data-tab="practice">📝 연습장</button>
+        <button class="mobile-tab" data-tab="bookmarks">📌 북마크</button>
         <button class="mobile-tab" data-tab="dashboard">📊 대시보드</button>
     </div>
 
@@ -1638,6 +1638,14 @@
         let activeProject = null;
         let colorChangeItem = null;
 
+        // URL을 하이퍼링크로 변환하는 함수
+        function convertUrlsToLinks(text) {
+            if (!text) return '';
+            
+            const urlRegex = /(https?:\/\/[^\s]+)/g;
+            return text.replace(urlRegex, '<a href="$1" target="_blank" rel="noopener noreferrer" style="color: #0066cc; text-decoration: underline;">$1</a>');
+        }
+
         async function renderProject(projectName) {
             currentProject = projectName;
             const projectData = allProjectsData[projectName];
@@ -1707,7 +1715,7 @@
                             const editBtn = document.getElementById('view-clipboard-edit-btn');
 
                             titleEl.textContent = item.title || '';
-                            contentEl.textContent = item.text;
+                            contentEl.innerHTML = convertUrlsToLinks(item.text);
                             
                             copyBtn.dataset.clipboardText = item.text;
                             editBtn.dataset.clipboardIndex = index;
