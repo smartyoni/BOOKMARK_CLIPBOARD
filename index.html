@@ -409,10 +409,10 @@
         .modal-content {
             background-color: #ffffff;
             margin: auto;
-            padding: 40px;
+            padding: 60px;
             border: none;
             width: 90%;
-            max-width: 480px;
+            max-width: 720px;
             border-radius: 8px;
             box-shadow: rgba(15, 15, 15, 0.05) 0px 0px 0px 1px, rgba(15, 15, 15, 0.1) 0px 3px 6px, rgba(15, 15, 15, 0.2) 0px 9px 24px;
             position: relative;
@@ -966,8 +966,9 @@
             /* 모바일에서 모달 크기 조정 */
             .modal-content {
                 width: 95%;
-                max-width: 400px;
+                max-width: 600px;
                 margin: 20px;
+                padding: 40px;
             }
 
             /* 툴팁 모바일 최적화 */
@@ -1231,7 +1232,7 @@
         <div class="modal-content">
             <span class="close-button view-clipboard-close">&times;</span>
             <h2 id="view-clipboard-title"></h2>
-            <div id="view-clipboard-content" style="white-space: pre-wrap; word-wrap: break-word; max-height: 400px; overflow-y: auto; margin-bottom: 20px;"></div>
+            <div id="view-clipboard-content" style="white-space: pre-wrap; word-wrap: break-word; max-height: 600px; overflow-y: auto; margin-bottom: 20px;"></div>
             <div class="modal-actions">
                 <button id="view-clipboard-copy-btn" class="action-button">복사</button>
                 <button id="view-clipboard-edit-btn" class="action-button secondary-button">수정</button>
@@ -1279,6 +1280,7 @@
                 const dataToSave = {
                     projects: allProjectsData,
                     currentProject: currentProject,
+                    projectOrder: projectOrder || Object.keys(allProjectsData),
                     lastUpdated: new Date().toISOString()
                 };
                 
@@ -1351,7 +1353,8 @@
             try {
                 const dataToSave = {
                     projects: allProjectsData,
-                    currentProject: currentProject
+                    currentProject: currentProject,
+                    projectOrder: projectOrder || Object.keys(allProjectsData)
                 };
                 localStorage.setItem(STORAGE_KEY, JSON.stringify(dataToSave));
                 console.log('데이터를 로컬스토리지에 저장했습니다.');
@@ -1453,6 +1456,7 @@
                 console.log('로컬 데이터를 Firebase로 마이그레이션 중...');
                 allProjectsData = localData.projects;
                 currentProject = localData.currentProject;
+                projectOrder = localData.projectOrder || Object.keys(localData.projects);
                 saveToFirebase();
                 console.log('마이그레이션 완료');
                 return localData;
@@ -1461,7 +1465,7 @@
         }
 
         // 앱 초기화 - Firebase 우선, 로컬스토리지 백업
-        let allProjectsData, currentProject;
+        let allProjectsData, currentProject, projectOrder;
         
         async function initializeApp() {
             try {
@@ -1470,6 +1474,7 @@
                 if (savedData && savedData.projects) {
                     allProjectsData = savedData.projects;
                     currentProject = savedData.currentProject || Object.keys(savedData.projects)[0];
+                    projectOrder = savedData.projectOrder || Object.keys(savedData.projects);
                     console.log('Firebase 데이터로 앱 초기화');
                 } else {
                     // Firebase에 데이터가 없으면 로컬 데이터 마이그레이션 시도
@@ -1494,9 +1499,11 @@
                 if (localData) {
                     allProjectsData = localData.projects;
                     currentProject = localData.currentProject || Object.keys(localData.projects)[0];
+                    projectOrder = localData.projectOrder || Object.keys(localData.projects);
                 } else {
                     allProjectsData = getDefaultData();
                     currentProject = '가계약';
+                    projectOrder = Object.keys(allProjectsData);
                 }
                 renderProjectList();
                 renderProject(currentProject);
@@ -1706,7 +1713,11 @@
             const projectList = document.getElementById('project-list');
             projectList.innerHTML = '';
             
-            Object.keys(allProjectsData).forEach((projectName, index) => {
+            // projectOrder 배열을 사용하여 순서 보장
+            const orderedProjects = projectOrder || Object.keys(allProjectsData);
+            orderedProjects.forEach((projectName, index) => {
+                // 존재하지 않는 프로젝트는 건너뛰기
+                if (!allProjectsData[projectName]) return;
                 const li = document.createElement('li');
                 li.id = `project-${projectName}`;
                 li.textContent = projectName;
@@ -2084,6 +2095,13 @@
                 clipboard: []
             };
             
+            // 새 프로젝트를 projectOrder 배열에 추가
+            if (!projectOrder) {
+                projectOrder = Object.keys(allProjectsData);
+            } else {
+                projectOrder.push(name);
+            }
+            
             renderProjectList();
             renderProject(name);
             
@@ -2449,6 +2467,14 @@
                     allProjectsData[trimmedName] = allProjectsData[activeProject];
                     delete allProjectsData[activeProject];
                     
+                    // projectOrder에서 프로젝트명 변경
+                    if (projectOrder) {
+                        const index = projectOrder.indexOf(activeProject);
+                        if (index !== -1) {
+                            projectOrder[index] = trimmedName;
+                        }
+                    }
+                    
                     if (currentProject === activeProject) {
                         currentProject = trimmedName;
                     }
@@ -2472,8 +2498,19 @@
                 if (confirm(`'${activeProject}' 프로젝트를 삭제하시겠습니까?`)) {
                     delete allProjectsData[activeProject];
                     
+                    // projectOrder에서 삭제된 프로젝트 제거
+                    if (projectOrder) {
+                        const index = projectOrder.indexOf(activeProject);
+                        if (index !== -1) {
+                            projectOrder.splice(index, 1);
+                        }
+                    }
+                    
                     if (currentProject === activeProject) {
-                        currentProject = Object.keys(allProjectsData)[0];
+                        const remainingProjects = projectOrder && projectOrder.length > 0 
+                            ? projectOrder 
+                            : Object.keys(allProjectsData);
+                        currentProject = remainingProjects[0];
                     }
                     
                     renderProjectList();
@@ -2651,21 +2688,18 @@
                 const draggedProjectName = draggedProject.dataset.projectName;
                 const targetProjectName = e.target.dataset.projectName;
                 
-                const projectNames = Object.keys(allProjectsData);
-                const draggedIndex = projectNames.indexOf(draggedProjectName);
-                const targetIndex = projectNames.indexOf(targetProjectName);
+                // projectOrder 배열을 사용하여 순서 변경
+                const currentOrder = projectOrder || Object.keys(allProjectsData);
+                const draggedIndex = currentOrder.indexOf(draggedProjectName);
+                const targetIndex = currentOrder.indexOf(targetProjectName);
                 
                 if (draggedIndex !== -1 && targetIndex !== -1 && draggedIndex !== targetIndex) {
-                    projectNames.splice(draggedIndex, 1);
-                    projectNames.splice(targetIndex, 0, draggedProjectName);
+                    // 순서 배열에서 이동
+                    currentOrder.splice(draggedIndex, 1);
+                    currentOrder.splice(targetIndex, 0, draggedProjectName);
                     
-                    const newProjectData = {};
-                    projectNames.forEach(name => {
-                        newProjectData[name] = allProjectsData[name];
-                    });
-                    
-                    Object.keys(allProjectsData).forEach(key => delete allProjectsData[key]);
-                    Object.assign(allProjectsData, newProjectData);
+                    // projectOrder 업데이트
+                    projectOrder = [...currentOrder];
                     
                     renderProjectList();
                     saveToFirebase();
