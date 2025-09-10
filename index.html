@@ -1248,6 +1248,16 @@
             </div>
         </div>
     </div>
+
+    <!-- Copy Confirmation Modal -->
+    <div id="copy-confirmation-modal" class="modal">
+        <div class="modal-content" style="max-width: 300px; text-align: center;">
+            <h2 style="margin-bottom: 20px; font-size: 18px;">✅ 복사 완료</h2>
+            <p style="margin-bottom: 20px; color: #37352f;">내용이 클립보드에 복사되었습니다.</p>
+            <button id="copy-confirmation-ok" class="action-button">확인</button>
+        </div>
+    </div>
+    
     <script>
         document.addEventListener('DOMContentLoaded', function() {
         
@@ -1279,7 +1289,7 @@
         const STORAGE_KEY = 'bookmark-clipboard-app-data';
         
         // Firebase에 데이터 저장 (개인용 단일 문서)
-        async function saveToFirebase() {
+        async function saveToFirebase(retryCount = 0) {
             if (!firebaseInitialized || !db) {
                 console.log('Firebase 미초기화, 로컬스토리지 사용');
                 return saveToLocalStorage();
@@ -1294,15 +1304,75 @@
                 };
                 
                 await db.collection('userdata').doc('bookmark-app').set(dataToSave);
-                console.log('데이터를 Firebase에 저장했습니다.');
+                console.log('✅ 데이터를 Firebase에 저장했습니다.');
                 
                 // 로컬스토리지에도 백업 저장
                 saveToLocalStorage();
                 
+                // 저장 성공 시 시각적 피드백
+                showSaveStatus('success');
+                
             } catch (error) {
-                console.error('Firebase 저장 실패, 로컬스토리지 사용:', error);
+                console.error('❌ Firebase 저장 실패:', error);
+                
+                // 재시도 로직 (최대 3회)
+                if (retryCount < 3) {
+                    console.log(`Firebase 저장 재시도 ${retryCount + 1}/3...`);
+                    setTimeout(() => saveToFirebase(retryCount + 1), 1000 * (retryCount + 1));
+                    return;
+                }
+                
+                // 최종 실패시 로컬스토리지에만 저장
                 saveToLocalStorage();
+                showSaveStatus('error');
+                
+                // 사용자에게 경고 표시
+                console.warn('⚠️ 클라우드 동기화 실패 - 로컬 저장만 완료됨');
             }
+        }
+        
+        // 저장 상태 표시 함수
+        function showSaveStatus(status) {
+            const existingStatus = document.getElementById('save-status');
+            if (existingStatus) existingStatus.remove();
+            
+            const statusDiv = document.createElement('div');
+            statusDiv.id = 'save-status';
+            statusDiv.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 10px 15px;
+                border-radius: 6px;
+                font-size: 14px;
+                font-weight: 600;
+                z-index: 3000;
+                opacity: 0;
+                transition: opacity 0.3s ease;
+            `;
+            
+            if (status === 'success') {
+                statusDiv.textContent = '✅ 저장 완료';
+                statusDiv.style.backgroundColor = '#d4edda';
+                statusDiv.style.color = '#155724';
+                statusDiv.style.border = '1px solid #c3e6cb';
+            } else {
+                statusDiv.textContent = '⚠️ 동기화 실패';
+                statusDiv.style.backgroundColor = '#f8d7da';
+                statusDiv.style.color = '#721c24';
+                statusDiv.style.border = '1px solid #f5c6cb';
+            }
+            
+            document.body.appendChild(statusDiv);
+            
+            // 애니메이션으로 표시
+            setTimeout(() => statusDiv.style.opacity = '1', 100);
+            
+            // 3초 후 자동 사라짐
+            setTimeout(() => {
+                statusDiv.style.opacity = '0';
+                setTimeout(() => statusDiv.remove(), 300);
+            }, 3000);
         }
 
         // Firebase에 연습장 내용 저장
@@ -2698,7 +2768,7 @@
                     } else if (item.type === 'clipboard') {
                         copyToClipboard(item.text).then(success => {
                             if (success) {
-                                alert('내용이 클립보드에 복사되었습니다.');
+                                showCopyConfirmation();
                             } else {
                                 alert('복사에 실패했습니다. 수동으로 복사해 주세요.');
                             }
@@ -2940,8 +3010,32 @@
         const viewClipboardCopyBtn = document.getElementById('view-clipboard-copy-btn');
         const viewClipboardEditBtn = document.getElementById('view-clipboard-edit-btn');
 
+        // Copy Confirmation Modal
+        const copyConfirmationModal = document.getElementById('copy-confirmation-modal');
+        const copyConfirmationOkBtn = document.getElementById('copy-confirmation-ok');
+        
+        // 복사 확인 모달 표시 함수
+        function showCopyConfirmation() {
+            copyConfirmationModal.style.display = 'flex';
+        }
+        
+        // 복사 확인 모달 숨김 함수
+        function hideCopyConfirmation() {
+            copyConfirmationModal.style.display = 'none';
+        }
+
         viewClipboardCloseBtn.addEventListener('click', () => {
             viewClipboardModal.style.display = 'none';
+        });
+
+        // Copy Confirmation Modal 이벤트
+        copyConfirmationOkBtn.addEventListener('click', hideCopyConfirmation);
+        
+        // 모달 외부 클릭 시 닫기
+        copyConfirmationModal.addEventListener('click', (e) => {
+            if (e.target === copyConfirmationModal) {
+                hideCopyConfirmation();
+            }
         });
 
         viewClipboardModal.addEventListener('click', (e) => {
@@ -3000,7 +3094,7 @@
             const textToCopy = e.target.dataset.clipboardText;
             copyToClipboard(textToCopy).then(success => {
                 if (success) {
-                    alert('내용이 클립보드에 복사되었습니다.');
+                    showCopyConfirmation();
                     viewClipboardModal.style.display = 'none';
                 } else {
                     alert('복사에 실패했습니다. 수동으로 복사해 주세요.');
@@ -3098,12 +3192,12 @@
                 try {
                     if (navigator.clipboard && navigator.clipboard.writeText) {
                         await navigator.clipboard.writeText(text);
-                        alert('내용이 클립보드에 복사되었습니다.');
+                        showCopyConfirmation();
                     } else {
                         // 폴백 방식
                         practiceTextarea.select();
                         document.execCommand('copy');
-                        alert('내용이 클립보드에 복사되었습니다.');
+                        showCopyConfirmation();
                     }
                 } catch (err) {
                     console.error('복사 실패:', err);
