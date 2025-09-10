@@ -1234,6 +1234,7 @@
             <div id="view-clipboard-content" style="white-space: pre-wrap; word-wrap: break-word; max-height: 400px; overflow-y: auto; margin-bottom: 20px;"></div>
             <div class="modal-actions">
                 <button id="view-clipboard-copy-btn" class="action-button">복사</button>
+                <button id="view-clipboard-edit-btn" class="action-button secondary-button">수정</button>
             </div>
         </div>
     </div>
@@ -1587,11 +1588,13 @@
                             const titleEl = document.getElementById('view-clipboard-title');
                             const contentEl = document.getElementById('view-clipboard-content');
                             const copyBtn = document.getElementById('view-clipboard-copy-btn');
+                            const editBtn = document.getElementById('view-clipboard-edit-btn');
 
                             titleEl.textContent = item.title || '';
                             contentEl.textContent = item.text;
                             
                             copyBtn.dataset.clipboardText = item.text;
+                            editBtn.dataset.clipboardIndex = index;
 
                             modal.style.display = 'flex';
                         }
@@ -2045,17 +2048,18 @@
             addClipboardModal.style.display = 'none';
         });
 
-        addBookmarkModal.addEventListener('click', (e) => {
-            if (e.target === addBookmarkModal) {
-                addBookmarkModal.style.display = 'none';
-            }
-        });
+        // 편집용 모달은 영역 바깥 클릭으로 닫히지 않도록 이벤트 제거
+        // addBookmarkModal.addEventListener('click', (e) => {
+        //     if (e.target === addBookmarkModal) {
+        //         addBookmarkModal.style.display = 'none';
+        //     }
+        // });
         
-        addClipboardModal.addEventListener('click', (e) => {
-            if (e.target === addClipboardModal) {
-                addClipboardModal.style.display = 'none';
-            }
-        });
+        // addClipboardModal.addEventListener('click', (e) => {
+        //     if (e.target === addClipboardModal) {
+        //         addClipboardModal.style.display = 'none';
+        //     }
+        // });
 
         const addProjectModal = document.getElementById('add-project-modal');
         const addProjectSave = document.getElementById('add-project-save');
@@ -2095,11 +2099,12 @@
             addProjectModal.style.display = 'none';
         });
         
-        addProjectModal.addEventListener('click', (e) => {
-            if (e.target === addProjectModal) {
-                addProjectModal.style.display = 'none';
-            }
-        });
+        // 프로젝트 추가 모달도 편집용이므로 영역 바깥 클릭으로 닫히지 않도록 이벤트 제거
+        // addProjectModal.addEventListener('click', (e) => {
+        //     if (e.target === addProjectModal) {
+        //         addProjectModal.style.display = 'none';
+        //     }
+        // });
 
         const settingsBtn = document.getElementById('settings-btn');
         const settingsModal = document.getElementById('settings-modal');
@@ -2832,6 +2837,7 @@
         const viewClipboardModal = document.getElementById('view-clipboard-modal');
         const viewClipboardCloseBtn = viewClipboardModal.querySelector('.view-clipboard-close');
         const viewClipboardCopyBtn = document.getElementById('view-clipboard-copy-btn');
+        const viewClipboardEditBtn = document.getElementById('view-clipboard-edit-btn');
 
         viewClipboardCloseBtn.addEventListener('click', () => {
             viewClipboardModal.style.display = 'none';
@@ -2899,6 +2905,27 @@
                     alert('복사에 실패했습니다. 수동으로 복사해 주세요.');
                 }
             });
+        });
+
+        viewClipboardEditBtn.addEventListener('click', (e) => {
+            const index = parseInt(e.target.dataset.clipboardIndex);
+            const projectData = allProjectsData[currentProject];
+            const item = projectData.clipboard[index];
+            
+            // 보기 모달 닫기
+            viewClipboardModal.style.display = 'none';
+            
+            // 편집 모달 열기
+            const addClipboardModal = document.getElementById('add-clipboard-modal');
+            document.querySelector('#add-clipboard-modal h2').textContent = '클립보드 편집';
+            document.getElementById('add-clipboard-title').value = item.title || '';
+            document.getElementById('add-clipboard-content').value = item.text;
+            
+            // 편집 모드 설정
+            addClipboardModal.dataset.editMode = 'true';
+            addClipboardModal.dataset.editIndex = index;
+            
+            addClipboardModal.style.display = 'flex';
         });
 
         // 모바일 탭 네비게이션 처리
