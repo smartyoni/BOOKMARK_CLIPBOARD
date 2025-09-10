@@ -1074,33 +1074,13 @@
                 
                 <div class="dashboard-area">
                 <div class="dashboard-widget">
-                    <h4 class="dashboard-header">⭐ 즐겨찾기</h4>
-                    <div id="favorites-list" class="dashboard-content"></div>
+                    <h4 class="dashboard-header">🔖 북마크 즐겨찾기</h4>
+                    <div id="bookmark-favorites-list" class="dashboard-content"></div>
                 </div>
                 
                 <div class="dashboard-widget">
-                    <h4 class="dashboard-header">📊 통계</h4>
-                    <div id="stats-content" class="dashboard-content">
-                        <div class="stat-item">
-                            <span class="stat-label">총 북마크:</span>
-                            <span id="total-bookmarks" class="stat-value">0</span>
-                        </div>
-                        <div class="stat-item">
-                            <span class="stat-label">총 클립보드:</span>
-                            <span id="total-clipboard" class="stat-value">0</span>
-                        </div>
-                        <div class="stat-item">
-                            <span class="stat-label">즐겨찾기:</span>
-                            <span id="total-favorites" class="stat-value">0</span>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="dashboard-widget">
-                    <h4 class="dashboard-header">🕒 최근 활동</h4>
-                    <div id="recent-activity" class="dashboard-content">
-                        <div class="activity-placeholder">활동 기록이 없습니다</div>
-                    </div>
+                    <h4 class="dashboard-header">📋 클립보드 즐겨찾기</h4>
+                    <div id="clipboard-favorites-list" class="dashboard-content"></div>
                 </div>
                 </div>
             </div>
@@ -1703,8 +1683,8 @@
             });
             document.getElementById(`project-${projectName}`).classList.add('active');
             
-            renderFavorites();
-            renderStatistics();
+            renderBookmarkFavorites();
+            renderClipboardFavorites();
             
             saveToFirebase();
         }
@@ -2706,19 +2686,18 @@
             });
         });
 
-        function renderFavorites() {
-            const favoritesList = document.getElementById('favorites-list');
-            favoritesList.innerHTML = '';
+        function renderBookmarkFavorites() {
+            const bookmarkFavoritesList = document.getElementById('bookmark-favorites-list');
+            bookmarkFavoritesList.innerHTML = '';
             
-            let allFavorites = [];
+            let bookmarkFavorites = [];
             
             Object.keys(allProjectsData).forEach(projectName => {
                 const projectData = allProjectsData[projectName];
                 
                 projectData.bookmarks.forEach((bookmark, index) => {
                     if (bookmark.favorite) {
-                        allFavorites.push({
-                            type: 'bookmark',
+                        bookmarkFavorites.push({
                             name: bookmark.name,
                             url: bookmark.url,
                             color: bookmark.color,
@@ -2727,27 +2706,14 @@
                         });
                     }
                 });
-                
-                projectData.clipboard.forEach((clip, index) => {
-                    if (clip.favorite) {
-                        allFavorites.push({
-                            type: 'clipboard',
-                            name: clip.title || clip.text.substring(0, 20) + (clip.text.length > 20 ? '...' : ''),
-                            text: clip.text,
-                            color: clip.color,
-                            project: projectName,
-                            index: index
-                        });
-                    }
-                });
             });
             
-            if (allFavorites.length === 0) {
-                favoritesList.innerHTML = '<div class="activity-placeholder">즐겨찾기가 없습니다</div>';
+            if (bookmarkFavorites.length === 0) {
+                bookmarkFavoritesList.innerHTML = '<div class="activity-placeholder">북마크 즐겨찾기가 없습니다</div>';
                 return;
             }
             
-            allFavorites.forEach(item => {
+            bookmarkFavorites.forEach(item => {
                 const favoriteItem = document.createElement('div');
                 favoriteItem.className = 'favorite-item';
                 favoriteItem.style.backgroundColor = item.color || '#f8f9fa';
@@ -2769,37 +2735,75 @@
                 
                 favoriteItem.style.cursor = 'pointer';
                 favoriteItem.addEventListener('click', () => {
-                    if (item.type === 'bookmark') {
-                        window.open(item.url, '_blank');
-                    } else if (item.type === 'clipboard') {
-                        copyToClipboard(item.text).then(success => {
-                            if (success) {
-                                showCopyConfirmation();
-                            } else {
-                                alert('복사에 실패했습니다. 수동으로 복사해 주세요.');
-                            }
+                    window.open(item.url, '_blank');
+                });
+                
+                bookmarkFavoritesList.appendChild(favoriteItem);
+            });
+        }
+
+        function renderClipboardFavorites() {
+            const clipboardFavoritesList = document.getElementById('clipboard-favorites-list');
+            clipboardFavoritesList.innerHTML = '';
+            
+            let clipboardFavorites = [];
+            
+            Object.keys(allProjectsData).forEach(projectName => {
+                const projectData = allProjectsData[projectName];
+                
+                projectData.clipboard.forEach((clip, index) => {
+                    if (clip.favorite) {
+                        clipboardFavorites.push({
+                            name: clip.title || clip.text.substring(0, 20) + (clip.text.length > 20 ? '...' : ''),
+                            text: clip.text,
+                            color: clip.color,
+                            project: projectName,
+                            index: index
                         });
                     }
                 });
+            });
+            
+            if (clipboardFavorites.length === 0) {
+                clipboardFavoritesList.innerHTML = '<div class="activity-placeholder">클립보드 즐겨찾기가 없습니다</div>';
+                return;
+            }
+            
+            clipboardFavorites.forEach(item => {
+                const favoriteItem = document.createElement('div');
+                favoriteItem.className = 'favorite-item';
+                favoriteItem.style.backgroundColor = item.color || '#f8f9fa';
                 
-                favoritesList.appendChild(favoriteItem);
+                const itemContent = document.createElement('div');
+                itemContent.className = 'favorite-item-content';
+                
+                const itemName = document.createElement('div');
+                itemName.className = 'favorite-item-name';
+                itemName.textContent = item.name;
+                
+                const itemProject = document.createElement('div');
+                itemProject.className = 'favorite-item-project';
+                itemProject.textContent = item.project;
+                
+                itemContent.appendChild(itemName);
+                itemContent.appendChild(itemProject);
+                favoriteItem.appendChild(itemContent);
+                
+                favoriteItem.style.cursor = 'pointer';
+                favoriteItem.addEventListener('click', () => {
+                    copyToClipboard(item.text).then(success => {
+                        if (success) {
+                            showCopyConfirmation();
+                        } else {
+                            alert('복사에 실패했습니다. 수동으로 복사해 주세요.');
+                        }
+                    });
+                });
+                
+                clipboardFavoritesList.appendChild(favoriteItem);
             });
         }
         
-        function renderStatistics() {
-            const currentProjectData = allProjectsData[currentProject];
-            
-            document.getElementById('total-bookmarks').textContent = currentProjectData.bookmarks.length;
-            document.getElementById('total-clipboard').textContent = currentProjectData.clipboard.length;
-            
-            let totalFavorites = 0;
-            Object.values(allProjectsData).forEach(projectData => {
-                totalFavorites += projectData.bookmarks.filter(b => b.favorite).length;
-                totalFavorites += projectData.clipboard.filter(c => c.favorite).length;
-            });
-            
-            document.getElementById('total-favorites').textContent = totalFavorites;
-        }
 
         let draggedProject = null;
 
