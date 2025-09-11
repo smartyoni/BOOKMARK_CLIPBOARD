@@ -352,7 +352,7 @@
             border-radius: 4px;
             background-color: #ffffff;
             color: #ff8c00;
-            cursor: pointer;
+            cursor: pointer; /* 기본 포인터 유지 */
             font-size: 12px;
             transition: all 0.2s;
         }
@@ -371,7 +371,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            cursor: pointer;
+            cursor: crosshair; /* 생성/추가 느낌 */
             flex-shrink: 0;
             margin-left: 6px;
             transition: all 0.2s ease;
@@ -438,6 +438,7 @@
         .item-button.bookmark-button {
             color: #37352f;
             background-color: rgba(46, 170, 220, 0.1);
+            cursor: alias; /* 링크/바로가기 느낌 */
         }
         .item-button.bookmark-button:hover {
             background-color: rgba(46, 170, 220, 0.2);
@@ -445,6 +446,7 @@
         .item-button.clipboard-button {
             color: #37352f;
             background-color: rgba(100, 71, 58, 0.1);
+            cursor: copy; /* 복사 기능 강조 */
         }
         
         /* 구분선 스타일 */
@@ -454,7 +456,7 @@
             background-color: rgba(55, 53, 47, 0.3);
             margin: 8px 0;
             border-radius: 3px;
-            cursor: grab;
+            cursor: move; /* 이동 가능 느낌 */
             position: relative;
         }
         
@@ -1530,39 +1532,110 @@
             }, 3000);
         }
 
-        // Firebase에 연습장 내용 저장 (디바운싱 적용)
+        // Firebase에 연습장 내용 저장 (디바운싱 적용) - 전역 독립
         let practicesSaveTimeout;
+        let isSaving = false;
         function savePracticeContent(content, immediate = false) {
-            if (currentProject && allProjectsData[currentProject]) {
-                if (!allProjectsData[currentProject].practices) {
-                    allProjectsData[currentProject].practices = {
-                        1: '', 2: '', 3: '', 4: '', 5: ''
-                    };
-                }
-                allProjectsData[currentProject].practices[currentPracticeTab] = content;
+            if (isSaving) {
+                return;
+            }
+            
+            // 내용이 실제로 변경된 경우에만 저장
+            const currentContent = globalPractices[currentPracticeTab] || '';
+            if (currentContent === content) {
+                return;
+            }
+            
+            globalPractices[currentPracticeTab] = content;
+            
+            // 즉시 저장이 아닌 경우 디바운싱 적용
+            if (immediate) {
+                clearTimeout(practicesSaveTimeout);
+                isSaving = true;
+                savePracticeToFirebase().finally(() => {
+                    isSaving = false;
+                });
+            } else {
+                clearTimeout(practicesSaveTimeout);
+                practicesSaveTimeout = setTimeout(() => {
+                    isSaving = true;
+                    savePracticeToFirebase().finally(() => {
+                        isSaving = false;
+                    });
+                }, 500); // 500ms 지연
+            }
+        }
+        
+        // 전역 연습장 Firebase 저장
+        async function savePracticeToFirebase() {
+            if (!firebaseInitialized || !db) {
+                console.log('Firebase 미초기화, 로컬스토리지에 연습장 저장');
+                localStorage.setItem('global-practices', JSON.stringify(globalPractices));
+                return;
+            }
+            
+            try {
+                await db.collection('userdata').doc('global-practices').set({
+                    practices: globalPractices,
+                    lastUpdated: new Date().toISOString()
+                });
+                console.log('전역 연습장을 Firebase에 저장했습니다.');
                 
-                // 즉시 저장이 아닌 경우 디바운싱 적용
-                if (immediate) {
-                    clearTimeout(practicesSaveTimeout);
-                    saveToFirebase();
-                } else {
-                    clearTimeout(practicesSaveTimeout);
-                    practicesSaveTimeout = setTimeout(() => {
-                        saveToFirebase();
-                    }, 500); // 500ms 지연
-                }
+                // 로컬스토리지에도 백업 저장
+                localStorage.setItem('global-practices', JSON.stringify(globalPractices));
+                
+            } catch (error) {
+                console.error('Firebase 연습장 저장 실패, 로컬스토리지 사용:', error);
+                localStorage.setItem('global-practices', JSON.stringify(globalPractices));
             }
         }
 
-        // Firebase에서 연습장 내용 로드
+        // 전역 연습장 내용 로드
         function loadPracticeContent() {
             const practiceTextarea = document.getElementById('practice-textarea');
             
-            if (currentProject && allProjectsData[currentProject] && allProjectsData[currentProject].practices) {
-                const content = allProjectsData[currentProject].practices[currentPracticeTab] || '';
-                practiceTextarea.value = content;
-            } else {
-                practiceTextarea.value = '';
+            // DOM이 준비되지 않은 경우 대기
+            if (!practiceTextarea) {
+                setTimeout(loadPracticeContent, 100);
+                return;
+            }
+            
+            const content = globalPractices[currentPracticeTab] || '';
+            practiceTextarea.value = content;
+        }
+        
+        // Firebase에서 전역 연습장 데이터 로드
+        async function loadPracticeFromFirebase() {
+            if (!firebaseInitialized || !db) {
+                console.log('Firebase 미초기화, 로컬스토리지에서 연습장 로드');
+                const localPractices = localStorage.getItem('global-practices');
+                if (localPractices) {
+                    globalPractices = JSON.parse(localPractices);
+                }
+                return;
+            }
+            
+            try {
+                const doc = await db.collection('userdata').doc('global-practices').get();
+                if (doc.exists) {
+                    const data = doc.data();
+                    if (data.practices) {
+                        globalPractices = data.practices;
+                    }
+                    console.log('Firebase에서 전역 연습장을 로드했습니다.');
+                } else {
+                    // Firebase에 문서가 없으면 로컬스토리지에서 로드
+                    const localPractices = localStorage.getItem('global-practices');
+                    if (localPractices) {
+                        globalPractices = JSON.parse(localPractices);
+                    }
+                }
+            } catch (error) {
+                console.error('Firebase 연습장 로드 실패, 로컬스토리지 사용:', error);
+                const localPractices = localStorage.getItem('global-practices');
+                if (localPractices) {
+                    globalPractices = JSON.parse(localPractices);
+                }
             }
         }
         
@@ -1585,6 +1658,13 @@
         // 탭 UI 업데이트
         function updatePracticeTabUI() {
             const tabs = document.querySelectorAll('.practice-tab');
+            
+            // DOM이 준비되지 않은 경우 대기
+            if (tabs.length === 0) {
+                setTimeout(updatePracticeTabUI, 100);
+                return;
+            }
+            
             tabs.forEach(tab => {
                 const tabNumber = parseInt(tab.dataset.tab);
                 if (tabNumber === currentPracticeTab) {
@@ -1713,21 +1793,14 @@
         // 앱 초기화 - Firebase 우선, 로컬스토리지 백업
         let allProjectsData, currentProject, projectOrder;
         let currentPracticeTab = 1; // 현재 활성 연습장 탭
+        let globalPractices = { // 전역 독립 연습장
+            1: '',
+            2: '',
+            3: '',
+            4: '',
+            5: ''
+        };
         
-        // 기존 프로젝트에 practices 구조 추가
-        function ensurePracticesStructure() {
-            Object.keys(allProjectsData).forEach(projectName => {
-                if (!allProjectsData[projectName].practices) {
-                    allProjectsData[projectName].practices = {
-                        1: '',
-                        2: '',
-                        3: '',
-                        4: '',
-                        5: ''
-                    };
-                }
-            });
-        }
         
         async function initializeApp() {
             try {
@@ -1737,8 +1810,6 @@
                     allProjectsData = savedData.projects;
                     currentProject = savedData.currentProject || Object.keys(savedData.projects)[0];
                     projectOrder = savedData.projectOrder || Object.keys(savedData.projects);
-                    // 기존 프로젝트에 practices 구조 추가
-                    ensurePracticesStructure();
                     console.log('Firebase 데이터로 앱 초기화');
                 } else {
                     // Firebase에 데이터가 없으면 로컬 데이터 마이그레이션 시도
@@ -1751,6 +1822,9 @@
                         saveToFirebase();
                     }
                 }
+                
+                // 전역 연습장 데이터 로드
+                await loadPracticeFromFirebase();
                 
                 // UI 렌더링
                 renderProjectList();
@@ -1810,12 +1884,6 @@
         }
 
         async function renderProject(projectName) {
-            // 프로젝트 변경 전 현재 연습장 내용 저장
-            const practiceTextarea = document.getElementById('practice-textarea');
-            if (practiceTextarea && currentProject && currentProject !== projectName) {
-                savePracticeContent(practiceTextarea.value, true); // 즉시 저장
-            }
-            
             currentProject = projectName;
             const projectData = allProjectsData[projectName];
             
@@ -2541,14 +2609,7 @@
             
             allProjectsData[name] = {
                 bookmarks: [],
-                clipboard: [],
-                practices: {
-                    1: '',
-                    2: '',
-                    3: '',
-                    4: '',
-                    5: ''
-                }
+                clipboard: []
             };
             
             // 새 프로젝트를 projectOrder 배열에 추가
@@ -3560,20 +3621,17 @@
             // 실시간 동기화 리스너 설정 (Firebase 초기화 후)
             setTimeout(() => {
                 if (firebaseInitialized && db) {
-                    db.collection('userdata').doc('bookmark-app').onSnapshot((doc) => {
+                    db.collection('userdata').doc('global-practices').onSnapshot((doc) => {
                         if (doc.exists && document.activeElement !== practiceTextarea) {
                             // 사용자가 현재 텍스트상자를 편집 중이 아닐 때만 업데이트
                             const data = doc.data();
-                            if (data.projects && currentProject && data.projects[currentProject] && data.projects[currentProject].practices) {
-                                const remoteContent = data.projects[currentProject].practices[currentPracticeTab] || '';
+                            if (data.practices) {
+                                const remoteContent = data.practices[currentPracticeTab] || '';
                                 if (remoteContent !== practiceTextarea.value) {
                                     // 원격 데이터로 로컬 데이터 업데이트
-                                    allProjectsData = data.projects;
+                                    globalPractices = data.practices;
                                     practiceTextarea.value = remoteContent;
                                     console.log('다른 기기에서 연습장 내용이 업데이트되었습니다.');
-                                    
-                                    // UI도 업데이트
-                                    renderProject(currentProject);
                                 }
                             }
                         }
