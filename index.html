@@ -1530,8 +1530,9 @@
             }, 3000);
         }
 
-        // Firebase에 연습장 내용 저장
-        function savePracticeContent(content) {
+        // Firebase에 연습장 내용 저장 (디바운싱 적용)
+        let practicesSaveTimeout;
+        function savePracticeContent(content, immediate = false) {
             if (currentProject && allProjectsData[currentProject]) {
                 if (!allProjectsData[currentProject].practices) {
                     allProjectsData[currentProject].practices = {
@@ -1539,7 +1540,17 @@
                     };
                 }
                 allProjectsData[currentProject].practices[currentPracticeTab] = content;
-                saveToFirebase(); // 전체 프로젝트 데이터를 Firebase에 저장
+                
+                // 즉시 저장이 아닌 경우 디바운싱 적용
+                if (immediate) {
+                    clearTimeout(practicesSaveTimeout);
+                    saveToFirebase();
+                } else {
+                    clearTimeout(practicesSaveTimeout);
+                    practicesSaveTimeout = setTimeout(() => {
+                        saveToFirebase();
+                    }, 500); // 500ms 지연
+                }
             }
         }
 
@@ -1557,11 +1568,9 @@
         
         // 탭 전환 함수
         function switchPracticeTab(tabNumber) {
-            // 현재 탭의 내용을 저장
+            // 현재 탭의 내용을 즉시 저장
             const practiceTextarea = document.getElementById('practice-textarea');
-            if (practiceTextarea.value !== '') {
-                savePracticeContent(practiceTextarea.value);
-            }
+            savePracticeContent(practiceTextarea.value, true); // 즉시 저장
             
             // 탭 변경
             currentPracticeTab = tabNumber;
@@ -1801,6 +1810,12 @@
         }
 
         async function renderProject(projectName) {
+            // 프로젝트 변경 전 현재 연습장 내용 저장
+            const practiceTextarea = document.getElementById('practice-textarea');
+            if (practiceTextarea && currentProject && currentProject !== projectName) {
+                savePracticeContent(practiceTextarea.value, true); // 즉시 저장
+            }
+            
             currentProject = projectName;
             const projectData = allProjectsData[projectName];
             
@@ -3525,7 +3540,7 @@
             clearBtn.addEventListener('click', () => {
                 if (practiceTextarea.value.trim() && confirm('연습장의 모든 내용을 초기화하시겠습니까?')) {
                     practiceTextarea.value = '';
-                    savePracticeContent('');
+                    savePracticeContent('', true); // 즉시 저장
                     practiceTextarea.focus();
                 }
             });
@@ -3545,13 +3560,21 @@
             // 실시간 동기화 리스너 설정 (Firebase 초기화 후)
             setTimeout(() => {
                 if (firebaseInitialized && db) {
-                    db.collection('userdata').doc('practice').onSnapshot((doc) => {
+                    db.collection('userdata').doc('bookmark-app').onSnapshot((doc) => {
                         if (doc.exists && document.activeElement !== practiceTextarea) {
                             // 사용자가 현재 텍스트상자를 편집 중이 아닐 때만 업데이트
                             const data = doc.data();
-                            if (data.content !== practiceTextarea.value) {
-                                practiceTextarea.value = data.content || '';
-                                console.log('다른 기기에서 연습장 내용이 업데이트되었습니다.');
+                            if (data.projects && currentProject && data.projects[currentProject] && data.projects[currentProject].practices) {
+                                const remoteContent = data.projects[currentProject].practices[currentPracticeTab] || '';
+                                if (remoteContent !== practiceTextarea.value) {
+                                    // 원격 데이터로 로컬 데이터 업데이트
+                                    allProjectsData = data.projects;
+                                    practiceTextarea.value = remoteContent;
+                                    console.log('다른 기기에서 연습장 내용이 업데이트되었습니다.');
+                                    
+                                    // UI도 업데이트
+                                    renderProject(currentProject);
+                                }
                             }
                         }
                     });
