@@ -211,8 +211,13 @@
             font-weight: 600 !important;
             line-height: 1.3 !important;
         }
-        .bookmark-header #add-bookmark-divider-btn {
+        .bookmark-header #add-bookmark-btn {
             margin-left: auto !important;
+            margin-right: 4px !important;
+        }
+        
+        .bookmark-header #add-bookmark-divider-btn {
+            margin-left: 0 !important;
         }
 
         .clipboard-header {
@@ -228,8 +233,13 @@
             font-weight: 600 !important;
             line-height: 1.3 !important;
         }
-        .clipboard-header #add-divider-btn {
+        .clipboard-header #add-clipboard-btn {
             margin-left: auto !important;
+            margin-right: 4px !important;
+        }
+        
+        .clipboard-header #add-divider-btn {
+            margin-left: 0 !important;
         }
         .practice-header {
             background-color: #fff3cd !important;
@@ -362,8 +372,8 @@
         }
         .add-section-btn {
             background-color: transparent;
-            color: rgba(55, 53, 47, 0.6);
-            border: 2px solid rgba(55, 53, 47, 0.3);
+            color: rgba(55, 53, 47, 0.8);
+            border: 2px solid #000000;
             border-radius: 50%;
             width: 33px;
             height: 33px;
@@ -377,9 +387,9 @@
             transition: all 0.2s ease;
         }
         .add-section-btn:hover {
-            background-color: rgba(55, 53, 47, 0.1);
-            color: #37352f;
-            border-color: rgba(55, 53, 47, 0.5);
+            background-color: rgba(0, 0, 0, 0.1);
+            color: #000000;
+            border-color: #000000;
             transform: scale(1.05);
         }
         .icon-button {
@@ -695,6 +705,45 @@
             background-color: rgba(55, 53, 47, 0.16);
         }
 
+        /* Template Popup Modal Styles */
+        #template-popup-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        #template-popup-title {
+            margin: 0;
+            flex: 1;
+        }
+
+        #template-popup-category {
+            margin-left: 16px;
+            padding: 4px 12px;
+            background-color: rgba(55, 53, 47, 0.08);
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+            color: rgba(55, 53, 47, 0.65);
+        }
+
+        #template-popup-content {
+            background-color: rgba(55, 53, 47, 0.04);
+            border-radius: 6px;
+            padding: 16px;
+            margin-bottom: 24px;
+            font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+            font-size: 14px;
+            line-height: 1.6;
+            color: #37352f;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid rgba(55, 53, 47, 0.09);
+        }
+
         /* Color Palette Styles */
         .color-palette-grid {
             display: grid;
@@ -771,6 +820,187 @@
             padding: 12px;
             max-height: 200px;
             overflow-y: auto;
+        }
+
+        /* 템플릿 관리 스타일 */
+        .template-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #f1f3f4;
+            border-bottom: 1px solid rgba(55, 53, 47, 0.1);
+            padding: 12px;
+        }
+
+        .template-header h4 {
+            margin: 0;
+            padding: 0;
+            border: none;
+            background: none;
+            color: #37352f;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .template-toolbar {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .template-btn {
+            background-color: #64b5f6;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 6px 12px;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .template-btn:hover {
+            background-color: #42a5f5;
+        }
+
+        .template-select {
+            background-color: white;
+            border: 1px solid rgba(55, 53, 47, 0.2);
+            border-radius: 4px;
+            padding: 6px 8px;
+            font-size: 12px;
+            color: #37352f;
+            cursor: pointer;
+        }
+
+        .template-card {
+            border: 1px solid rgba(55, 53, 47, 0.1);
+            border-radius: 6px;
+            background-color: #ffffff;
+            margin-bottom: 8px;
+            transition: box-shadow 0.2s;
+            cursor: pointer;
+        }
+
+        .template-card:hover {
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .template-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            border-bottom: 1px solid rgba(55, 53, 47, 0.1);
+        }
+
+        .template-title {
+            font-size: 13px;
+            font-weight: 500;
+            color: #37352f;
+            margin: 0;
+        }
+
+        .template-actions {
+            display: flex;
+            gap: 6px;
+        }
+
+        .template-action-btn {
+            background-color: transparent;
+            border: 1px solid rgba(55, 53, 47, 0.2);
+            border-radius: 3px;
+            padding: 4px 8px;
+            font-size: 11px;
+            color: #37352f;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .template-action-btn:hover {
+            background-color: #f1f3f4;
+        }
+
+        .template-action-btn.copy-btn:hover {
+            background-color: #e3f2fd;
+            border-color: #64b5f6;
+            color: #1976d2;
+        }
+
+        .template-action-btn.delete-btn:hover {
+            background-color: #ffebee;
+            border-color: #f44336;
+            color: #d32f2f;
+        }
+
+        .template-category {
+            font-size: 11px;
+            color: rgba(55, 53, 47, 0.6);
+            background-color: rgba(55, 53, 47, 0.1);
+            padding: 2px 6px;
+            border-radius: 3px;
+        }
+
+        .template-preview {
+            padding: 12px;
+            font-size: 12px;
+            color: rgba(55, 53, 47, 0.7);
+            border-top: 1px solid rgba(55, 53, 47, 0.1);
+            max-height: 60px;
+            overflow: hidden;
+            background-color: #fafafa;
+        }
+
+        .template-usage {
+            text-align: right;
+            font-size: 10px;
+            color: rgba(55, 53, 47, 0.5);
+            padding: 4px 12px;
+        }
+
+        /* 변수 입력 버튼들 */
+        .variable-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-bottom: 8px;
+            padding: 8px;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+        }
+
+        .variable-btn {
+            background-color: #e3f2fd;
+            color: #1976d2;
+            border: 1px solid #bbdefb;
+            border-radius: 3px;
+            padding: 4px 8px;
+            font-size: 11px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .variable-btn:hover {
+            background-color: #bbdefb;
+            border-color: #90caf9;
+        }
+
+        .variable-btn:active {
+            background-color: #90caf9;
+            transform: translateY(1px);
+        }
+
+        .empty-var-btn {
+            background-color: #f0f0f0 !important;
+            color: #666 !important;
+            border-color: #ccc !important;
+        }
+
+        .empty-var-btn:hover {
+            background-color: #e0e0e0 !important;
+            border-color: #999 !important;
         }
 
         .favorite-item {
@@ -1231,13 +1461,20 @@
                 
                 <div class="dashboard-area">
                 <div class="dashboard-widget">
-                    <h4 class="dashboard-header">🔖 북마크 즐겨찾기</h4>
-                    <div id="bookmark-favorites-list" class="dashboard-content"></div>
-                </div>
-                
-                <div class="dashboard-widget">
-                    <h4 class="dashboard-header">📋 클립보드 즐겨찾기</h4>
-                    <div id="clipboard-favorites-list" class="dashboard-content"></div>
+                    <div class="template-header">
+                        <h4 class="dashboard-header">📝 템플릿 관리</h4>
+                        <div class="template-toolbar">
+                            <button id="add-template-btn" class="template-btn">+ 새 템플릿</button>
+                            <select id="template-category-filter" class="template-select">
+                                <option value="all">전체</option>
+                                <option value="계약">계약</option>
+                                <option value="잔금">잔금</option>
+                                <option value="고객">고객</option>
+                                <option value="매물">매물</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div id="template-list" class="dashboard-content"></div>
                 </div>
                 </div>
             </div>
@@ -1416,6 +1653,449 @@
     </div>
     
     <script>
+        // 전역 템플릿 관련 변수들
+        let templates = [];
+        let editingTemplateId = null;
+
+        // 모달 닫기
+        function closeTemplateModal() {
+            document.getElementById('template-edit-modal').style.display = 'none';
+        }
+
+        // 템플릿 팝업 함수들
+        let currentPopupTemplate = null;
+
+        // 클립보드 복사 함수
+        function copyToClipboard(text) {
+            // 먼저 modern API 시도
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                return navigator.clipboard.writeText(text)
+                    .then(() => true)
+                    .catch(() => false);
+            }
+            
+            // 대체 방법: 임시 textarea 생성
+            return new Promise((resolve) => {
+                const textArea = document.createElement('textarea');
+                textArea.value = text;
+                textArea.style.position = 'fixed';
+                textArea.style.top = '-9999px';
+                textArea.style.left = '-9999px';
+                textArea.setAttribute('readonly', '');
+                textArea.style.contain = 'strict';
+                
+                document.body.appendChild(textArea);
+                
+                // iOS Safari 대응
+                if (/ipad|iphone/i.test(navigator.userAgent)) {
+                    textArea.contentEditable = 'true';
+                    textArea.readOnly = false;
+                    const range = document.createRange();
+                    range.selectNodeContents(textArea);
+                    const selection = window.getSelection();
+                    selection.removeAllRanges();
+                    selection.addRange(range);
+                    textArea.setSelectionRange(0, 999999);
+                } else {
+                    textArea.select();
+                }
+                
+                try {
+                    const successful = document.execCommand('copy');
+                    document.body.removeChild(textArea);
+                    resolve(successful);
+                } catch (err) {
+                    document.body.removeChild(textArea);
+                    resolve(false);
+                }
+            });
+        }
+
+        // 복사 확인 모달 함수들
+        function showCopyConfirmation() {
+            const copyConfirmationModal = document.getElementById('copy-confirmation-modal');
+            if (copyConfirmationModal) {
+                copyConfirmationModal.style.display = 'flex';
+                setTimeout(() => {
+                    copyConfirmationModal.style.display = 'none';
+                }, 1500);
+            }
+        }
+
+        function showTemplatePopup(template) {
+            if (!template) {
+                console.error('showTemplatePopup: template is null or undefined');
+                return;
+            }
+            
+            console.log('showTemplatePopup: Setting currentPopupTemplate to:', template);
+            currentPopupTemplate = template;
+            
+            document.getElementById('template-popup-title').textContent = template.title || '제목 없음';
+            document.getElementById('template-popup-category').textContent = template.category || '카테고리 없음';
+            document.getElementById('template-popup-content').textContent = template.content || '내용 없음';
+            document.getElementById('template-popup-modal').style.display = 'flex';
+        }
+
+        function closeTemplatePopup() {
+            document.getElementById('template-popup-modal').style.display = 'none';
+            currentPopupTemplate = null;
+        }
+
+        async function copyTemplateFromPopup() {
+            if (!currentPopupTemplate) {
+                console.error('currentPopupTemplate is null');
+                return;
+            }
+            
+            const processedContent = replaceVariables(currentPopupTemplate.content);
+            
+            try {
+                const success = await copyToClipboard(processedContent);
+                if (success) {
+                    currentPopupTemplate.usageCount = (currentPopupTemplate.usageCount || 0) + 1;
+                    await saveTemplates();
+                    renderTemplates();
+                    showCopyConfirmation();
+                    closeTemplatePopup();
+                } else {
+                    alert('클립보드 복사에 실패했습니다.');
+                }
+            } catch (error) {
+                console.error('템플릿 복사 실패:', error);
+                alert('템플릿 복사에 실패했습니다.');
+            }
+        }
+
+        function editTemplateFromPopup() {
+            if (!currentPopupTemplate) {
+                console.error('currentPopupTemplate is null');
+                return;
+            }
+            console.log('Editing template:', currentPopupTemplate);
+            
+            // 템플릿 객체를 임시 저장
+            const templateToEdit = currentPopupTemplate;
+            closeTemplatePopup();
+            editTemplate(templateToEdit);
+        }
+
+        async function deleteTemplateFromPopup() {
+            if (!currentPopupTemplate) return;
+            const confirmDelete = confirm(`"${currentPopupTemplate.title}" 템플릿을 삭제하시겠습니까?\n\n이 작업은 되돌릴 수 없습니다.`);
+            
+            if (confirmDelete) {
+                const templateIndex = templates.findIndex(t => t.id === currentPopupTemplate.id);
+                if (templateIndex !== -1) {
+                    templates.splice(templateIndex, 1);
+                    await saveTemplates();
+                    renderTemplates();
+                    closeTemplatePopup();
+                }
+            }
+        }
+
+        // 변수 삽입 기능
+        function insertVariable(variable) {
+            const textarea = document.getElementById('template-content-input');
+            const startPos = textarea.selectionStart;
+            const endPos = textarea.selectionEnd;
+            const textBefore = textarea.value.substring(0, startPos);
+            const textAfter = textarea.value.substring(endPos);
+            
+            textarea.value = textBefore + variable + textAfter;
+            
+            // 커서 위치를 삽입된 변수 뒤로 이동
+            const newPos = startPos + variable.length;
+            textarea.setSelectionRange(newPos, newPos);
+            textarea.focus();
+            
+            // 미리보기 업데이트
+            updateTemplatePreview();
+        }
+
+        // 빈 변수 삽입 기능
+        function insertEmptyVariable() {
+            const textarea = document.getElementById('template-content-input');
+            const startPos = textarea.selectionStart;
+            const endPos = textarea.selectionEnd;
+            const textBefore = textarea.value.substring(0, startPos);
+            const textAfter = textarea.value.substring(endPos);
+            
+            textarea.value = textBefore + '{}' + textAfter;
+            
+            // 커서를 중괄호 사이로 이동
+            const newPos = startPos + 1;
+            textarea.setSelectionRange(newPos, newPos);
+            textarea.focus();
+            
+            // 미리보기 업데이트
+            updateTemplatePreview();
+        }
+
+        // 변수 치환 함수
+        function replaceVariables(content) {
+            const now = new Date();
+            const today = now.toLocaleDateString('ko-KR');
+            const currentTime = now.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' });
+            const projectName = window.currentProject || '선택된 프로젝트 없음';
+            
+            return content
+                .replace(/\{오늘날짜\}/g, today)
+                .replace(/\{현재시간\}/g, currentTime)
+                .replace(/\{프로젝트명\}/g, projectName)
+                .replace(/\{고객명\}/g, '[고객명]')
+                .replace(/\{계약일\}/g, '[계약일]')
+                .replace(/\{금액\}/g, '[금액]');
+        }
+
+        // 템플릿 미리보기 업데이트
+        function updateTemplatePreview() {
+            const content = document.getElementById('template-content-input').value;
+            const preview = document.getElementById('template-preview');
+            if (content.trim()) {
+                preview.textContent = replaceVariables(content);
+            } else {
+                preview.textContent = '변수가 치환된 내용이 여기에 표시됩니다.';
+            }
+        }
+
+        // 새 템플릿 추가
+        function addNewTemplate() {
+            editingTemplateId = null;
+            document.getElementById('template-title-input').value = '';
+            document.getElementById('template-category-input').value = '계약';
+            document.getElementById('template-content-input').value = '';
+            document.getElementById('template-preview').textContent = '변수가 치환된 내용이 여기에 표시됩니다.';
+            document.getElementById('template-edit-modal').style.display = 'flex';
+        }
+
+        // 템플릿 편집
+        function editTemplate(template) {
+            if (!template || !template.id) {
+                console.error('Invalid template object:', template);
+                alert('템플릿 데이터에 오류가 있습니다.');
+                return;
+            }
+            
+            console.log('Editing template with ID:', template.id);
+            editingTemplateId = template.id;
+            document.getElementById('template-title-input').value = template.title || '';
+            document.getElementById('template-category-input').value = template.category || '계약';
+            document.getElementById('template-content-input').value = template.content || '';
+            updateTemplatePreview();
+            document.getElementById('template-edit-modal').style.display = 'flex';
+        }
+
+        // 템플릿 삭제
+        async function deleteTemplate(template) {
+            const confirmDelete = confirm(`"${template.title}" 템플릿을 삭제하시겠습니까?\n\n이 작업은 되돌릴 수 없습니다.`);
+            
+            if (confirmDelete) {
+                try {
+                    const templateIndex = templates.findIndex(t => t.id === template.id);
+                    if (templateIndex !== -1) {
+                        templates.splice(templateIndex, 1);
+                        await saveTemplates();
+                        renderTemplates();
+                        console.log(`템플릿 "${template.title}" 삭제 완료`);
+                    }
+                } catch (error) {
+                    console.error('템플릿 삭제 실패:', error);
+                    alert('템플릿 삭제에 실패했습니다.');
+                }
+            }
+        }
+
+        // 전역 Firebase 변수들 (전역으로 접근 가능하도록)
+        let globalDb = null;
+        let globalFirebaseInitialized = false;
+
+        // 템플릿 데이터 저장
+        async function saveTemplates() {
+            try {
+                // 로컬스토리지에 저장 (항상)
+                localStorage.setItem('templates', JSON.stringify(templates));
+                
+                // Firebase에도 저장 (가능한 경우)
+                if (globalFirebaseInitialized && globalDb) {
+                    await globalDb.collection('templates').doc('userTemplates').set({
+                        templates: templates,
+                        lastModified: new Date()
+                    });
+                }
+                console.log('템플릿 저장 완료');
+            } catch (error) {
+                console.error('템플릿 저장 실패:', error);
+                // 로컬스토리지라도 저장되었으면 성공으로 간주
+                if (localStorage.getItem('templates')) {
+                    console.log('로컬스토리지에 템플릿 저장 완료');
+                } else {
+                    alert('템플릿 저장에 실패했습니다.');
+                }
+            }
+        }
+
+        // 템플릿 데이터 로드
+        async function loadTemplates() {
+            try {
+                if (globalFirebaseInitialized && globalDb) {
+                    const doc = await globalDb.collection('templates').doc('userTemplates').get();
+                    if (doc.exists) {
+                        templates = doc.data().templates || [];
+                    } else {
+                        templates = [];
+                    }
+                } else {
+                    // 로컬스토리지에서 로드
+                    const savedTemplates = localStorage.getItem('templates');
+                    if (savedTemplates) {
+                        templates = JSON.parse(savedTemplates);
+                    } else {
+                        templates = [];
+                    }
+                }
+                renderTemplates();
+            } catch (error) {
+                console.error('템플릿 로드 실패:', error);
+                // 로컬스토리지 fallback
+                const savedTemplates = localStorage.getItem('templates');
+                if (savedTemplates) {
+                    templates = JSON.parse(savedTemplates);
+                } else {
+                    templates = [];
+                }
+                renderTemplates();
+            }
+        }
+
+        // 템플릿 목록 렌더링
+        function renderTemplates() {
+            const templateList = document.getElementById('template-list');
+            const categoryFilter = document.getElementById('template-category-filter');
+            
+            if (!templateList) return; // 요소가 없으면 종료
+            
+            let filteredTemplates = templates;
+            if (categoryFilter && categoryFilter.value !== 'all') {
+                filteredTemplates = templates.filter(template => template.category === categoryFilter.value);
+            }
+            
+            if (filteredTemplates.length === 0) {
+                templateList.innerHTML = '<div class="activity-placeholder">템플릿이 없습니다. 새 템플릿을 추가해보세요.</div>';
+                return;
+            }
+            
+            templateList.innerHTML = '';
+            filteredTemplates.forEach(template => {
+                const templateCard = createTemplateCard(template);
+                templateList.appendChild(templateCard);
+            });
+        }
+
+        // 템플릿 카드 생성
+        // 템플릿 카드 생성 (복사 버튼 제거됨)
+        function createTemplateCard(template) {
+            const card = document.createElement('div');
+            card.className = 'template-card';
+            
+            // 카드 클릭 시 팝업 표시
+            card.onclick = () => showTemplatePopup(template);
+            
+            const header = document.createElement('div');
+            header.className = 'template-card-header';
+            
+            const title = document.createElement('h5');
+            title.className = 'template-title';
+            title.textContent = `📝 ${template.title}`;
+            
+            const rightArea = document.createElement('div');
+            rightArea.style.display = 'flex';
+            rightArea.style.alignItems = 'center';
+            rightArea.style.gap = '8px';
+            
+            const category = document.createElement('span');
+            category.className = 'template-category';
+            category.textContent = template.category;
+            
+            rightArea.appendChild(category);
+            
+            header.appendChild(title);
+            header.appendChild(rightArea);
+            
+            const preview = document.createElement('div');
+            preview.className = 'template-preview';
+            const previewText = template.content.substring(0, 100) + (template.content.length > 100 ? '...' : '');
+            preview.textContent = previewText;
+            
+            card.appendChild(header);
+            card.appendChild(preview);
+            
+            return card;
+        }
+
+        // 템플릿 복사
+        async function copyTemplate(template) {
+            const processedContent = replaceVariables(template.content);
+            
+            try {
+                await copyToClipboard(processedContent);
+                template.usageCount = (template.usageCount || 0) + 1;
+                await saveTemplates();
+                renderTemplates();
+                // showCopyConfirmation(); // 함수가 있다면 호출
+            } catch (error) {
+                console.error('템플릿 복사 실패:', error);
+                alert('템플릿 복사에 실패했습니다.');
+            }
+        }
+
+        // 템플릿 저장
+        async function saveTemplate(formData) {
+            const title = formData.get('title') || document.getElementById('template-title-input').value;
+            let category = formData.get('category') || document.getElementById('template-category-input').value;
+            const content = formData.get('content') || document.getElementById('template-content-input').value;
+            
+            // 커스텀 카테고리 처리
+            if (category === 'custom') {
+                const customCategory = formData.get('customCategory') || document.getElementById('custom-category-input').value;
+                if (!customCategory.trim()) {
+                    alert('새 카테고리명을 입력해주세요.');
+                    return;
+                }
+                category = customCategory.trim();
+            }
+            
+            if (!title.trim() || !content.trim()) {
+                alert('제목과 내용은 필수입니다.');
+                return;
+            }
+            
+            const templateData = {
+                id: editingTemplateId || Date.now().toString(),
+                title: title.trim(),
+                category: category,
+                content: content.trim(),
+                usageCount: 0,
+                createdAt: editingTemplateId ? templates.find(t => t.id === editingTemplateId)?.createdAt || new Date() : new Date(),
+                updatedAt: new Date()
+            };
+            
+            if (editingTemplateId) {
+                const index = templates.findIndex(t => t.id === editingTemplateId);
+                if (index !== -1) {
+                    templateData.usageCount = templates[index].usageCount || 0;
+                    templates[index] = templateData;
+                }
+            } else {
+                templates.push(templateData);
+            }
+            
+            await saveTemplates();
+            renderTemplates();
+            closeTemplateModal();
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
         
         // Firebase 설정 - 본인의 Firebase 프로젝트 설정으로 교체하세요
@@ -1437,10 +2117,18 @@
             db = firebase.firestore();
             firebaseInitialized = true;
             console.log('Firebase 초기화 성공');
+            
+            // 전역 변수에 할당
+            globalDb = db;
+            globalFirebaseInitialized = firebaseInitialized;
         } catch (error) {
             console.warn('Firebase 초기화 실패, 로컬스토리지 사용:', error);
             firebaseInitialized = false;
+            globalFirebaseInitialized = false;
         }
+
+        // 템플릿 초기화
+        loadTemplates();
         
         // 데이터 저장 함수들 (Firebase + 로컬스토리지 백업)
         const STORAGE_KEY = 'bookmark-clipboard-app-data';
@@ -1999,8 +2687,7 @@
             });
             document.getElementById(`project-${projectName}`).classList.add('active');
             
-            renderBookmarkFavorites();
-            renderClipboardFavorites();
+            renderTemplates();
             
             // 연습장 내용 로드 및 탭 UI 업데이트
             loadPracticeContent();
@@ -3080,111 +3767,40 @@
             });
         });
 
-        function renderBookmarkFavorites() {
-            const bookmarkFavoritesList = document.getElementById('bookmark-favorites-list');
-            bookmarkFavoritesList.innerHTML = '';
-            
-            let bookmarkFavorites = [];
-            
-            Object.keys(allProjectsData).forEach(projectName => {
-                const projectData = allProjectsData[projectName];
-                
-                projectData.bookmarks.forEach((bookmark, index) => {
-                    if (bookmark.favorite) {
-                        bookmarkFavorites.push({
-                            name: bookmark.name,
-                            url: bookmark.url,
-                            color: bookmark.color,
-                            project: projectName,
-                            index: index
-                        });
+        // 템플릿 데이터 로드
+        async function loadTemplates() {
+            try {
+                if (firebaseInitialized && db) {
+                    const doc = await db.collection('templates').doc('userTemplates').get();
+                    if (doc.exists) {
+                        templates = doc.data().templates || [];
+                    } else {
+                        templates = [];
                     }
-                });
-            });
-            
-            if (bookmarkFavorites.length === 0) {
-                bookmarkFavoritesList.innerHTML = '<div class="activity-placeholder">북마크 즐겨찾기가 없습니다</div>';
-                return;
+                } else {
+                    // 로컬스토리지에서 로드
+                    const savedTemplates = localStorage.getItem('templates');
+                    if (savedTemplates) {
+                        templates = JSON.parse(savedTemplates);
+                    } else {
+                        templates = [];
+                    }
+                }
+                renderTemplates();
+            } catch (error) {
+                console.error('템플릿 로드 실패:', error);
+                // 로컬스토리지 fallback
+                const savedTemplates = localStorage.getItem('templates');
+                if (savedTemplates) {
+                    templates = JSON.parse(savedTemplates);
+                } else {
+                    templates = [];
+                }
+                renderTemplates();
             }
-            
-            bookmarkFavorites.forEach(item => {
-                const favoriteItem = document.createElement('div');
-                favoriteItem.className = 'favorite-item bookmark-fav';
-                favoriteItem.style.backgroundColor = item.color || '';
-                favoriteItem.textContent = item.name;
-                favoriteItem.title = `${item.name} (${item.project})`;
-                
-                favoriteItem.addEventListener('click', () => {
-                    window.open(item.url, '_blank');
-                });
-                
-                bookmarkFavoritesList.appendChild(favoriteItem);
-            });
         }
 
-        function renderClipboardFavorites() {
-            const clipboardFavoritesList = document.getElementById('clipboard-favorites-list');
-            clipboardFavoritesList.innerHTML = '';
-            
-            let clipboardFavorites = [];
-            
-            Object.keys(allProjectsData).forEach(projectName => {
-                const projectData = allProjectsData[projectName];
-                
-                projectData.clipboard.forEach((clip, index) => {
-                    if (clip.favorite) {
-                        clipboardFavorites.push({
-                            name: clip.title || clip.text.substring(0, 20) + (clip.text.length > 20 ? '...' : ''),
-                            text: clip.text,
-                            color: clip.color,
-                            project: projectName,
-                            index: index
-                        });
-                    }
-                });
-            });
-            
-            if (clipboardFavorites.length === 0) {
-                clipboardFavoritesList.innerHTML = '<div class="activity-placeholder">클립보드 즐겨찾기가 없습니다</div>';
-                return;
-            }
-            
-            clipboardFavorites.forEach(item => {
-                const favoriteItem = document.createElement('div');
-                favoriteItem.className = 'favorite-item clipboard-fav';
-                favoriteItem.style.backgroundColor = item.color || '';
-                favoriteItem.textContent = item.name;
-                favoriteItem.title = `${item.name} (${item.project})`;
-                
-                // 제목 길이에 따른 동적 너비 계산
-                const textLength = item.name.length;
-                let width;
-                if (textLength <= 4) {
-                    width = '60px';
-                } else if (textLength <= 8) {
-                    width = '90px';
-                } else if (textLength <= 12) {
-                    width = '120px';
-                } else if (textLength <= 16) {
-                    width = '150px';
-                } else {
-                    width = '180px';
-                }
-                favoriteItem.style.width = width;
-                
-                favoriteItem.addEventListener('click', () => {
-                    copyToClipboard(item.text).then(success => {
-                        if (success) {
-                            showCopyConfirmation();
-                        } else {
-                            alert('복사에 실패했습니다. 수동으로 복사해 주세요.');
-                        }
-                    });
-                });
-                
-                clipboardFavoritesList.appendChild(favoriteItem);
-            });
-        }
+        // 템플릿 데이터 저장
         
 
         let draggedProject = null;
@@ -3900,8 +4516,108 @@
             setTimeout(() => {
                 checkPWAInstallability();
             }, 2000); // 2초 후 확인 (UI 로딩 완료 후)
+
+            // 템플릿 관련 이벤트 리스너들
+            document.getElementById('add-template-btn').addEventListener('click', addNewTemplate);
+            document.getElementById('template-category-filter').addEventListener('change', renderTemplates);
+            
+            // 템플릿 폼 이벤트 리스너
+            document.getElementById('template-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                saveTemplate(new FormData(e.target));
+            });
+            
+            // 템플릿 내용 변경 시 미리보기 업데이트
+            document.getElementById('template-content-input').addEventListener('input', updateTemplatePreview);
+            
+            // 카테고리 선택 변경 시 커스텀 입력 토글
+            document.getElementById('template-category-input').addEventListener('change', function() {
+                const customInput = document.getElementById('custom-category-input');
+                if (this.value === 'custom') {
+                    customInput.style.display = 'block';
+                    customInput.required = true;
+                } else {
+                    customInput.style.display = 'none';
+                    customInput.required = false;
+                }
+            });
         });
     });
     </script>
+
+    <!-- 템플릿 편집 모달 -->
+    <div id="template-edit-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" onclick="closeTemplateModal()">&times;</span>
+            <h2>템플릿 편집</h2>
+            
+            <form id="template-form">
+                <div class="modal-form-group">
+                    <label for="template-title-input">제목:</label>
+                    <input type="text" id="template-title-input" name="title" placeholder="템플릿 제목을 입력하세요" required>
+                </div>
+                
+                <div class="modal-form-group">
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <label for="template-category-input" style="margin-bottom: 0; min-width: 60px;">카테고리:</label>
+                        <select id="template-category-input" name="category" style="flex: 1;">
+                            <option value="계약">계약</option>
+                            <option value="잔금">잔금</option>
+                            <option value="고객">고객</option>
+                            <option value="매물">매물</option>
+                            <option value="custom">+ 새 카테고리</option>
+                        </select>
+                    </div>
+                    <input type="text" id="custom-category-input" name="customCategory" placeholder="새 카테고리 입력" style="display: none; margin-top: 8px;">
+                </div>
+                
+                
+                <div class="modal-form-group">
+                    <label for="template-content-input">내용:</label>
+                    <div class="variable-buttons">
+                        <button type="button" class="variable-btn" onclick="insertVariable('{오늘날짜}')">{오늘날짜}</button>
+                        <button type="button" class="variable-btn" onclick="insertVariable('{현재시간}')">{현재시간}</button>
+                        <button type="button" class="variable-btn" onclick="insertVariable('{프로젝트명}')">{프로젝트명}</button>
+                        <button type="button" class="variable-btn" onclick="insertVariable('{고객명}')">{고객명}</button>
+                        <button type="button" class="variable-btn" onclick="insertVariable('{계약일}')">{계약일}</button>
+                        <button type="button" class="variable-btn" onclick="insertVariable('{금액}')">{금액}</button>
+                        <button type="button" class="variable-btn empty-var-btn" onclick="insertEmptyVariable()">{빈 변수}</button>
+                    </div>
+                    <textarea id="template-content-input" name="content" placeholder="템플릿 내용을 입력하세요. 위 버튼을 클릭하여 변수를 삽입할 수 있습니다."></textarea>
+                </div>
+                
+                <div class="modal-form-group">
+                    <label>미리보기:</label>
+                    <div id="template-preview" class="template-preview">
+                        변수가 치환된 내용이 여기에 표시됩니다.
+                    </div>
+                </div>
+                
+                <div class="modal-actions">
+                    <button type="button" class="secondary-button" onclick="closeTemplateModal()">취소</button>
+                    <button type="submit" class="primary-button">저장</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 템플릿 내용 팝업 모달 -->
+    <div id="template-popup-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" onclick="closeTemplatePopup()">&times;</span>
+            <div id="template-popup-header">
+                <h2 id="template-popup-title"></h2>
+                <span id="template-popup-category" class="template-category"></span>
+            </div>
+            <div id="template-popup-content">
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="primary-button" onclick="copyTemplateFromPopup()">복사</button>
+                <button type="button" class="secondary-button" onclick="editTemplateFromPopup()">편집</button>
+                <button type="button" class="secondary-button delete-btn" onclick="deleteTemplateFromPopup()">삭제</button>
+                <button type="button" class="secondary-button" onclick="closeTemplatePopup()">닫기</button>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
