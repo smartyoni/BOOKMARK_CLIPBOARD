@@ -718,15 +718,6 @@
             flex: 1;
         }
 
-        #template-popup-category {
-            margin-left: 16px;
-            padding: 4px 12px;
-            background-color: rgba(55, 53, 47, 0.08);
-            border-radius: 12px;
-            font-size: 12px;
-            font-weight: 500;
-            color: rgba(55, 53, 47, 0.65);
-        }
 
         #template-popup-content {
             background-color: rgba(55, 53, 47, 0.04);
@@ -934,23 +925,7 @@
             color: #d32f2f;
         }
 
-        .template-category {
-            font-size: 11px;
-            color: rgba(55, 53, 47, 0.6);
-            background-color: rgba(55, 53, 47, 0.1);
-            padding: 2px 6px;
-            border-radius: 3px;
-        }
 
-        .template-preview {
-            padding: 12px;
-            font-size: 12px;
-            color: rgba(55, 53, 47, 0.7);
-            border-top: 1px solid rgba(55, 53, 47, 0.1);
-            max-height: 60px;
-            overflow: hidden;
-            background-color: #fafafa;
-        }
 
         .template-usage {
             text-align: right;
@@ -1465,13 +1440,6 @@
                         <h4 class="dashboard-header">📝 템플릿 관리</h4>
                         <div class="template-toolbar">
                             <button id="add-template-btn" class="template-btn">+ 새 템플릿</button>
-                            <select id="template-category-filter" class="template-select">
-                                <option value="all">전체</option>
-                                <option value="계약">계약</option>
-                                <option value="잔금">잔금</option>
-                                <option value="고객">고객</option>
-                                <option value="매물">매물</option>
-                            </select>
                         </div>
                     </div>
                     <div id="template-list" class="dashboard-content"></div>
@@ -1722,6 +1690,25 @@
             }
         }
 
+        // 내용보기 함수
+        function showTemplateContent() {
+            if (!currentPopupTemplate) return;
+            
+            // 저장된 변수값 로드
+            const savedValues = loadVariableHistory(currentPopupTemplate.id);
+            
+            // 변수 치환하여 내용 표시 (빈 변수는 괄호로 표시)
+            const processedContent = replaceVariables(currentPopupTemplate.content, savedValues, true);
+            document.getElementById('template-popup-content').innerHTML = `
+                <div style="background-color: #f8f9fa; border: 1px solid #e9ecef; border-radius: 6px; padding: 16px; white-space: pre-wrap; font-family: monospace; font-size: 14px; line-height: 1.5;">
+                    ${processedContent}
+                </div>
+            `;
+            
+            // 변수 입력 섹션 숨기기
+            document.getElementById('template-variables-section').style.display = 'none';
+        }
+
         function showTemplatePopup(template) {
             if (!template) {
                 console.error('showTemplatePopup: template is null or undefined');
@@ -1732,13 +1719,28 @@
             currentPopupTemplate = template;
             
             document.getElementById('template-popup-title').textContent = template.title || '제목 없음';
-            document.getElementById('template-popup-category').textContent = template.category || '카테고리 없음';
+            
+            // 초기에는 원본 내용 표시
             document.getElementById('template-popup-content').textContent = template.content || '내용 없음';
+            
+            // 변수 입력 UI 초기화
+            document.getElementById('template-variables-section').style.display = 'none';
+            
+            // 템플릿에 변수가 있는지 확인하여 버튼 상태 설정
+            const variables = extractVariables(template.content);
+            const variablesToggleBtn = document.getElementById('template-variables-toggle-btn');
+            if (variables.length > 0) {
+                variablesToggleBtn.style.display = 'block';
+            } else {
+                variablesToggleBtn.style.display = 'none';
+            }
+            
             document.getElementById('template-popup-modal').style.display = 'flex';
         }
 
         function closeTemplatePopup() {
             document.getElementById('template-popup-modal').style.display = 'none';
+            document.getElementById('template-variables-section').style.display = 'none';
             currentPopupTemplate = null;
         }
 
@@ -1795,6 +1797,111 @@
             }
         }
 
+        // 변수 입력 UI 표시 함수 (개선)
+        function showVariableInputs() {
+            if (!currentPopupTemplate) return;
+            
+            const variables = extractVariables(currentPopupTemplate.content);
+            const variablesSection = document.getElementById('template-variables-section');
+            const variablesContainer = document.getElementById('template-variables-inputs');
+            
+            if (variables.length === 0) {
+                alert('이 템플릿에는 입력할 변수가 없습니다.');
+                return;
+            }
+            
+            // 저장된 변수값 로드
+            const savedValues = loadVariableHistory(currentPopupTemplate.id);
+            
+            // 변수 입력 필드 생성 (이전 값 자동 입력)
+            variablesContainer.innerHTML = '';
+            variables.forEach(variable => {
+                const div = document.createElement('div');
+                div.style.marginBottom = '8px';
+                div.innerHTML = `
+                    <label style="display: block; margin-bottom: 4px; font-size: 12px; color: #37352f;">${variable}:</label>
+                    <input type="text" id="var-${variable}" placeholder="${variable} 값을 입력하세요" 
+                           value="${savedValues[variable] || ''}"
+                           style="width: 100%; padding: 6px 8px; border: 1px solid #ccc; border-radius: 3px; font-size: 12px;">
+                `;
+                variablesContainer.appendChild(div);
+            });
+            
+            variablesSection.style.display = 'block';
+            
+            // 원본 내용 표시로 되돌리기
+            document.getElementById('template-popup-content').textContent = currentPopupTemplate.content;
+        }
+
+        // 변수 초기화
+        function resetVariables() {
+            const variablesContainer = document.getElementById('template-variables-inputs');
+            const inputs = variablesContainer.querySelectorAll('input');
+            inputs.forEach(input => input.value = '');
+            
+            // 원래 내용으로 복원
+            if (currentPopupTemplate) {
+                document.getElementById('template-popup-content').textContent = currentPopupTemplate.content;
+            }
+        }
+
+        // 양식 저장 (변수값이 적용된 템플릿을 새로운 템플릿으로 저장)
+        async function saveFormTemplate() {
+            if (!currentPopupTemplate) return;
+            
+            const variables = extractVariables(currentPopupTemplate.content);
+            const customValues = {};
+            
+            // 입력된 변수값 수집
+            variables.forEach(variable => {
+                const input = document.getElementById(`var-${variable}`);
+                if (input) {
+                    customValues[variable] = input.value.trim();
+                }
+            });
+            
+            // 변수값 히스토리 저장
+            saveVariableHistory(currentPopupTemplate.id, customValues);
+            
+            // 변수가 치환된 내용 생성
+            const processedContent = replaceVariables(currentPopupTemplate.content, customValues);
+            
+            // 새 템플릿명 생성 (원본 + 날짜시간)
+            const now = new Date();
+            const timestamp = now.toLocaleString('ko-KR', { 
+                month: '2-digit', 
+                day: '2-digit', 
+                hour: '2-digit', 
+                minute: '2-digit'
+            }).replace(/\./g, '').replace(/\s/g, '_');
+            
+            const newTemplateTitle = `${currentPopupTemplate.title}_${timestamp}`;
+            
+            // 새 템플릿 객체 생성
+            const newTemplate = {
+                id: Date.now().toString(),
+                title: newTemplateTitle,
+                content: processedContent,
+                createdAt: new Date().toISOString(),
+                usageCount: 0
+            };
+            
+            // 템플릿 배열에 추가
+            templates.push(newTemplate);
+            await saveTemplates();
+            renderTemplates();
+            
+            // UI 업데이트 - 처리된 내용을 스타일과 함께 표시
+            document.getElementById('template-popup-content').innerHTML = `
+                <div style="background-color: #f8f9fa; border: 1px solid #e9ecef; border-radius: 6px; padding: 16px; white-space: pre-wrap; font-family: monospace; font-size: 14px; line-height: 1.5;">
+                    ${processedContent}
+                </div>
+            `;
+            document.getElementById('template-variables-section').style.display = 'none';
+            
+            alert(`"${newTemplateTitle}" 양식이 저장되었습니다.`);
+        }
+
         // 변수 삽입 기능
         function insertVariable(variable) {
             const textarea = document.getElementById('template-content-input');
@@ -1810,8 +1917,6 @@
             textarea.setSelectionRange(newPos, newPos);
             textarea.focus();
             
-            // 미리보기 업데이트
-            updateTemplatePreview();
         }
 
         // 빈 변수 삽입 기능
@@ -1829,44 +1934,71 @@
             textarea.setSelectionRange(newPos, newPos);
             textarea.focus();
             
-            // 미리보기 업데이트
-            updateTemplatePreview();
         }
 
-        // 변수 치환 함수
-        function replaceVariables(content) {
+        // 변수값 히스토리 관리
+        function saveVariableHistory(templateId, variables) {
+            const historyKey = `template_variables_${templateId}`;
+            localStorage.setItem(historyKey, JSON.stringify(variables));
+        }
+
+        function loadVariableHistory(templateId) {
+            const historyKey = `template_variables_${templateId}`;
+            const saved = localStorage.getItem(historyKey);
+            return saved ? JSON.parse(saved) : {};
+        }
+
+        // 변수 치환 함수 (빈 변수 처리 포함)
+        function replaceVariables(content, customValues = {}, showEmptyAsPlaceholder = false) {
             const now = new Date();
             const today = now.toLocaleDateString('ko-KR');
             const currentTime = now.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' });
             const projectName = window.currentProject || '선택된 프로젝트 없음';
             
-            return content
+            let result = content
                 .replace(/\{오늘날짜\}/g, today)
                 .replace(/\{현재시간\}/g, currentTime)
-                .replace(/\{프로젝트명\}/g, projectName)
-                .replace(/\{고객명\}/g, '[고객명]')
-                .replace(/\{계약일\}/g, '[계약일]')
-                .replace(/\{금액\}/g, '[금액]');
+                .replace(/\{프로젝트명\}/g, projectName);
+            
+            // 사용자 정의 변수 치환
+            for (const [key, value] of Object.entries(customValues)) {
+                if (value && value.trim()) {
+                    const regex = new RegExp(`\\{${key}\\}`, 'g');
+                    result = result.replace(regex, value);
+                }
+            }
+            
+            // 빈 변수 처리
+            if (showEmptyAsPlaceholder) {
+                result = result.replace(/\{([^}]+)\}/g, '($1)');
+            }
+                
+            return result;
         }
 
-        // 템플릿 미리보기 업데이트
-        function updateTemplatePreview() {
-            const content = document.getElementById('template-content-input').value;
-            const preview = document.getElementById('template-preview');
-            if (content.trim()) {
-                preview.textContent = replaceVariables(content);
-            } else {
-                preview.textContent = '변수가 치환된 내용이 여기에 표시됩니다.';
+        // 템플릿에서 변수 추출 함수
+        function extractVariables(content) {
+            const variableRegex = /\{([^}]+)\}/g;
+            const variables = new Set();
+            let match;
+            
+            while ((match = variableRegex.exec(content)) !== null) {
+                const varName = match[1];
+                // 시스템 변수는 제외
+                if (!['오늘날짜', '현재시간', '프로젝트명'].includes(varName)) {
+                    variables.add(varName);
+                }
             }
+            
+            return Array.from(variables);
         }
+
 
         // 새 템플릿 추가
         function addNewTemplate() {
             editingTemplateId = null;
             document.getElementById('template-title-input').value = '';
-            document.getElementById('template-category-input').value = '계약';
             document.getElementById('template-content-input').value = '';
-            document.getElementById('template-preview').textContent = '변수가 치환된 내용이 여기에 표시됩니다.';
             document.getElementById('template-edit-modal').style.display = 'flex';
         }
 
@@ -1881,9 +2013,7 @@
             console.log('Editing template with ID:', template.id);
             editingTemplateId = template.id;
             document.getElementById('template-title-input').value = template.title || '';
-            document.getElementById('template-category-input').value = template.category || '계약';
             document.getElementById('template-content-input').value = template.content || '';
-            updateTemplatePreview();
             document.getElementById('template-edit-modal').style.display = 'flex';
         }
 
@@ -1972,14 +2102,10 @@
         // 템플릿 목록 렌더링
         function renderTemplates() {
             const templateList = document.getElementById('template-list');
-            const categoryFilter = document.getElementById('template-category-filter');
             
             if (!templateList) return; // 요소가 없으면 종료
             
             let filteredTemplates = templates;
-            if (categoryFilter && categoryFilter.value !== 'all') {
-                filteredTemplates = templates.filter(template => template.category === categoryFilter.value);
-            }
             
             if (filteredTemplates.length === 0) {
                 templateList.innerHTML = '<div class="activity-placeholder">템플릿이 없습니다. 새 템플릿을 추가해보세요.</div>';
@@ -2014,22 +2140,11 @@
             rightArea.style.alignItems = 'center';
             rightArea.style.gap = '8px';
             
-            const category = document.createElement('span');
-            category.className = 'template-category';
-            category.textContent = template.category;
-            
-            rightArea.appendChild(category);
             
             header.appendChild(title);
             header.appendChild(rightArea);
             
-            const preview = document.createElement('div');
-            preview.className = 'template-preview';
-            const previewText = template.content.substring(0, 100) + (template.content.length > 100 ? '...' : '');
-            preview.textContent = previewText;
-            
             card.appendChild(header);
-            card.appendChild(preview);
             
             return card;
         }
@@ -2053,18 +2168,7 @@
         // 템플릿 저장
         async function saveTemplate(formData) {
             const title = formData.get('title') || document.getElementById('template-title-input').value;
-            let category = formData.get('category') || document.getElementById('template-category-input').value;
             const content = formData.get('content') || document.getElementById('template-content-input').value;
-            
-            // 커스텀 카테고리 처리
-            if (category === 'custom') {
-                const customCategory = formData.get('customCategory') || document.getElementById('custom-category-input').value;
-                if (!customCategory.trim()) {
-                    alert('새 카테고리명을 입력해주세요.');
-                    return;
-                }
-                category = customCategory.trim();
-            }
             
             if (!title.trim() || !content.trim()) {
                 alert('제목과 내용은 필수입니다.');
@@ -2074,7 +2178,6 @@
             const templateData = {
                 id: editingTemplateId || Date.now().toString(),
                 title: title.trim(),
-                category: category,
                 content: content.trim(),
                 usageCount: 0,
                 createdAt: editingTemplateId ? templates.find(t => t.id === editingTemplateId)?.createdAt || new Date() : new Date(),
@@ -4519,7 +4622,6 @@
 
             // 템플릿 관련 이벤트 리스너들
             document.getElementById('add-template-btn').addEventListener('click', addNewTemplate);
-            document.getElementById('template-category-filter').addEventListener('change', renderTemplates);
             
             // 템플릿 폼 이벤트 리스너
             document.getElementById('template-form').addEventListener('submit', function(e) {
@@ -4528,19 +4630,7 @@
             });
             
             // 템플릿 내용 변경 시 미리보기 업데이트
-            document.getElementById('template-content-input').addEventListener('input', updateTemplatePreview);
             
-            // 카테고리 선택 변경 시 커스텀 입력 토글
-            document.getElementById('template-category-input').addEventListener('change', function() {
-                const customInput = document.getElementById('custom-category-input');
-                if (this.value === 'custom') {
-                    customInput.style.display = 'block';
-                    customInput.required = true;
-                } else {
-                    customInput.style.display = 'none';
-                    customInput.required = false;
-                }
-            });
         });
     });
     </script>
@@ -4557,19 +4647,6 @@
                     <input type="text" id="template-title-input" name="title" placeholder="템플릿 제목을 입력하세요" required>
                 </div>
                 
-                <div class="modal-form-group">
-                    <div style="display: flex; align-items: center; gap: 8px;">
-                        <label for="template-category-input" style="margin-bottom: 0; min-width: 60px;">카테고리:</label>
-                        <select id="template-category-input" name="category" style="flex: 1;">
-                            <option value="계약">계약</option>
-                            <option value="잔금">잔금</option>
-                            <option value="고객">고객</option>
-                            <option value="매물">매물</option>
-                            <option value="custom">+ 새 카테고리</option>
-                        </select>
-                    </div>
-                    <input type="text" id="custom-category-input" name="customCategory" placeholder="새 카테고리 입력" style="display: none; margin-top: 8px;">
-                </div>
                 
                 
                 <div class="modal-form-group">
@@ -4586,12 +4663,6 @@
                     <textarea id="template-content-input" name="content" placeholder="템플릿 내용을 입력하세요. 위 버튼을 클릭하여 변수를 삽입할 수 있습니다."></textarea>
                 </div>
                 
-                <div class="modal-form-group">
-                    <label>미리보기:</label>
-                    <div id="template-preview" class="template-preview">
-                        변수가 치환된 내용이 여기에 표시됩니다.
-                    </div>
-                </div>
                 
                 <div class="modal-actions">
                     <button type="button" class="secondary-button" onclick="closeTemplateModal()">취소</button>
@@ -4607,9 +4678,22 @@
             <span class="close-button" onclick="closeTemplatePopup()">&times;</span>
             <div id="template-popup-header">
                 <h2 id="template-popup-title"></h2>
-                <span id="template-popup-category" class="template-category"></span>
             </div>
             <div id="template-popup-content">
+            </div>
+            <!-- 내용보기/변수입력 버튼 영역 -->
+            <div id="template-action-buttons" style="margin: 20px 0; display: flex; gap: 12px; justify-content: center;">
+                <button type="button" class="primary-button" onclick="showTemplateContent()" style="flex: 1;">내용보기</button>
+                <button type="button" class="secondary-button" onclick="showVariableInputs()" style="flex: 1;" id="template-variables-toggle-btn">변수입력</button>
+            </div>
+            <!-- 변수 입력 영역 -->
+            <div id="template-variables-section" style="display: none; margin: 20px 0; border: 1px solid #e0e0e0; border-radius: 6px; padding: 16px; background-color: #fafafa;">
+                <h4 style="margin: 0 0 12px 0; color: #37352f; font-size: 14px;">변수 입력</h4>
+                <div id="template-variables-inputs"></div>
+                <div style="margin-top: 12px; display: flex; gap: 8px;">
+                    <button type="button" class="secondary-button" onclick="resetVariables()">초기화</button>
+                    <button type="button" class="primary-button" onclick="saveFormTemplate()">양식 저장</button>
+                </div>
             </div>
             <div class="modal-actions">
                 <button type="button" class="primary-button" onclick="copyTemplateFromPopup()">복사</button>
