@@ -164,6 +164,375 @@
             background-color: rgba(255, 255, 255, 0.2);
             border-color: rgba(255, 255, 255, 0.3);
         }
+        
+        /* 검색바 스타일 */
+        .search-container {
+            position: relative;
+            flex-grow: 1;
+            max-width: 400px;
+            margin: 0 20px;
+        }
+        
+        #global-search {
+            width: 100%;
+            padding: 8px 16px 8px 40px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            background-color: rgba(255, 255, 255, 0.15);
+            color: white;
+            font-size: 14px;
+            outline: none;
+            transition: all 0.2s ease;
+            backdrop-filter: blur(10px);
+        }
+        
+        #global-search::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        #global-search:focus {
+            background-color: rgba(255, 255, 255, 0.25);
+            border-color: rgba(255, 255, 255, 0.5);
+            box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.1);
+        }
+        
+        .search-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 16px;
+            pointer-events: none;
+        }
+        
+        /* 검색 결과 드롭다운 */
+        .search-results {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            z-index: 1000;
+            max-height: 400px;
+            overflow-y: auto;
+            margin-top: 4px;
+            display: none;
+        }
+        
+        .search-results.show {
+            display: block;
+        }
+        
+        .search-category {
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .search-category:last-child {
+            border-bottom: none;
+        }
+        
+        .search-category-header {
+            padding: 8px 16px;
+            background-color: #f8f9fa;
+            color: #666;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .search-result-item {
+            padding: 12px 16px;
+            cursor: pointer;
+            transition: background-color 0.1s ease;
+            border-bottom: 1px solid #f5f5f5;
+            color: #37352f;
+        }
+        
+        .search-result-item:last-child {
+            border-bottom: none;
+        }
+        
+        .search-result-item:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .search-result-item.selected {
+            background-color: #e3f2fd;
+        }
+        
+        .search-result-title {
+            font-weight: 500;
+            font-size: 14px;
+            margin-bottom: 4px;
+        }
+        
+        .search-result-subtitle {
+            font-size: 12px;
+            color: #666;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        
+        .search-result-project {
+            font-size: 11px;
+            color: #999;
+            background-color: #f0f0f0;
+            padding: 2px 6px;
+            border-radius: 10px;
+            display: inline-block;
+            margin-top: 4px;
+        }
+        
+        .search-highlight {
+            background-color: yellow;
+            font-weight: bold;
+        }
+        
+        .no-search-results {
+            padding: 20px;
+            text-align: center;
+            color: #666;
+            font-style: italic;
+        }
+        
+        /* 검색 결과 하이라이트 애니메이션 */
+        .search-highlight-glow {
+            position: relative;
+            background: linear-gradient(45deg, #fff9c4, #ffeaa7, #fff9c4) !important;
+            border: 2px solid #ffd700 !important;
+            border-radius: 8px !important;
+            transition: all 0.3s ease !important;
+            animation: searchGlow 3s ease-in-out !important;
+            z-index: 10 !important;
+        }
+        
+        .search-highlight-glow::before {
+            content: '';
+            position: absolute;
+            top: -4px;
+            left: -4px;
+            right: -4px;
+            bottom: -4px;
+            background: linear-gradient(45deg, #ffd700, #ffed4e, #ffd700);
+            border-radius: 12px;
+            z-index: -1;
+            animation: glowPulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes searchGlow {
+            0% { 
+                box-shadow: 0 0 5px rgba(255, 215, 0, 0.3);
+                transform: scale(1);
+            }
+            15% { 
+                box-shadow: 0 0 25px rgba(255, 215, 0, 0.8);
+                transform: scale(1.02);
+            }
+            30% { 
+                box-shadow: 0 0 20px rgba(255, 215, 0, 0.6);
+                transform: scale(1);
+            }
+            45% { 
+                box-shadow: 0 0 25px rgba(255, 215, 0, 0.8);
+                transform: scale(1.01);
+            }
+            60% { 
+                box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+                transform: scale(1);
+            }
+            80% { 
+                box-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+            }
+            100% { 
+                box-shadow: 0 0 5px rgba(255, 215, 0, 0.1);
+                transform: scale(1);
+            }
+        }
+        
+        @keyframes glowPulse {
+            0%, 100% { 
+                opacity: 0.7;
+                filter: blur(2px);
+            }
+            50% { 
+                opacity: 1;
+                filter: blur(3px);
+            }
+        }
+        
+        /* 페이드 아웃 애니메이션 */
+        .search-highlight-fade-out {
+            animation: fadeToNormal 1s ease-out forwards !important;
+        }
+        
+        @keyframes fadeToNormal {
+            0% {
+                background: linear-gradient(45deg, #fff9c4, #ffeaa7, #fff9c4) !important;
+                border: 2px solid #ffd700 !important;
+                box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+            }
+            100% {
+                background: transparent !important;
+                border: none !important;
+                box-shadow: none !important;
+            }
+        }
+        
+        /* 스파크 효과 (선택적) */
+        .search-highlight-glow.with-sparkle::after {
+            content: '✨';
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            font-size: 16px;
+            animation: sparkleFloat 2s ease-in-out;
+        }
+        
+        @keyframes sparkleFloat {
+            0% { 
+                opacity: 0;
+                transform: translateY(10px) scale(0.5);
+            }
+            20% { 
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+            80% { 
+                opacity: 1;
+                transform: translateY(-5px) scale(1.1);
+            }
+            100% { 
+                opacity: 0;
+                transform: translateY(-15px) scale(0.8);
+            }
+        }
+        
+        /* 검색 결과 미리보기 모달 스타일 */
+        .clipboard-preview-text, .template-preview-text {
+            background-color: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 16px;
+            margin: 16px 0;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 14px;
+            line-height: 1.5;
+            color: #37352f;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .template-variables {
+            margin: 16px 0;
+            padding: 16px;
+            background-color: #f0f8ff;
+            border: 1px solid #cce7ff;
+            border-radius: 8px;
+        }
+        
+        .template-variables h4 {
+            margin: 0 0 12px 0;
+            color: #2c5aa0;
+            font-size: 14px;
+        }
+        
+        .variable-input-group {
+            margin-bottom: 12px;
+        }
+        
+        .variable-input-group label {
+            display: block;
+            margin-bottom: 4px;
+            font-weight: 500;
+            font-size: 13px;
+            color: #37352f;
+        }
+        
+        .variable-input-group input {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+        
+        .variable-input-group input:focus {
+            outline: none;
+            border-color: #4285f4;
+            box-shadow: 0 0 0 2px rgba(66, 133, 244, 0.1);
+        }
+        
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            margin-top: 20px;
+            padding-top: 16px;
+            border-top: 1px solid #eee;
+        }
+        
+        .primary-btn {
+            background-color: #4285f4;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+        
+        .primary-btn:hover {
+            background-color: #3367d6;
+        }
+        
+        .secondary-btn {
+            background-color: #f8f9fa;
+            color: #37352f;
+            border: 1px solid #dadce0;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .secondary-btn:hover {
+            background-color: #f1f3f4;
+            border-color: #c4c7c5;
+        }
+        
+        /* 토스트 메시지 애니메이션 */
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        @keyframes slideOutRight {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+        }
         .content-panels {
             display: flex;
             gap: 16px;
@@ -1328,6 +1697,43 @@
             .content-header h1 {
                 font-size: 20px;
             }
+            
+            /* 모바일에서 검색바 조정 */
+            .search-container {
+                max-width: 300px;
+                margin: 0 8px;
+            }
+            
+            #global-search {
+                font-size: 13px;
+                padding: 6px 12px 6px 32px;
+            }
+            
+            .search-icon {
+                left: 8px;
+                font-size: 14px;
+            }
+            
+            .search-results {
+                font-size: 13px;
+                max-height: 300px;
+            }
+            
+            .search-result-item {
+                padding: 8px 12px;
+            }
+            
+            .search-result-title {
+                font-size: 13px;
+            }
+            
+            .search-result-subtitle {
+                font-size: 11px;
+            }
+            
+            .search-result-project {
+                font-size: 10px;
+            }
 
             /* 모바일에서 모달 크기 조정 */
             .modal-content {
@@ -1403,6 +1809,11 @@
         <div class="main-area">
             <div class="content-header">
                 <h1 id="current-project-title"></h1>
+                <div class="search-container">
+                    <div class="search-icon">🔍</div>
+                    <input type="text" id="global-search" placeholder="프로젝트, 북마크, 클립보드, 템플릿 검색...">
+                    <div id="search-results" class="search-results"></div>
+                </div>
                 <button id="settings-btn" class="icon-button">⚙️</button>
             </div>
             
@@ -1450,6 +1861,7 @@
         </div>
         </div>
     </div>
+
 
     <!-- Settings Modal -->
     <div id="settings-modal" class="modal">
@@ -2044,6 +2456,8 @@
 
         // 템플릿 데이터 저장
         async function saveTemplates() {
+            // 검색 인덱스 업데이트
+            updateSearchIndex();
             try {
                 // 로컬스토리지에 저장 (항상)
                 localStorage.setItem('templates', JSON.stringify(templates));
@@ -2239,6 +2653,8 @@
         
         // Firebase에 데이터 저장 (개인용 단일 문서)
         async function saveToFirebase(retryCount = 0) {
+            // 검색 인덱스 업데이트
+            updateSearchIndex();
             if (!firebaseInitialized || !db) {
                 console.log('Firebase 미초기화, 로컬스토리지 사용');
                 return saveToLocalStorage();
@@ -2664,6 +3080,9 @@
                 
                 renderProjectList();
                 renderProject(currentProject);
+                
+                // 검색 인덱스 초기화
+                updateSearchIndex();
             }
         }
 
@@ -3625,6 +4044,393 @@
         //         addProjectModal.style.display = 'none';
         //     }
         // });
+
+        // 글로벌 검색 기능
+        const globalSearchInput = document.getElementById('global-search');
+        const searchResults = document.getElementById('search-results');
+        let searchTimeout;
+        let selectedResultIndex = -1;
+        let searchIndex = [];
+
+        // 검색 인덱스 생성
+        function createSearchIndex() {
+            searchIndex = [];
+            
+            // 프로젝트 검색 인덱스
+            Object.keys(allProjectsData).forEach(projectName => {
+                if (projectName !== 'TODAY') {
+                    searchIndex.push({
+                        type: 'project',
+                        title: projectName,
+                        subtitle: `프로젝트 - ${allProjectsData[projectName].bookmarks?.length || 0}개 북마크, ${allProjectsData[projectName].clipboard?.length || 0}개 클립보드`,
+                        project: projectName,
+                        searchText: projectName.toLowerCase()
+                    });
+                }
+            });
+
+            // 북마크 검색 인덱스
+            Object.keys(allProjectsData).forEach(projectName => {
+                const project = allProjectsData[projectName];
+                if (project.bookmarks) {
+                    project.bookmarks.forEach((bookmark, index) => {
+                        if (bookmark.type !== 'divider') {
+                            searchIndex.push({
+                                type: 'bookmark',
+                                title: bookmark.name || bookmark.url,
+                                subtitle: bookmark.url,
+                                project: projectName,
+                                index: index,
+                                data: bookmark,
+                                searchText: `${bookmark.name || ''} ${bookmark.url || ''}`.toLowerCase()
+                            });
+                        }
+                    });
+                }
+            });
+
+            // 클립보드 검색 인덱스
+            Object.keys(allProjectsData).forEach(projectName => {
+                const project = allProjectsData[projectName];
+                if (project.clipboard) {
+                    project.clipboard.forEach((item, index) => {
+                        if (item.type !== 'divider') {
+                            searchIndex.push({
+                                type: 'clipboard',
+                                title: item.title || '제목 없음',
+                                subtitle: item.text ? item.text.substring(0, 100) + (item.text.length > 100 ? '...' : '') : '',
+                                project: projectName,
+                                index: index,
+                                data: item,
+                                searchText: `${item.title || ''} ${item.text || ''}`.toLowerCase()
+                            });
+                        }
+                    });
+                }
+            });
+
+            // 템플릿 검색 인덱스
+            if (templates && Array.isArray(templates)) {
+                templates.forEach((template, index) => {
+                    searchIndex.push({
+                        type: 'template',
+                        title: template.title || '제목 없음',
+                        subtitle: template.content ? template.content.substring(0, 100) + (template.content.length > 100 ? '...' : '') : '',
+                        project: '템플릿',
+                        index: index,
+                        data: template,
+                        searchText: `${template.title || ''} ${template.content || ''}`.toLowerCase()
+                    });
+                });
+            }
+        }
+
+        // 검색 실행
+        function performSearch(query) {
+            if (!query.trim()) {
+                hideSearchResults();
+                return;
+            }
+
+            const searchTerm = query.toLowerCase();
+            const results = searchIndex.filter(item => 
+                item.searchText.includes(searchTerm)
+            );
+
+            displaySearchResults(results, searchTerm);
+        }
+
+        // 검색 결과 표시
+        function displaySearchResults(results, searchTerm) {
+            if (results.length === 0) {
+                searchResults.innerHTML = '<div class="no-search-results">검색 결과가 없습니다.</div>';
+                searchResults.classList.add('show');
+                return;
+            }
+
+            // 카테고리별로 그룹화
+            const categories = {
+                project: { title: '📁 프로젝트', items: [] },
+                bookmark: { title: '🔗 북마크', items: [] },
+                clipboard: { title: '📋 클립보드', items: [] },
+                template: { title: '📄 템플릿', items: [] }
+            };
+
+            results.forEach(result => {
+                if (categories[result.type]) {
+                    categories[result.type].items.push(result);
+                }
+            });
+
+            let html = '';
+            Object.values(categories).forEach(category => {
+                if (category.items.length > 0) {
+                    html += `<div class="search-category">
+                        <div class="search-category-header">${category.title} (${category.items.length})</div>`;
+                    
+                    category.items.forEach((item, index) => {
+                        const highlightedTitle = highlightSearchTerm(item.title, searchTerm);
+                        const highlightedSubtitle = highlightSearchTerm(item.subtitle, searchTerm);
+                        
+                        html += `<div class="search-result-item" data-type="${item.type}" data-project="${item.project}" data-index="${item.index}">
+                            <div class="search-result-title">${highlightedTitle}</div>
+                            <div class="search-result-subtitle">${highlightedSubtitle}</div>
+                            ${item.project !== '템플릿' ? `<div class="search-result-project">${item.project}</div>` : ''}
+                        </div>`;
+                    });
+                    
+                    html += '</div>';
+                }
+            });
+
+            searchResults.innerHTML = html;
+            searchResults.classList.add('show');
+            selectedResultIndex = -1;
+
+            // 검색 결과 클릭 이벤트
+            searchResults.querySelectorAll('.search-result-item').forEach(item => {
+                item.addEventListener('click', handleSearchResultClick);
+            });
+        }
+
+        // 검색어 하이라이트
+        function highlightSearchTerm(text, term) {
+            if (!text || !term) return text;
+            const regex = new RegExp(`(${term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+            return text.replace(regex, '<span class="search-highlight">$1</span>');
+        }
+
+        // 검색 결과 클릭 처리 (컨텍스트 우선 방식: 이동 + 하이라이트)
+        function handleSearchResultClick(event) {
+            const resultItem = event.currentTarget;
+            const type = resultItem.getAttribute('data-type');
+            const project = resultItem.getAttribute('data-project');
+            const index = parseInt(resultItem.getAttribute('data-index'));
+
+            hideSearchResults();
+            globalSearchInput.value = '';
+
+            // 모든 타입: 해당 위치로 이동 + 하이라이트
+            if (type === 'project') {
+                // 프로젝트: 해당 프로젝트로 이동
+                switchProject(project);
+                // 프로젝트 사이드바에서 하이라이트
+                setTimeout(() => {
+                    const projectItems = document.querySelectorAll('#project-list li');
+                    projectItems.forEach(item => {
+                        if (item.textContent.trim() === project) {
+                            applySearchHighlight(item, 'project');
+                        }
+                    });
+                }, 200);
+            } else if (type === 'bookmark') {
+                // 북마크: 해당 프로젝트로 이동 + 북마크 하이라이트
+                switchProject(project);
+                setTimeout(() => {
+                    const listElement = document.getElementById('bookmark-list');
+                    const targetItem = listElement.children[index];
+                    if (targetItem) {
+                        // 부드러운 스크롤
+                        targetItem.scrollIntoView({ 
+                            behavior: 'smooth', 
+                            block: 'center',
+                            inline: 'nearest'
+                        });
+                        
+                        // 황금빛 글로우 효과 적용
+                        setTimeout(() => {
+                            applySearchHighlight(targetItem, 'bookmark');
+                        }, 500); // 스크롤 완료 후 하이라이트
+                    }
+                }, 300);
+            } else if (type === 'clipboard') {
+                // 클립보드: 해당 프로젝트로 이동 + 클립보드 하이라이트
+                switchProject(project);
+                setTimeout(() => {
+                    const listElement = document.getElementById('clipboard-list');
+                    const targetItem = listElement.children[index];
+                    if (targetItem) {
+                        // 부드러운 스크롤
+                        targetItem.scrollIntoView({ 
+                            behavior: 'smooth', 
+                            block: 'center',
+                            inline: 'nearest'
+                        });
+                        
+                        // 황금빛 글로우 효과 적용
+                        setTimeout(() => {
+                            applySearchHighlight(targetItem, 'clipboard');
+                        }, 500); // 스크롤 완료 후 하이라이트
+                    }
+                }, 300);
+            } else if (type === 'template') {
+                // 템플릿: 대시보드로 이동 + 템플릿 카드 하이라이트
+                switchToDashboard();
+                setTimeout(() => {
+                    const templateCards = document.querySelectorAll('.template-card');
+                    templateCards.forEach((card, cardIndex) => {
+                        if (cardIndex === index) {
+                            // 부드러운 스크롤
+                            card.scrollIntoView({ 
+                                behavior: 'smooth', 
+                                block: 'center',
+                                inline: 'nearest'
+                            });
+                            
+                            // 황금빛 글로우 효과 적용
+                            setTimeout(() => {
+                                applySearchHighlight(card, 'template');
+                            }, 500);
+                        }
+                    });
+                }, 300);
+            }
+        }
+
+        // 프로젝트 전환 함수 (검색에서 사용)
+        function switchProject(projectName) {
+            renderProject(projectName);
+        }
+
+        // 대시보드로 전환하는 함수
+        function switchToDashboard() {
+            // 모바일 환경에서는 대시보드 탭으로 전환
+            if (window.innerWidth <= 768) {
+                const mobileTabs = document.querySelectorAll('.mobile-tab');
+                const dashboardTab = Array.from(mobileTabs).find(tab => tab.dataset.tab === 'dashboard');
+                
+                if (dashboardTab) {
+                    // 모든 탭 비활성화
+                    mobileTabs.forEach(tab => tab.classList.remove('active'));
+                    
+                    // 대시보드 탭 활성화
+                    dashboardTab.classList.add('active');
+                    
+                    // 모든 패널 숨김
+                    document.getElementById('project-sidebar').classList.remove('mobile-visible');
+                    document.querySelector('.bookmark-panel').classList.remove('mobile-visible');
+                    document.querySelector('.clipboard-panel').classList.remove('mobile-visible');
+                    document.querySelector('.practice-panel').classList.remove('mobile-visible');
+                    
+                    // 대시보드 영역 표시
+                    document.querySelector('.dashboard-area').classList.add('mobile-visible');
+                }
+            }
+            // 데스크톱에서는 대시보드가 기본적으로 보이므로 별도 처리 불필요
+        }
+
+
+        // 검색 하이라이트 효과 적용
+        function applySearchHighlight(element, type) {
+            if (!element) return;
+            
+            // 기존 하이라이트 효과 제거
+            clearSearchHighlight(element);
+            
+            // 황금빛 글로우 효과 적용
+            element.classList.add('search-highlight-glow');
+            
+            // 특별한 효과: 스파크 추가 (북마크와 클립보드만)
+            if (type === 'bookmark' || type === 'clipboard') {
+                element.classList.add('with-sparkle');
+            }
+            
+            // 3초 후 페이드 아웃 시작
+            setTimeout(() => {
+                element.classList.add('search-highlight-fade-out');
+                element.classList.remove('search-highlight-glow', 'with-sparkle');
+                
+                // 페이드 아웃 완료 후 클래스 제거
+                setTimeout(() => {
+                    element.classList.remove('search-highlight-fade-out');
+                    // 인라인 스타일도 완전히 제거
+                    element.style.background = '';
+                    element.style.border = '';
+                    element.style.boxShadow = '';
+                }, 1000);
+            }, 3000);
+        }
+
+        // 기존 하이라이트 효과 제거
+        function clearSearchHighlight(element) {
+            element.classList.remove('search-highlight-glow', 'search-highlight-fade-out', 'with-sparkle');
+            element.style.background = '';
+            element.style.border = '';
+            element.style.boxShadow = '';
+        }
+
+        // 전체 하이라이트 효과 초기화 (필요시 사용)
+        function clearAllSearchHighlights() {
+            document.querySelectorAll('.search-highlight-glow, .search-highlight-fade-out').forEach(element => {
+                clearSearchHighlight(element);
+            });
+        }
+
+        // 검색 결과 숨기기
+        function hideSearchResults() {
+            searchResults.classList.remove('show');
+            selectedResultIndex = -1;
+        }
+
+        // 검색 입력 이벤트
+        globalSearchInput.addEventListener('input', (e) => {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                performSearch(e.target.value);
+            }, 300);
+        });
+
+        // 검색창 포커스 이벤트
+        globalSearchInput.addEventListener('focus', () => {
+            if (globalSearchInput.value.trim() && searchResults.innerHTML) {
+                searchResults.classList.add('show');
+            }
+        });
+
+        // 검색창 블러 이벤트 (지연 처리로 클릭 이벤트 보장)
+        globalSearchInput.addEventListener('blur', () => {
+            setTimeout(() => {
+                hideSearchResults();
+            }, 200);
+        });
+
+        // 키보드 네비게이션
+        globalSearchInput.addEventListener('keydown', (e) => {
+            const resultItems = searchResults.querySelectorAll('.search-result-item');
+            
+            if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                if (selectedResultIndex < resultItems.length - 1) {
+                    if (selectedResultIndex >= 0) {
+                        resultItems[selectedResultIndex].classList.remove('selected');
+                    }
+                    selectedResultIndex++;
+                    resultItems[selectedResultIndex].classList.add('selected');
+                    resultItems[selectedResultIndex].scrollIntoView({ block: 'nearest' });
+                }
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                if (selectedResultIndex > 0) {
+                    resultItems[selectedResultIndex].classList.remove('selected');
+                    selectedResultIndex--;
+                    resultItems[selectedResultIndex].classList.add('selected');
+                    resultItems[selectedResultIndex].scrollIntoView({ block: 'nearest' });
+                }
+            } else if (e.key === 'Enter') {
+                e.preventDefault();
+                if (selectedResultIndex >= 0 && selectedResultIndex < resultItems.length) {
+                    resultItems[selectedResultIndex].click();
+                }
+            } else if (e.key === 'Escape') {
+                hideSearchResults();
+                globalSearchInput.blur();
+            }
+        });
+
+        // 검색 인덱스 업데이트 (데이터 변경 시 호출)
+        function updateSearchIndex() {
+            createSearchIndex();
+        }
 
         const settingsBtn = document.getElementById('settings-btn');
         const settingsModal = document.getElementById('settings-modal');
