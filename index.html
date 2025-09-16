@@ -1249,6 +1249,16 @@
             cursor: pointer;
         }
 
+        .template-card.parent-template {
+            border-left: 3px solid #2196F3;
+        }
+
+        .template-card.child-template {
+            margin-left: 20px;
+            background-color: #f8f9fa;
+            border-left: 2px solid #ddd;
+        }
+
         .template-card:hover {
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         }
@@ -1266,6 +1276,38 @@
             font-weight: 500;
             color: #37352f;
             margin: 0;
+            cursor: pointer;
+        }
+
+        .accordion-toggle {
+            background: none;
+            border: none;
+            font-size: 12px;
+            cursor: pointer;
+            padding: 2px;
+            width: 16px;
+            height: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .pin-icon {
+            font-size: 12px;
+            opacity: 0.7;
+        }
+
+        .child-count-badge {
+            background-color: #2196F3;
+            color: white;
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-weight: bold;
+        }
+
+        .template-children {
+            margin-bottom: 12px;
         }
 
         .template-actions {
@@ -2235,8 +2277,18 @@
 
         async function deleteTemplateFromPopup() {
             if (!currentPopupTemplate) return;
+
+            // 부모 템플릿 삭제 보호
+            if (currentPopupTemplate.isParent !== false) {
+                const children = templates.filter(t => t.parentId === currentPopupTemplate.id);
+                if (children.length > 0) {
+                    alert(`이 템플릿에는 ${children.length}개의 파생 템플릿이 있습니다.\n먼저 파생 템플릿들을 삭제해주세요.`);
+                    return;
+                }
+            }
+
             const confirmDelete = confirm(`"${currentPopupTemplate.title}" 템플릿을 삭제하시겠습니까?\n\n이 작업은 되돌릴 수 없습니다.`);
-            
+
             if (confirmDelete) {
                 const templateIndex = templates.findIndex(t => t.id === currentPopupTemplate.id);
                 if (templateIndex !== -1) {
@@ -2344,13 +2396,15 @@
                 const newTemplateTitle = `${currentPopupTemplate.title}_${timestamp}`;
                 console.log('새 템플릿 제목:', newTemplateTitle);
 
-                // 새 템플릿 객체 생성
+                // 새 템플릿 객체 생성 (파생 템플릿)
                 const newTemplate = {
                     id: Date.now().toString(),
                     title: newTemplateTitle,
                     content: processedContent,
                     createdAt: new Date().toISOString(),
-                    usageCount: 0
+                    usageCount: 0,
+                    isParent: false,
+                    parentId: currentPopupTemplate.id
                 };
 
                 console.log('새 템플릿 객체:', newTemplate);
@@ -2499,8 +2553,17 @@
 
         // 템플릿 삭제
         async function deleteTemplate(template) {
+            // 부모 템플릿 삭제 보호
+            if (template.isParent !== false) {
+                const children = templates.filter(t => t.parentId === template.id);
+                if (children.length > 0) {
+                    alert(`이 템플릿에는 ${children.length}개의 파생 템플릿이 있습니다.\n먼저 파생 템플릿들을 삭제해주세요.`);
+                    return;
+                }
+            }
+
             const confirmDelete = confirm(`"${template.title}" 템플릿을 삭제하시겠습니까?\n\n이 작업은 되돌릴 수 없습니다.`);
-            
+
             if (confirmDelete) {
                 try {
                     const templateIndex = templates.findIndex(t => t.id === template.id);
@@ -2583,54 +2646,132 @@
             }
         }
 
-        // 템플릿 목록 렌더링
+        // 템플릿 목록 렌더링 (계층 구조)
         function renderTemplates() {
             const templateList = document.getElementById('template-list');
-            
+
             if (!templateList) return; // 요소가 없으면 종료
-            
-            let filteredTemplates = templates;
-            
-            if (filteredTemplates.length === 0) {
+
+            if (templates.length === 0) {
                 templateList.innerHTML = '<div class="activity-placeholder">템플릿이 없습니다. 새 템플릿을 추가해보세요.</div>';
                 return;
             }
-            
+
+            // 부모 템플릿과 자식 템플릿 분리 및 정렬
+            const parentTemplates = templates.filter(t => t.isParent !== false)
+                .sort((a, b) => a.title.localeCompare(b.title));
+            const childTemplates = templates.filter(t => t.isParent === false)
+                .sort((a, b) => a.title.localeCompare(b.title));
+
             templateList.innerHTML = '';
-            filteredTemplates.forEach(template => {
-                const templateCard = createTemplateCard(template);
-                templateList.appendChild(templateCard);
+
+            parentTemplates.forEach(parentTemplate => {
+                // 부모 템플릿의 자식들 찾기
+                const children = childTemplates.filter(child => child.parentId === parentTemplate.id);
+
+                // 부모 템플릿 카드 생성
+                const parentCard = createParentTemplateCard(parentTemplate, children.length);
+                templateList.appendChild(parentCard);
+
+                // 자식 템플릿들을 담을 컨테이너 생성
+                if (children.length > 0) {
+                    const childrenContainer = document.createElement('div');
+                    childrenContainer.className = 'template-children';
+                    childrenContainer.id = `children-${parentTemplate.id}`;
+                    childrenContainer.style.display = 'none'; // 기본적으로 숨김
+
+                    children.forEach(child => {
+                        const childCard = createChildTemplateCard(child);
+                        childrenContainer.appendChild(childCard);
+                    });
+
+                    templateList.appendChild(childrenContainer);
+                }
             });
         }
 
-        // 템플릿 카드 생성
-        // 템플릿 카드 생성 (복사 버튼 제거됨)
-        function createTemplateCard(template) {
+        // 부모 템플릿 카드 생성
+        function createParentTemplateCard(template, childCount) {
             const card = document.createElement('div');
-            card.className = 'template-card';
-            
-            // 카드 클릭 시 팝업 표시
-            card.onclick = () => showTemplatePopup(template);
-            
+            card.className = 'template-card parent-template';
+
             const header = document.createElement('div');
             header.className = 'template-card-header';
-            
+
+            const leftArea = document.createElement('div');
+            leftArea.style.display = 'flex';
+            leftArea.style.alignItems = 'center';
+            leftArea.style.gap = '8px';
+
+            // 아코디언 토글 버튼 (자식이 있을 때만)
+            if (childCount > 0) {
+                const toggleBtn = document.createElement('button');
+                toggleBtn.className = 'accordion-toggle';
+                toggleBtn.id = `toggle-${template.id}`;
+                toggleBtn.innerHTML = '▶';
+                toggleBtn.onclick = (e) => {
+                    e.stopPropagation();
+                    toggleChildren(template.id);
+                };
+                leftArea.appendChild(toggleBtn);
+            }
+
+            // 고정핀 아이콘
+            const pinIcon = document.createElement('span');
+            pinIcon.className = 'pin-icon';
+            pinIcon.innerHTML = '📌';
+            pinIcon.title = '원본 템플릿';
+            leftArea.appendChild(pinIcon);
+
             const title = document.createElement('h5');
             title.className = 'template-title';
-            title.textContent = `📝 ${template.title}`;
-            
-            const rightArea = document.createElement('div');
-            rightArea.style.display = 'flex';
-            rightArea.style.alignItems = 'center';
-            rightArea.style.gap = '8px';
-            
-            
-            header.appendChild(title);
-            header.appendChild(rightArea);
-            
+            title.textContent = template.title;
+            title.onclick = () => showTemplatePopup(template);
+            leftArea.appendChild(title);
+
+            header.appendChild(leftArea);
+
+            // 자식 개수 표시
+            if (childCount > 0) {
+                const childCountBadge = document.createElement('span');
+                childCountBadge.className = 'child-count-badge';
+                childCountBadge.textContent = childCount;
+                header.appendChild(childCountBadge);
+            }
+
             card.appendChild(header);
-            
             return card;
+        }
+
+        // 자식 템플릿 카드 생성
+        function createChildTemplateCard(template) {
+            const card = document.createElement('div');
+            card.className = 'template-card child-template';
+
+            const header = document.createElement('div');
+            header.className = 'template-card-header';
+
+            const title = document.createElement('h5');
+            title.className = 'template-title';
+            title.textContent = template.title;
+            title.onclick = () => showTemplatePopup(template);
+
+            header.appendChild(title);
+            card.appendChild(header);
+
+            return card;
+        }
+
+        // 아코디언 토글 기능
+        function toggleChildren(parentId) {
+            const childrenContainer = document.getElementById(`children-${parentId}`);
+            const toggleBtn = document.getElementById(`toggle-${parentId}`);
+
+            if (childrenContainer && toggleBtn) {
+                const isVisible = childrenContainer.style.display !== 'none';
+                childrenContainer.style.display = isVisible ? 'none' : 'block';
+                toggleBtn.innerHTML = isVisible ? '▶' : '▼';
+            }
         }
 
         // 템플릿 복사
@@ -2665,7 +2806,9 @@
                 content: content.trim(),
                 usageCount: 0,
                 createdAt: editingTemplateId ? templates.find(t => t.id === editingTemplateId)?.createdAt || new Date() : new Date(),
-                updatedAt: new Date()
+                updatedAt: new Date(),
+                isParent: editingTemplateId ? templates.find(t => t.id === editingTemplateId)?.isParent : true,
+                parentId: editingTemplateId ? templates.find(t => t.id === editingTemplateId)?.parentId : null
             };
             
             if (editingTemplateId) {
