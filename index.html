@@ -2043,9 +2043,6 @@
             document.getElementById('template-edit-modal').style.display = 'none';
         }
 
-        // 템플릿 팝업 함수들
-        let currentPopupTemplate = null;
-
         // 클립보드 복사 함수
         function copyToClipboard(text) {
             // 먼저 modern API 시도
@@ -2054,7 +2051,7 @@
                     .then(() => true)
                     .catch(() => false);
             }
-            
+
             // 대체 방법: 임시 textarea 생성
             return new Promise((resolve) => {
                 const textArea = document.createElement('textarea');
@@ -2064,9 +2061,9 @@
                 textArea.style.left = '-9999px';
                 textArea.setAttribute('readonly', '');
                 textArea.style.contain = 'strict';
-                
+
                 document.body.appendChild(textArea);
-                
+
                 // iOS Safari 대응
                 if (/ipad|iphone/i.test(navigator.userAgent)) {
                     textArea.contentEditable = 'true';
@@ -2080,7 +2077,7 @@
                 } else {
                     textArea.select();
                 }
-                
+
                 try {
                     const successful = document.execCommand('copy');
                     document.body.removeChild(textArea);
@@ -2091,6 +2088,10 @@
                 }
             });
         }
+
+        // 템플릿 팝업 함수들
+        let currentPopupTemplate = null;
+
 
         // 복사 확인 모달 함수들
         function showCopyConfirmation() {
@@ -2158,27 +2159,59 @@
         }
 
         async function copyTemplateFromPopup() {
-            if (!currentPopupTemplate) {
-                console.error('currentPopupTemplate is null');
-                return;
-            }
-            
-            const processedContent = replaceVariables(currentPopupTemplate.content);
-            
             try {
+                console.log('copyTemplateFromPopup 함수 시작');
+
+                if (!currentPopupTemplate) {
+                    console.error('currentPopupTemplate is null');
+                    alert('템플릿 정보를 찾을 수 없습니다.');
+                    return;
+                }
+
+                console.log('현재 팝업 템플릿:', currentPopupTemplate);
+
+                // 변수값 수집 (입력되어 있는 경우)
+                const variables = extractVariables(currentPopupTemplate.content);
+                const customValues = {};
+
+                variables.forEach(variable => {
+                    const input = document.getElementById(`var-${variable}`);
+                    if (input && input.value.trim()) {
+                        customValues[variable] = input.value.trim();
+                        console.log(`변수 ${variable}: ${input.value.trim()}`);
+                    }
+                });
+
+                console.log('수집된 변수값들:', customValues);
+
+                // 변수값이 있으면 치환하여 복사, 없으면 원본 복사
+                const processedContent = Object.keys(customValues).length > 0
+                    ? replaceVariables(currentPopupTemplate.content, customValues)
+                    : replaceVariables(currentPopupTemplate.content);
+
+                console.log('처리된 내용:', processedContent);
+
                 const success = await copyToClipboard(processedContent);
+                console.log('복사 결과:', success);
+
                 if (success) {
+                    // 변수값 히스토리 저장 (값이 있는 경우)
+                    if (Object.keys(customValues).length > 0) {
+                        saveVariableHistory(currentPopupTemplate.id, customValues);
+                    }
+
                     currentPopupTemplate.usageCount = (currentPopupTemplate.usageCount || 0) + 1;
                     await saveTemplates();
                     renderTemplates();
                     showCopyConfirmation();
                     closeTemplatePopup();
+                    console.log('복사 완료');
                 } else {
                     alert('클립보드 복사에 실패했습니다.');
                 }
             } catch (error) {
                 console.error('템플릿 복사 실패:', error);
-                alert('템플릿 복사에 실패했습니다.');
+                alert('템플릿 복사에 실패했습니다: ' + error.message);
             }
         }
 
@@ -2260,59 +2293,88 @@
 
         // 양식 저장 (변수값이 적용된 템플릿을 새로운 템플릿으로 저장)
         async function saveFormTemplate() {
-            if (!currentPopupTemplate) return;
-            
-            const variables = extractVariables(currentPopupTemplate.content);
-            const customValues = {};
-            
-            // 입력된 변수값 수집
-            variables.forEach(variable => {
-                const input = document.getElementById(`var-${variable}`);
-                if (input) {
-                    customValues[variable] = input.value.trim();
+            try {
+                console.log('saveFormTemplate 함수 시작');
+
+                if (!currentPopupTemplate) {
+                    console.error('currentPopupTemplate이 없습니다');
+                    alert('템플릿 정보를 찾을 수 없습니다.');
+                    return;
                 }
-            });
-            
-            // 변수값 히스토리 저장
-            saveVariableHistory(currentPopupTemplate.id, customValues);
-            
-            // 변수가 치환된 내용 생성
-            const processedContent = replaceVariables(currentPopupTemplate.content, customValues);
-            
-            // 새 템플릿명 생성 (원본 + 날짜시간)
-            const now = new Date();
-            const timestamp = now.toLocaleString('ko-KR', { 
-                month: '2-digit', 
-                day: '2-digit', 
-                hour: '2-digit', 
-                minute: '2-digit'
-            }).replace(/\./g, '').replace(/\s/g, '_');
-            
-            const newTemplateTitle = `${currentPopupTemplate.title}_${timestamp}`;
-            
-            // 새 템플릿 객체 생성
-            const newTemplate = {
-                id: Date.now().toString(),
-                title: newTemplateTitle,
-                content: processedContent,
-                createdAt: new Date().toISOString(),
-                usageCount: 0
-            };
-            
-            // 템플릿 배열에 추가
-            templates.push(newTemplate);
-            await saveTemplates();
-            renderTemplates();
-            
-            // UI 업데이트 - 처리된 내용을 스타일과 함께 표시
-            document.getElementById('template-popup-content').innerHTML = `
-                <div style="background-color: #f8f9fa; border: 1px solid #e9ecef; border-radius: 6px; padding: 16px; white-space: pre-wrap; font-family: monospace; font-size: 14px; line-height: 1.5;">
-                    ${processedContent}
-                </div>
-            `;
-            document.getElementById('template-variables-section').style.display = 'none';
-            
-            alert(`"${newTemplateTitle}" 양식이 저장되었습니다.`);
+
+                console.log('현재 템플릿:', currentPopupTemplate);
+
+                const variables = extractVariables(currentPopupTemplate.content);
+                const customValues = {};
+
+                console.log('추출된 변수들:', variables);
+
+                // 입력된 변수값 수집
+                variables.forEach(variable => {
+                    const input = document.getElementById(`var-${variable}`);
+                    if (input) {
+                        customValues[variable] = input.value.trim();
+                        console.log(`변수 ${variable}: ${input.value.trim()}`);
+                    }
+                });
+
+                console.log('수집된 변수값들:', customValues);
+
+                // 변수값 히스토리 저장
+                saveVariableHistory(currentPopupTemplate.id, customValues);
+
+                // 변수가 치환된 내용 생성
+                const processedContent = replaceVariables(currentPopupTemplate.content, customValues);
+                console.log('처리된 내용:', processedContent);
+
+                // 새 템플릿명 생성 (원본 + 날짜시간)
+                const now = new Date();
+                const timestamp = now.toLocaleString('ko-KR', {
+                    month: '2-digit',
+                    day: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                }).replace(/\./g, '').replace(/\s/g, '_');
+
+                const newTemplateTitle = `${currentPopupTemplate.title}_${timestamp}`;
+                console.log('새 템플릿 제목:', newTemplateTitle);
+
+                // 새 템플릿 객체 생성
+                const newTemplate = {
+                    id: Date.now().toString(),
+                    title: newTemplateTitle,
+                    content: processedContent,
+                    createdAt: new Date().toISOString(),
+                    usageCount: 0
+                };
+
+                console.log('새 템플릿 객체:', newTemplate);
+
+                // 템플릿 배열에 추가
+                templates.push(newTemplate);
+                console.log('템플릿 배열에 추가 완료, 현재 템플릿 수:', templates.length);
+
+                await saveTemplates();
+                console.log('saveTemplates 완료');
+
+                renderTemplates();
+                console.log('renderTemplates 완료');
+
+                // UI 업데이트 - 처리된 내용을 스타일과 함께 표시
+                document.getElementById('template-popup-content').innerHTML = `
+                    <div style="background-color: #f8f9fa; border: 1px solid #e9ecef; border-radius: 6px; padding: 16px; white-space: pre-wrap; font-family: monospace; font-size: 14px; line-height: 1.5;">
+                        ${processedContent}
+                    </div>
+                `;
+                document.getElementById('template-variables-section').style.display = 'none';
+
+                alert(`"${newTemplateTitle}" 양식이 저장되었습니다.`);
+                console.log('saveFormTemplate 함수 완료');
+
+            } catch (error) {
+                console.error('saveFormTemplate 에러:', error);
+                alert('양식 저장 중 오류가 발생했습니다: ' + error.message);
+            }
         }
 
         // 변수 삽입 기능
@@ -2456,8 +2518,10 @@
 
         // 템플릿 데이터 저장
         async function saveTemplates() {
-            // 검색 인덱스 업데이트
-            updateSearchIndex();
+            // 검색 인덱스 업데이트 (함수가 정의된 경우에만)
+            if (typeof updateSearchIndex === 'function') {
+                updateSearchIndex();
+            }
             try {
                 // 로컬스토리지에 저장 (항상)
                 localStorage.setItem('templates', JSON.stringify(templates));
@@ -2653,8 +2717,10 @@
         
         // Firebase에 데이터 저장 (개인용 단일 문서)
         async function saveToFirebase(retryCount = 0) {
-            // 검색 인덱스 업데이트
-            updateSearchIndex();
+            // 검색 인덱스 업데이트 (함수가 정의된 경우에만)
+            if (typeof updateSearchIndex === 'function') {
+                updateSearchIndex();
+            }
             if (!firebaseInitialized || !db) {
                 console.log('Firebase 미초기화, 로컬스토리지 사용');
                 return saveToLocalStorage();
@@ -3081,8 +3147,10 @@
                 renderProjectList();
                 renderProject(currentProject);
                 
-                // 검색 인덱스 초기화
-                updateSearchIndex();
+                // 검색 인덱스 초기화 (함수가 정의된 경우에만)
+                if (typeof updateSearchIndex === 'function') {
+                    updateSearchIndex();
+                }
             }
         }
 
@@ -5156,51 +5224,6 @@
             }
         });
 
-        // 모바일 호환 복사 함수
-        function copyToClipboard(text) {
-            // 먼저 modern API 시도
-            if (navigator.clipboard && navigator.clipboard.writeText) {
-                return navigator.clipboard.writeText(text)
-                    .then(() => true)
-                    .catch(() => false);
-            }
-            
-            // 대체 방법: 임시 textarea 생성
-            return new Promise((resolve) => {
-                const textArea = document.createElement('textarea');
-                textArea.value = text;
-                textArea.style.position = 'fixed';
-                textArea.style.top = '-9999px';
-                textArea.style.left = '-9999px';
-                textArea.setAttribute('readonly', '');
-                textArea.style.contain = 'strict';
-                
-                document.body.appendChild(textArea);
-                
-                // iOS Safari 대응
-                if (/ipad|iphone/i.test(navigator.userAgent)) {
-                    textArea.contentEditable = 'true';
-                    textArea.readOnly = false;
-                    const range = document.createRange();
-                    range.selectNodeContents(textArea);
-                    const selection = window.getSelection();
-                    selection.removeAllRanges();
-                    selection.addRange(range);
-                    textArea.setSelectionRange(0, 999999);
-                } else {
-                    textArea.select();
-                }
-                
-                try {
-                    const successful = document.execCommand('copy');
-                    document.body.removeChild(textArea);
-                    resolve(successful);
-                } catch (err) {
-                    document.body.removeChild(textArea);
-                    resolve(false);
-                }
-            });
-        }
 
         viewClipboardCopyBtn.addEventListener('click', (e) => {
             const textToCopy = e.target.dataset.clipboardText;
