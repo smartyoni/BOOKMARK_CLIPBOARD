@@ -2794,33 +2794,40 @@
         async function saveTemplate(formData) {
             const title = formData.get('title') || document.getElementById('template-title-input').value;
             const content = formData.get('content') || document.getElementById('template-content-input').value;
-            
+
             if (!title.trim() || !content.trim()) {
                 alert('제목과 내용은 필수입니다.');
                 return;
             }
-            
-            const templateData = {
-                id: editingTemplateId || Date.now().toString(),
-                title: title.trim(),
-                content: content.trim(),
-                usageCount: 0,
-                createdAt: editingTemplateId ? templates.find(t => t.id === editingTemplateId)?.createdAt || new Date() : new Date(),
-                updatedAt: new Date(),
-                isParent: editingTemplateId ? templates.find(t => t.id === editingTemplateId)?.isParent : true,
-                parentId: editingTemplateId ? templates.find(t => t.id === editingTemplateId)?.parentId : null
-            };
-            
+
             if (editingTemplateId) {
+                // 기존 템플릿 편집
                 const index = templates.findIndex(t => t.id === editingTemplateId);
                 if (index !== -1) {
-                    templateData.usageCount = templates[index].usageCount || 0;
-                    templates[index] = templateData;
+                    const existingTemplate = templates[index];
+                    // 기존 템플릿의 모든 속성을 유지하면서 제목과 내용만 업데이트
+                    templates[index] = {
+                        ...existingTemplate,
+                        title: title.trim(),
+                        content: content.trim(),
+                        updatedAt: new Date()
+                    };
                 }
             } else {
+                // 새 템플릿 생성
+                const templateData = {
+                    id: Date.now().toString(),
+                    title: title.trim(),
+                    content: content.trim(),
+                    usageCount: 0,
+                    createdAt: new Date(),
+                    updatedAt: new Date(),
+                    isParent: true,
+                    parentId: null
+                };
                 templates.push(templateData);
             }
-            
+
             await saveTemplates();
             renderTemplates();
             closeTemplateModal();
