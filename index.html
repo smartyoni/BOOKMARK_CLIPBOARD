@@ -2341,7 +2341,14 @@
             const variablesContainer = document.getElementById('template-variables-inputs');
             const inputs = variablesContainer.querySelectorAll('input');
             inputs.forEach(input => input.value = '');
-            
+
+            // 변수값 히스토리도 삭제
+            if (currentPopupTemplate) {
+                const historyKey = `template_variables_${currentPopupTemplate.id}`;
+                localStorage.removeItem(historyKey);
+                console.log('변수 히스토리 삭제:', historyKey);
+            }
+
             // 원래 내용으로 복원
             if (currentPopupTemplate) {
                 document.getElementById('template-popup-content').textContent = currentPopupTemplate.content;
@@ -2384,34 +2391,52 @@
                 const processedContent = replaceVariables(currentPopupTemplate.content, customValues);
                 console.log('처리된 내용:', processedContent);
 
-                // 새 템플릿명 생성 (원본 + 날짜시간)
-                const now = new Date();
-                const timestamp = now.toLocaleString('ko-KR', {
-                    month: '2-digit',
-                    day: '2-digit',
-                    hour: '2-digit',
-                    minute: '2-digit'
-                }).replace(/\./g, '').replace(/\s/g, '_');
+                // 상위 템플릿과 하위 템플릿 구분하여 처리
+                if (currentPopupTemplate.isParent !== false) {
+                    // 상위 템플릿: 새 하위 템플릿 생성
+                    const now = new Date();
+                    const timestamp = now.toLocaleString('ko-KR', {
+                        month: '2-digit',
+                        day: '2-digit',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    }).replace(/\./g, '').replace(/\s/g, '_');
 
-                const newTemplateTitle = `${currentPopupTemplate.title}_${timestamp}`;
-                console.log('새 템플릿 제목:', newTemplateTitle);
+                    const newTemplateTitle = `${currentPopupTemplate.title}_${timestamp}`;
+                    console.log('새 하위 템플릿 제목:', newTemplateTitle);
 
-                // 새 템플릿 객체 생성 (파생 템플릿)
-                const newTemplate = {
-                    id: Date.now().toString(),
-                    title: newTemplateTitle,
-                    content: processedContent,
-                    createdAt: new Date().toISOString(),
-                    usageCount: 0,
-                    isParent: false,
-                    parentId: currentPopupTemplate.id
-                };
+                    // 새 하위 템플릿 객체 생성
+                    const newTemplate = {
+                        id: Date.now().toString(),
+                        title: newTemplateTitle,
+                        content: processedContent,
+                        createdAt: new Date().toISOString(),
+                        usageCount: 0,
+                        isParent: false,
+                        parentId: currentPopupTemplate.id
+                    };
 
-                console.log('새 템플릿 객체:', newTemplate);
+                    templates.push(newTemplate);
+                    console.log('새 하위 템플릿 생성 완료');
+                    alert(`"${newTemplateTitle}" 하위 템플릿이 생성되었습니다.`);
 
-                // 템플릿 배열에 추가
-                templates.push(newTemplate);
-                console.log('템플릿 배열에 추가 완료, 현재 템플릿 수:', templates.length);
+                } else {
+                    // 하위 템플릿: 기존 템플릿 내용 업데이트
+                    const templateIndex = templates.findIndex(t => t.id === currentPopupTemplate.id);
+                    if (templateIndex !== -1) {
+                        templates[templateIndex] = {
+                            ...templates[templateIndex],
+                            content: processedContent,
+                            updatedAt: new Date()
+                        };
+
+                        // 현재 팝업 템플릿도 업데이트
+                        currentPopupTemplate.content = processedContent;
+
+                        console.log('하위 템플릿 업데이트 완료');
+                        alert(`"${currentPopupTemplate.title}" 템플릿이 업데이트되었습니다.`);
+                    }
+                }
 
                 await saveTemplates();
                 console.log('saveTemplates 완료');
@@ -2426,8 +2451,6 @@
                     </div>
                 `;
                 document.getElementById('template-variables-section').style.display = 'none';
-
-                alert(`"${newTemplateTitle}" 양식이 저장되었습니다.`);
                 console.log('saveFormTemplate 함수 완료');
 
             } catch (error) {
@@ -5867,12 +5890,14 @@
             </div>
             <!-- 변수 입력 영역 -->
             <div id="template-variables-section" style="display: none; margin: 20px 0; border: 1px solid #e0e0e0; border-radius: 6px; padding: 16px; background-color: #fafafa;">
-                <h4 style="margin: 0 0 12px 0; color: #37352f; font-size: 14px;">변수 입력</h4>
-                <div id="template-variables-inputs"></div>
-                <div style="margin-top: 12px; display: flex; gap: 8px;">
-                    <button type="button" class="secondary-button" onclick="resetVariables()">초기화</button>
-                    <button type="button" class="primary-button" onclick="saveFormTemplate()">양식 저장</button>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                    <h4 style="margin: 0; color: #37352f; font-size: 14px;">변수 입력</h4>
+                    <div style="display: flex; gap: 8px; align-items: center;">
+                        <button type="button" class="primary-button" onclick="saveFormTemplate()" style="font-size: 12px; padding: 4px 8px;">양식 저장</button>
+                        <button type="button" class="secondary-button" onclick="resetVariables()" style="font-size: 12px; padding: 4px 8px;">초기화</button>
+                    </div>
                 </div>
+                <div id="template-variables-inputs"></div>
             </div>
             <div class="modal-actions">
                 <button type="button" class="primary-button" onclick="copyTemplateFromPopup()">복사</button>
