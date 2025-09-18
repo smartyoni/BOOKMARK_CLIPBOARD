@@ -2303,19 +2303,31 @@
         // 변수 입력 UI 표시 함수 (개선)
         function showVariableInputs() {
             if (!currentPopupTemplate) return;
-            
+
             const variables = extractVariables(currentPopupTemplate.content);
             const variablesSection = document.getElementById('template-variables-section');
             const variablesContainer = document.getElementById('template-variables-inputs');
-            
+            const childTitleSection = document.getElementById('child-template-title-section');
+            const childTitleInput = document.getElementById('child-template-title');
+
             if (variables.length === 0) {
                 alert('이 템플릿에는 입력할 변수가 없습니다.');
                 return;
             }
-            
+
+            // 상위 템플릿인지 확인하여 제목 입력란 표시 여부 결정
+            if (currentPopupTemplate.isParent !== false) {
+                // 상위 템플릿: 제목 입력란 표시
+                childTitleSection.style.display = 'block';
+                childTitleInput.value = ''; // 초기화
+            } else {
+                // 하위 템플릿: 제목 입력란 숨김
+                childTitleSection.style.display = 'none';
+            }
+
             // 저장된 변수값 로드
             const savedValues = loadVariableHistory(currentPopupTemplate.id);
-            
+
             // 변수 입력 필드 생성 (이전 값 자동 입력)
             variablesContainer.innerHTML = '';
             variables.forEach(variable => {
@@ -2323,13 +2335,13 @@
                 div.style.marginBottom = '8px';
                 div.innerHTML = `
                     <label style="display: block; margin-bottom: 4px; font-size: 12px; color: #37352f;">${variable}:</label>
-                    <input type="text" id="var-${variable}" placeholder="${variable} 값을 입력하세요" 
+                    <input type="text" id="var-${variable}" placeholder="${variable} 값을 입력하세요"
                            value="${savedValues[variable] || ''}"
                            style="width: 100%; padding: 6px 8px; border: 1px solid #ccc; border-radius: 3px; font-size: 12px;">
                 `;
                 variablesContainer.appendChild(div);
             });
-            
+
             variablesSection.style.display = 'block';
             
             // 원본 내용 표시로 되돌리기
@@ -2341,6 +2353,12 @@
             const variablesContainer = document.getElementById('template-variables-inputs');
             const inputs = variablesContainer.querySelectorAll('input');
             inputs.forEach(input => input.value = '');
+
+            // 하위 템플릿 제목 입력란도 초기화
+            const childTitleInput = document.getElementById('child-template-title');
+            if (childTitleInput) {
+                childTitleInput.value = '';
+            }
 
             // 변수값 히스토리도 삭제
             if (currentPopupTemplate) {
@@ -2394,15 +2412,26 @@
                 // 상위 템플릿과 하위 템플릿 구분하여 처리
                 if (currentPopupTemplate.isParent !== false) {
                     // 상위 템플릿: 새 하위 템플릿 생성
-                    const now = new Date();
-                    const timestamp = now.toLocaleString('ko-KR', {
-                        month: '2-digit',
-                        day: '2-digit',
-                        hour: '2-digit',
-                        minute: '2-digit'
-                    }).replace(/\./g, '').replace(/\s/g, '_');
 
-                    const newTemplateTitle = `${currentPopupTemplate.title}_${timestamp}`;
+                    // 사용자가 입력한 제목 확인
+                    const customTitleInput = document.getElementById('child-template-title');
+                    let newTemplateTitle;
+
+                    if (customTitleInput && customTitleInput.value.trim()) {
+                        // 사용자가 제목을 입력한 경우
+                        newTemplateTitle = customTitleInput.value.trim();
+                    } else {
+                        // 제목을 입력하지 않은 경우 기본 형식 사용
+                        const now = new Date();
+                        const timestamp = now.toLocaleString('ko-KR', {
+                            month: '2-digit',
+                            day: '2-digit',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                        }).replace(/\./g, '').replace(/\s/g, '_');
+                        newTemplateTitle = `${currentPopupTemplate.title}_${timestamp}`;
+                    }
+
                     console.log('새 하위 템플릿 제목:', newTemplateTitle);
 
                     // 새 하위 템플릿 객체 생성
@@ -5897,6 +5926,13 @@
                         <button type="button" class="secondary-button" onclick="resetVariables()" style="font-size: 12px; padding: 4px 8px;">초기화</button>
                     </div>
                 </div>
+
+                <!-- 하위 템플릿 제목 입력란 (상위 템플릿에서만 표시) -->
+                <div id="child-template-title-section" style="margin-bottom: 12px; display: none;">
+                    <label for="child-template-title" style="display: block; margin-bottom: 4px; color: #37352f; font-size: 12px; font-weight: 500;">하위 템플릿 제목:</label>
+                    <input type="text" id="child-template-title" placeholder="하위 템플릿의 제목을 입력하세요" style="width: 100%; padding: 8px; border: 1px solid #e0e0e0; border-radius: 4px; font-size: 14px; box-sizing: border-box;">
+                </div>
+
                 <div id="template-variables-inputs"></div>
             </div>
             <div class="modal-actions">
