@@ -5,7 +5,7 @@
   "start_url": "/BOOKMARK_CLIPBOARD/",
   "display": "standalone",
   "background_color": "#ffffff",
-  "theme_color": "#37352f",
+  "theme_color": "#D2691E",
   "orientation": "portrait-primary",
   "categories": ["productivity", "utilities"],
   "lang": "ko",

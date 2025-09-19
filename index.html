@@ -7,7 +7,8 @@
     
     <!-- PWA Meta Tags -->
     <meta name="description" content="프로젝트별 북마크와 클립보드를 효율적으로 관리하는 PWA 앱">
-    <meta name="theme-color" content="#64b5f6">
+    <meta name="theme-color" content="#D2691E">
+    <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="북마크앱">
@@ -46,7 +47,7 @@
         /* 왼쪽 사이드바 스타일 */
         #project-sidebar {
             width: 240px;
-            background-color: #f7f6f3;
+            background-color: #FDF5E6;
             padding: 12px 0;
             border-right: 1px solid rgba(55, 53, 47, 0.09);
             overflow-y: auto;
@@ -112,7 +113,7 @@
         }
         #project-list li.active {
             background-color: rgba(46, 170, 220, 0.15);
-            color: #2ea2dc;
+            color: #B8860B;
         }
 
         /* 메인 영역 스타일 */
@@ -138,10 +139,10 @@
             justify-content: space-between;
             align-items: center;
             padding: 16px 32px;
-            background: linear-gradient(135deg, #64b5f6 0%, #81c784 100%);
+            background: linear-gradient(135deg, #D2691E 0%, #F4A460 50%, #DEB887 100%);
             border-radius: 0;
             box-shadow: 0 2px 8px rgba(100, 181, 246, 0.15);
-            border-bottom: 3px solid #42a5f5;
+            border-bottom: 3px solid #8B4513;
             width: 100%;
             box-sizing: border-box;
         }
@@ -827,8 +828,49 @@
             color: #000000;
             background-color: rgba(100, 71, 58, 0.1);
             cursor: copy; /* 복사 기능 강조 */
+            position: relative;
         }
-        
+
+        /* 클립보드 버튼 툴팁 - 강화된 선택자 */
+        .item-button.clipboard-button .clipboard-tooltip {
+            position: absolute !important;
+            bottom: 100% !important;
+            left: 50% !important;
+            transform: translateX(-50%) !important;
+            background: linear-gradient(135deg, #ff6b6b 0%, #4ecdc4 100%) !important;
+            color: white !important;
+            padding: 10px 14px !important;
+            border-radius: 8px !important;
+            font-size: 12px !important;
+            font-weight: bold !important;
+            z-index: 1000 !important;
+            opacity: 0 !important;
+            visibility: hidden !important;
+            transition: opacity 0.3s ease, visibility 0.3s ease !important;
+            margin-bottom: 8px !important;
+            max-width: 220px !important;
+            word-wrap: break-word !important;
+            white-space: normal !important;
+            pointer-events: none !important;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2) !important;
+        }
+
+        .item-button.clipboard-button .clipboard-tooltip::after {
+            content: '' !important;
+            position: absolute !important;
+            top: 100% !important;
+            left: 50% !important;
+            transform: translateX(-50%) !important;
+            border: 6px solid transparent !important;
+            border-top-color: #764ba2 !important;
+        }
+
+        .item-button.clipboard-button:hover .clipboard-tooltip {
+            opacity: 1 !important;
+            visibility: visible !important;
+        }
+
         /* 구분선 스타일 */
         .divider {
             width: 100%;
@@ -1059,6 +1101,12 @@
             min-height: 360px;
             font-family: inherit;
             line-height: 1.5;
+        }
+
+        /* 요약 textarea 전용 스타일 */
+        #add-clipboard-summary {
+            min-height: 80px !important; /* 제목 입력 필드 높이의 약 2배 */
+            max-height: 120px;
         }
 
         .modal-actions {
@@ -1569,7 +1617,7 @@
         }
 
         .mobile-tab.active {
-            color: #2ea2dc;
+            color: #B8860B;
             font-weight: 600;
         }
 
@@ -1973,6 +2021,10 @@
                 <label for="add-clipboard-content">내용:</label>
                 <textarea id="add-clipboard-content"></textarea>
             </div>
+            <div class="modal-form-group">
+                <label for="add-clipboard-summary">요약:</label>
+                <textarea id="add-clipboard-summary" placeholder="클립보드 항목의 요약을 입력하세요 (선택사항)"></textarea>
+            </div>
             <div class="modal-actions">
                 <button id="add-clipboard-save" class="action-button">저장</button>
                 <button id="add-clipboard-cancel" class="action-button secondary-button">취소</button>
@@ -2023,37 +2075,69 @@
             <span class="close-button color-palette-close">&times;</span>
             <h2>색상 선택</h2>
             <div class="color-palette-grid">
-                <!-- 첫 번째 줄: 기본 + 빨간 계열 -->
-                <div class="color-option" data-color="#f8f9fa" style="background-color: #f8f9fa;" title="기본"></div>
-                <div class="color-option" data-color="#ffebee" style="background-color: #ffebee;" title="연한 빨강"></div>
-                <div class="color-option" data-color="#ffcdd2" style="background-color: #ffcdd2;" title="빨강"></div>
-                <div class="color-option" data-color="#ef9a9a" style="background-color: #ef9a9a;" title="진한 빨강"></div>
-                <div class="color-option" data-color="#e57373" style="background-color: #e57373;" title="더진한 빨강"></div>
-                <div class="color-option" data-color="#f44336" style="background-color: #f44336;" title="강한 빨강"></div>
-                
-                <!-- 두 번째 줄: 주황 계열 -->
-                <div class="color-option" data-color="#fff3e0" style="background-color: #fff3e0;" title="연한 주황"></div>
-                <div class="color-option" data-color="#ffe0b2" style="background-color: #ffe0b2;" title="주황"></div>
-                <div class="color-option" data-color="#ffcc80" style="background-color: #ffcc80;" title="진한 주황"></div>
-                <div class="color-option" data-color="#ffb74d" style="background-color: #ffb74d;" title="더진한 주황"></div>
-                <div class="color-option" data-color="#ff9800" style="background-color: #ff9800;" title="강한 주황"></div>
-                <div class="color-option" data-color="#e65100" style="background-color: #e65100;" title="깊은 주황"></div>
-                
-                <!-- 세 번째 줄: 노랑 + 초록 계열 -->
-                <div class="color-option" data-color="#fffde7" style="background-color: #fffde7;" title="연한 노랑"></div>
-                <div class="color-option" data-color="#fff176" style="background-color: #fff176;" title="노랑"></div>
-                <div class="color-option" data-color="#e8f5e8" style="background-color: #e8f5e8;" title="연한 초록"></div>
-                <div class="color-option" data-color="#a5d6a7" style="background-color: #a5d6a7;" title="초록"></div>
-                <div class="color-option" data-color="#66bb6a" style="background-color: #66bb6a;" title="진한 초록"></div>
-                <div class="color-option" data-color="#4caf50" style="background-color: #4caf50;" title="강한 초록"></div>
-                
-                <!-- 네 번째 줄: 파랑 계열 -->
-                <div class="color-option" data-color="#e3f2fd" style="background-color: #e3f2fd;" title="연한 파랑"></div>
-                <div class="color-option" data-color="#90caf9" style="background-color: #90caf9;" title="파랑"></div>
-                <div class="color-option" data-color="#64b5f6" style="background-color: #64b5f6;" title="진한 파랑"></div>
-                <div class="color-option" data-color="#42a5f5" style="background-color: #42a5f5;" title="더진한 파랑"></div>
-                <div class="color-option" data-color="#2196f3" style="background-color: #2196f3;" title="강한 파랑"></div>
-                <div class="color-option" data-color="#1976d2" style="background-color: #1976d2;" title="깊은 파랑"></div>
+                <!-- 첫 번째 줄: 기본 & 밝은 회색 계열 -->
+                <div class="color-option" data-color="#ffffff" style="background-color: #ffffff;" title="화이트 (기본)"></div>
+                <div class="color-option" data-color="#f8fafc" style="background-color: #f8fafc;" title="스노우"></div>
+                <div class="color-option" data-color="#e2e8f0" style="background-color: #e2e8f0;" title="실버"></div>
+                <div class="color-option" data-color="#94a3b8" style="background-color: #94a3b8;" title="그레이"></div>
+                <div class="color-option" data-color="#64748b" style="background-color: #64748b;" title="슬레이트"></div>
+                <div class="color-option" data-color="#334155" style="background-color: #334155;" title="차콜"></div>
+
+                <!-- 두 번째 줄: 🔴 밝은 빨강 계열 -->
+                <div class="color-option" data-color="#ffe4e6" style="background-color: #ffe4e6;" title="로즈 미스트"></div>
+                <div class="color-option" data-color="#fecdd3" style="background-color: #fecdd3;" title="체리 블러섬"></div>
+                <div class="color-option" data-color="#fda4af" style="background-color: #fda4af;" title="코랄 핑크"></div>
+                <div class="color-option" data-color="#fb7185" style="background-color: #fb7185;" title="워터멜론"></div>
+                <div class="color-option" data-color="#f43f5e" style="background-color: #f43f5e;" title="스트로베리"></div>
+                <div class="color-option" data-color="#e11d48" style="background-color: #e11d48;" title="크림슨"></div>
+
+                <!-- 세 번째 줄: 🟠 밝은 주황 계열 -->
+                <div class="color-option" data-color="#fff4ed" style="background-color: #fff4ed;" title="피치 크림"></div>
+                <div class="color-option" data-color="#fed7aa" style="background-color: #fed7aa;" title="피치"></div>
+                <div class="color-option" data-color="#fdba74" style="background-color: #fdba74;" title="아프리코트"></div>
+                <div class="color-option" data-color="#fb923c" style="background-color: #fb923c;" title="카로트"></div>
+                <div class="color-option" data-color="#f97316" style="background-color: #f97316;" title="오렌지"></div>
+                <div class="color-option" data-color="#ea580c" style="background-color: #ea580c;" title="탠저린"></div>
+
+                <!-- 네 번째 줄: 🟡 밝은 노랑 계열 -->
+                <div class="color-option" data-color="#fffbeb" style="background-color: #fffbeb;" title="레몬 미스트"></div>
+                <div class="color-option" data-color="#fef3c7" style="background-color: #fef3c7;" title="바닐라"></div>
+                <div class="color-option" data-color="#fde047" style="background-color: #fde047;" title="선샤인"></div>
+                <div class="color-option" data-color="#facc15" style="background-color: #facc15;" title="골든"></div>
+                <div class="color-option" data-color="#eab308" style="background-color: #eab308;" title="머스타드"></div>
+                <div class="color-option" data-color="#ca8a04" style="background-color: #ca8a04;" title="허니"></div>
+
+                <!-- 다섯 번째 줄: 🟢 밝은 초록 계열 -->
+                <div class="color-option" data-color="#f0fdf4" style="background-color: #f0fdf4;" title="민트 미스트"></div>
+                <div class="color-option" data-color="#dcfce7" style="background-color: #dcfce7;" title="스프링"></div>
+                <div class="color-option" data-color="#86efac" style="background-color: #86efac;" title="민트"></div>
+                <div class="color-option" data-color="#4ade80" style="background-color: #4ade80;" title="라임"></div>
+                <div class="color-option" data-color="#22c55e" style="background-color: #22c55e;" title="포레스트"></div>
+                <div class="color-option" data-color="#16a34a" style="background-color: #16a34a;" title="에메랄드"></div>
+
+                <!-- 여섯 번째 줄: 🔵 밝은 파랑 계열 -->
+                <div class="color-option" data-color="#f0f9ff" style="background-color: #f0f9ff;" title="스카이 미스트"></div>
+                <div class="color-option" data-color="#e0f2fe" style="background-color: #e0f2fe;" title="아이스블루"></div>
+                <div class="color-option" data-color="#7dd3fc" style="background-color: #7dd3fc;" title="스카이"></div>
+                <div class="color-option" data-color="#38bdf8" style="background-color: #38bdf8;" title="세룰리안"></div>
+                <div class="color-option" data-color="#0ea5e9" style="background-color: #0ea5e9;" title="오션"></div>
+                <div class="color-option" data-color="#0284c7" style="background-color: #0284c7;" title="딥블루"></div>
+
+                <!-- 일곱 번째 줄: 🟣 밝은 보라 계열 -->
+                <div class="color-option" data-color="#faf5ff" style="background-color: #faf5ff;" title="라벤더 미스트"></div>
+                <div class="color-option" data-color="#f3e8ff" style="background-color: #f3e8ff;" title="라일락"></div>
+                <div class="color-option" data-color="#d8b4fe" style="background-color: #d8b4fe;" title="라벤더"></div>
+                <div class="color-option" data-color="#c084fc" style="background-color: #c084fc;" title="아메시스트"></div>
+                <div class="color-option" data-color="#a855f7" style="background-color: #a855f7;" title="바이올렛"></div>
+                <div class="color-option" data-color="#9333ea" style="background-color: #9333ea;" title="퍼플"></div>
+
+                <!-- 여덟 번째 줄: 💗 밝은 핑크 & 특별 색상 -->
+                <div class="color-option" data-color="#fdf2f8" style="background-color: #fdf2f8;" title="로즈 미스트"></div>
+                <div class="color-option" data-color="#f9a8d4" style="background-color: #f9a8d4;" title="부블검"></div>
+                <div class="color-option" data-color="#ec4899" style="background-color: #ec4899;" title="핫핑크"></div>
+                <div class="color-option" data-color="#06b6d4" style="background-color: #06b6d4;" title="터키석"></div>
+                <div class="color-option" data-color="#10b981" style="background-color: #10b981;" title="제이드"></div>
+                <div class="color-option" data-color="#f59e0b" style="background-color: #f59e0b;" title="골드"></div>
             </div>
         </div>
     </div>
@@ -2063,7 +2147,11 @@
         <div class="modal-content">
             <span class="close-button view-clipboard-close">&times;</span>
             <h2 id="view-clipboard-title"></h2>
-            <div id="view-clipboard-content" style="white-space: pre-wrap; word-wrap: break-word; max-height: 600px; overflow-y: auto; margin-bottom: 20px;"></div>
+            <div id="view-clipboard-content" style="white-space: pre-wrap; word-wrap: break-word; max-height: 600px; overflow-y: auto; margin-bottom: 15px;"></div>
+            <div id="view-clipboard-summary-section" style="margin-bottom: 20px;">
+                <h4 style="margin: 0 0 8px 0; color: #666; font-size: 14px;">요약</h4>
+                <div id="view-clipboard-summary" style="padding: 10px; background-color: #f8f9fa; border-radius: 4px; border-left: 3px solid #007acc; font-size: 14px; color: #555;"></div>
+            </div>
             <div class="modal-actions">
                 <button id="view-clipboard-copy-btn" class="action-button">복사</button>
                 <button id="view-clipboard-edit-btn" class="action-button secondary-button">수정</button>
@@ -3281,8 +3369,21 @@
             4: '',
             5: ''
         };
-        
-        
+
+        // 기존 클립보드 데이터에 summary 필드 추가
+        function ensureClipboardSummaryField() {
+            Object.keys(allProjectsData).forEach(projectName => {
+                const project = allProjectsData[projectName];
+                if (project.clipboard && Array.isArray(project.clipboard)) {
+                    project.clipboard.forEach(item => {
+                        if (item.type !== 'divider' && !item.hasOwnProperty('summary')) {
+                            item.summary = '';
+                        }
+                    });
+                }
+            });
+        }
+
         async function initializeApp() {
             try {
                 const savedData = await loadFromFirebase();
@@ -3317,9 +3418,12 @@
                     }
                 }
                 
+                // 기존 데이터 호환성 처리
+                ensureClipboardSummaryField();
+
                 // 전역 연습장 데이터 로드
                 await loadPracticeFromFirebase();
-                
+
                 // UI 렌더링
                 renderProjectList();
                 renderProject(currentProject);
@@ -3350,7 +3454,10 @@
                         allProjectsData['TODAY'].clipboard = [];
                     }
                 }
-                
+
+                // 기존 데이터 호환성 처리 (에러 케이스에서도)
+                ensureClipboardSummaryField();
+
                 renderProjectList();
                 renderProject(currentProject);
                 
@@ -3483,16 +3590,65 @@
                     } else {
                         const button = document.createElement('button');
                         button.className = 'item-button clipboard-button draggable';
-                        
+
                         const favoriteIcon = item.favorite ? '⭐ ' : '';
-                        button.textContent = favoriteIcon + item.title.substring(0, 8 - favoriteIcon.length);
-                        
+                        const buttonText = favoriteIcon + item.title.substring(0, 8 - favoriteIcon.length);
+
                         button.style.backgroundColor = item.color || '#f8f9fa';
                         button.dataset.index = index;
                         button.dataset.type = 'clipboard';
                         button.dataset.fullName = item.title;
                         button.dataset.content = item.text;
                         button.draggable = true;
+
+                        // 버튼 텍스트를 텍스트 노드로 추가
+                        const textNode = document.createTextNode(buttonText);
+                        button.appendChild(textNode);
+
+                        // JavaScript 기반 tooltip 이벤트
+                        let tooltipElement = null;
+
+                        button.addEventListener('mouseenter', (e) => {
+                            // 기존 tooltip 제거
+                            if (tooltipElement) tooltipElement.remove();
+
+                            // 새 tooltip 생성
+                            tooltipElement = document.createElement('div');
+                            tooltipElement.className = 'js-clipboard-tooltip';
+                            tooltipElement.textContent = item.summary || '요약없음';
+                            tooltipElement.style.cssText = `
+                                position: fixed;
+                                background: linear-gradient(135deg, #F0E68C 0%, #DDA0DD 100%);
+                                color: black;
+                                padding: 10px 14px;
+                                border-radius: 8px;
+                                font-size: 14px;
+                                font-weight: bold;
+                                z-index: 10000;
+                                pointer-events: none;
+                                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+                                max-width: 220px;
+                                word-wrap: break-word;
+                                white-space: normal;
+                            `;
+
+                            // 위치 계산 (버튼 아래에 표시)
+                            const rect = button.getBoundingClientRect();
+                            tooltipElement.style.left = (rect.left + rect.width / 2) + 'px';
+                            tooltipElement.style.top = (rect.bottom + 8) + 'px';
+                            tooltipElement.style.transform = 'translateX(-50%)';
+
+                            document.body.appendChild(tooltipElement);
+                        });
+
+                        button.addEventListener('mouseleave', () => {
+                            if (tooltipElement) {
+                                tooltipElement.remove();
+                                tooltipElement = null;
+                            }
+                        });
+
+                        // title 속성 제거 (JavaScript tooltip만 사용)
                         
                         let isDragging = false;
                         button.addEventListener('mousedown', () => { isDragging = false; });
@@ -3507,12 +3663,23 @@
                                     const modal = document.getElementById('view-clipboard-modal');
                                     const titleEl = document.getElementById('view-clipboard-title');
                                     const contentEl = document.getElementById('view-clipboard-content');
+                                    const summaryEl = document.getElementById('view-clipboard-summary');
+                                    const summarySectionEl = document.getElementById('view-clipboard-summary-section');
                                     const copyBtn = document.getElementById('view-clipboard-copy-btn');
                                     const editBtn = document.getElementById('view-clipboard-edit-btn');
 
                                     titleEl.textContent = item.title || '';
                                     contentEl.innerHTML = convertUrlsToLinks(item.text);
-                                    
+
+                                    // 요약 표시
+                                    if (item.summary && item.summary.trim()) {
+                                        summaryEl.textContent = item.summary;
+                                        summarySectionEl.style.display = 'block';
+                                    } else {
+                                        summaryEl.textContent = '요약없음';
+                                        summarySectionEl.style.display = 'block';
+                                    }
+
                                     copyBtn.dataset.clipboardText = item.text;
                                     editBtn.dataset.clipboardIndex = index;
 
@@ -3601,15 +3768,64 @@
                     
                     const favoriteIcon = item.favorite ? '⭐ ' : '';
                     const buttonText = item.title || item.text || '';
-                    button.textContent = favoriteIcon + buttonText.substring(0, 10 - favoriteIcon.length);
-                    
+                    const fullButtonText = favoriteIcon + buttonText.substring(0, 10 - favoriteIcon.length);
+
                     button.style.backgroundColor = item.color || '#f8f9fa';
                     button.dataset.index = index;
                     button.dataset.type = 'clipboard';
                     button.dataset.fullText = item.text;
                     button.dataset.title = item.title || '';
                     button.draggable = true;
-                    
+
+                    // 버튼 텍스트를 텍스트 노드로 추가
+                    const textNode = document.createTextNode(fullButtonText);
+                    button.appendChild(textNode);
+
+                    // JavaScript 기반 tooltip 이벤트
+                    let tooltipElement = null;
+
+                    button.addEventListener('mouseenter', (e) => {
+                        // 기존 tooltip 제거
+                        if (tooltipElement) tooltipElement.remove();
+
+                        // 새 tooltip 생성
+                        tooltipElement = document.createElement('div');
+                        tooltipElement.className = 'js-clipboard-tooltip';
+                        tooltipElement.textContent = item.summary || '요약없음';
+                        tooltipElement.style.cssText = `
+                            position: fixed;
+                            background: linear-gradient(135deg, #F0E68C 0%, #DDA0DD 100%);
+                            color: black;
+                            padding: 10px 14px;
+                            border-radius: 8px;
+                            font-size: 14px;
+                            font-weight: bold;
+                            z-index: 10000;
+                            pointer-events: none;
+                            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+                            max-width: 220px;
+                            word-wrap: break-word;
+                            white-space: normal;
+                        `;
+
+                        // 위치 계산 (버튼 아래에 표시)
+                        const rect = button.getBoundingClientRect();
+                        tooltipElement.style.left = (rect.left + rect.width / 2) + 'px';
+                        tooltipElement.style.top = (rect.bottom + 8) + 'px';
+                        tooltipElement.style.transform = 'translateX(-50%)';
+
+                        document.body.appendChild(tooltipElement);
+                    });
+
+                    button.addEventListener('mouseleave', () => {
+                        if (tooltipElement) {
+                            tooltipElement.remove();
+                            tooltipElement = null;
+                        }
+                    });
+
+                    // title 속성 제거 (JavaScript tooltip만 사용)
+
                     let isDragging = false;
                     button.addEventListener('mousedown', () => { isDragging = false; });
                     button.addEventListener('dragstart', (e) => { 
@@ -3622,12 +3838,23 @@
                                 const modal = document.getElementById('view-clipboard-modal');
                                 const titleEl = document.getElementById('view-clipboard-title');
                                 const contentEl = document.getElementById('view-clipboard-content');
+                                const summaryEl = document.getElementById('view-clipboard-summary');
+                                const summarySectionEl = document.getElementById('view-clipboard-summary-section');
                                 const copyBtn = document.getElementById('view-clipboard-copy-btn');
                                 const editBtn = document.getElementById('view-clipboard-edit-btn');
 
                                 titleEl.textContent = item.title || '';
                                 contentEl.innerHTML = convertUrlsToLinks(item.text);
-                                
+
+                                // 요약 표시
+                                if (item.summary && item.summary.trim()) {
+                                    summaryEl.textContent = item.summary;
+                                    summarySectionEl.style.display = 'block';
+                                } else {
+                                    summaryEl.textContent = '요약없음';
+                                    summarySectionEl.style.display = 'block';
+                                }
+
                                 copyBtn.dataset.clipboardText = item.text;
                                 editBtn.dataset.clipboardIndex = index;
 
@@ -3730,7 +3957,8 @@
             
             document.getElementById('add-clipboard-title').value = '';
             document.getElementById('add-clipboard-content').value = '';
-            
+            document.getElementById('add-clipboard-summary').value = '';
+
             delete modal.dataset.editMode;
             delete modal.dataset.editIndex;
         }
@@ -4059,6 +4287,7 @@
                     document.querySelector('#add-clipboard-modal h2').textContent = '클립보드 편집';
                     document.getElementById('add-clipboard-title').value = item.title || '';
                     document.getElementById('add-clipboard-content').value = item.text;
+                    document.getElementById('add-clipboard-summary').value = item.summary || '';
                     modal.style.display = 'flex';
                     modal.dataset.editMode = 'true';
                     modal.dataset.editIndex = index;
@@ -4219,25 +4448,28 @@
         addClipboardSave.addEventListener('click', () => {
             const title = document.getElementById('add-clipboard-title').value.trim();
             const content = document.getElementById('add-clipboard-content').value.trim();
-            
+            const summary = document.getElementById('add-clipboard-summary').value.trim();
+
             if (!title || !content) {
                 alert('제목과 내용을 모두 입력해주세요.');
                 return;
             }
-            
+
             // clipboard 배열이 존재하는지 확인
             if (!allProjectsData[currentProject].clipboard) {
                 allProjectsData[currentProject].clipboard = [];
             }
-            
+
             if (addClipboardModal.dataset.editMode === 'true') {
                 const index = parseInt(addClipboardModal.dataset.editIndex);
                 allProjectsData[currentProject].clipboard[index].title = title;
                 allProjectsData[currentProject].clipboard[index].text = content;
+                allProjectsData[currentProject].clipboard[index].summary = summary;
             } else {
-                allProjectsData[currentProject].clipboard.push({ 
+                allProjectsData[currentProject].clipboard.push({
                     title: title,
-                    text: content, 
+                    text: content,
+                    summary: '',
                     color: '#f8f9fa',
                     favorite: false
                 });

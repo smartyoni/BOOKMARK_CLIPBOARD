@@ -1,8 +1,8 @@
 const CACHE_NAME = 'bookmark-clipboard-v2';
 const urlsToCache = [
-  '/BOOKMARK_CLIPBOARD/',
-  '/BOOKMARK_CLIPBOARD/index.html',
-  '/BOOKMARK_CLIPBOARD/manifest.json',
+  '/',
+  '/index.html',
+  '/manifest.json',
   'https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js',
   'https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js'
 ];
@@ -91,10 +91,16 @@ self.addEventListener('fetch', event => {
               }
 
               const responseToCache = response.clone();
-              caches.open(CACHE_NAME)
-                .then(cache => {
-                  cache.put(event.request, responseToCache);
-                });
+              // chrome-extension 및 기타 지원되지 않는 스키마 제외
+              if (event.request.url.startsWith('http://') || event.request.url.startsWith('https://')) {
+                caches.open(CACHE_NAME)
+                  .then(cache => {
+                    cache.put(event.request, responseToCache);
+                  })
+                  .catch(err => {
+                    console.log('캐시 저장 실패:', err);
+                  });
+              }
 
               return response;
             });
@@ -136,8 +142,8 @@ self.addEventListener('push', event => {
     const data = event.data.json();
     const options = {
       body: data.body,
-      icon: '/BOOKMARK_CLIPBOARD/icon-192x192.png',
-      badge: '/BOOKMARK_CLIPBOARD/icon-192x192.png',
+      icon: '/icon-192x192.png',
+      badge: '/icon-192x192.png',
       vibrate: [200, 100, 200],
       data: {
         dateOfArrival: Date.now(),
