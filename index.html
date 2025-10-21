@@ -1408,36 +1408,45 @@
                 padding: 12px 8px; /* 좌우 패딩 줄임 */
             }
 
-            /* 모바일에서 상단 북마크 패널 */
+            /* 모바일에서 상단 북마크 패널 - 기본 숨김 */
             .content-panel.bookmark-panel.top-bookmark {
-                height: auto;
-                margin-bottom: 16px;
+                display: none;
+                height: calc(100% - 32px);
+                width: 100%;
+                margin-bottom: 0;
+                padding: 12px 8px;
+                box-sizing: border-box;
+            }
+
+            /* 모바일에서 북마크 패널 표시 (탭 터치시) */
+            .content-panel.bookmark-panel.top-bookmark.mobile-visible {
                 display: block;
             }
 
-            /* 모바일에서 하단 content-panels 세로 배치 */
+            /* 모바일에서 하단 content-panels - 기본 숨김 */
             .content-panels {
+                display: none;
                 flex-direction: column;
                 gap: 16px;
             }
 
+            /* 모바일에서 각 패널별 표시/숨김 */
             .content-panel {
                 flex: none;
                 max-width: none;
                 width: 100%;
-                min-height: 200px;
+                height: calc(100% - 32px);
                 padding: 12px 8px; /* 내부 패딩 조정 */
                 box-sizing: border-box;
+                display: none;
             }
 
-            /* 모바일에서 각 패널별 표시/숨김 */
             .content-panel.clipboard-panel {
                 display: none;
             }
 
             .content-panel.clipboard-panel.mobile-visible {
                 display: block;
-                height: auto;
             }
 
             .content-panel.practice-panel {
@@ -1446,7 +1455,6 @@
 
             .content-panel.practice-panel.mobile-visible {
                 display: block;
-                height: auto;
             }
 
             .dashboard-area {
