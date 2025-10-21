@@ -1760,6 +1760,7 @@
             <li id="context-edit">편집</li>
             <li id="context-favorite">즐겨찾기</li>
             <li id="context-color">색상 변경</li>
+            <li id="context-copy-button">버튼 복사</li>
             <li id="context-delete">삭제</li>
             <li id="context-cancel">취소</li>
         </ul>
@@ -1770,6 +1771,13 @@
             <li id="project-context-rename">이름 수정</li>
             <li id="project-context-delete">삭제</li>
             <li id="project-context-cancel">취소</li>
+        </ul>
+    </div>
+
+    <div id="bookmark-list-context-menu" class="context-menu">
+        <ul>
+            <li id="list-context-paste">붙여넣기</li>
+            <li id="list-context-cancel">취소</li>
         </ul>
     </div>
 
@@ -3190,6 +3198,7 @@
         const contextEdit = document.getElementById('context-edit');
         const contextFavorite = document.getElementById('context-favorite');
         const contextColor = document.getElementById('context-color');
+        const contextCopyButton = document.getElementById('context-copy-button');
         const contextDelete = document.getElementById('context-delete');
         const contextCancel = document.getElementById('context-cancel');
 
@@ -3198,9 +3207,14 @@
         const projectContextDelete = document.getElementById('project-context-delete');
         const projectContextCancel = document.getElementById('project-context-cancel');
 
+        const bookmarkListContextMenu = document.getElementById('bookmark-list-context-menu');
+        const listContextPaste = document.getElementById('list-context-paste');
+        const listContextCancel = document.getElementById('list-context-cancel');
+
         let activeItem = null;
         let activeProject = null;
         let colorChangeItem = null;
+        let copiedBookmark = null; // 복사된 북마크 저장
 
         // URL을 하이퍼링크로 변환하는 함수
         // HTML 이스케이프 - XSS 방지
@@ -4073,6 +4087,25 @@
             }
         });
 
+        // 버튼 복사 이벤트
+        contextCopyButton.addEventListener('click', () => {
+            if (activeItem && activeItem.type === 'bookmark') {
+                const bookmark = allProjectsData[currentProject].bookmarks[activeItem.index];
+                if (bookmark && bookmark.type !== 'divider') {
+                    // 북마크 데이터 복사
+                    copiedBookmark = {
+                        name: bookmark.name,
+                        url: bookmark.url,
+                        color: bookmark.color || '#f8f9fa',
+                        favorite: bookmark.favorite || false
+                    };
+                    showSaveStatus('success', '북마크 복사 완료! 붙여넣기 메뉴를 사용하세요.');
+                }
+                contextMenu.style.display = 'none';
+                activeItem = null;
+            }
+        });
+
         contextDelete.addEventListener('click', () => {
             if (activeItem) {
                 const { type, index } = activeItem;
@@ -4103,7 +4136,73 @@
             contextMenu.style.display = 'none';
             activeItem = null;
         });
-        
+
+        // 북마크 리스트 컨텍스트 메뉴 이벤트
+        listContextPaste.addEventListener('click', () => {
+            if (copiedBookmark) {
+                // 복사된 북마크를 현재 프로젝트의 북마크 리스트에 추가
+                const newBookmark = {
+                    name: copiedBookmark.name,
+                    url: copiedBookmark.url,
+                    color: copiedBookmark.color,
+                    favorite: copiedBookmark.favorite
+                };
+                allProjectsData[currentProject].bookmarks.push(newBookmark);
+                renderProject(currentProject);
+                bookmarkListContextMenu.style.display = 'none';
+                showSaveStatus('success', '북마크 붙여넣기 완료!');
+                saveToFirebase();
+            }
+        });
+
+        listContextCancel.addEventListener('click', () => {
+            bookmarkListContextMenu.style.display = 'none';
+        });
+
+        // 북마크 리스트 우클릭 이벤트
+        bookmarkList.addEventListener('contextmenu', (e) => {
+            e.preventDefault();
+
+            // 클릭된 요소가 북마크 버튼이 아닌 경우만 처리
+            if (!e.target.closest('.item-button')) {
+                // 붙여넣기 메뉴 활성화 여부 결정
+                listContextPaste.style.opacity = copiedBookmark ? '1' : '0.5';
+                listContextPaste.style.pointerEvents = copiedBookmark ? 'auto' : 'none';
+
+                bookmarkListContextMenu.style.display = 'block';
+
+                // 화면 경계를 고려한 위치 계산
+                const menuWidth = 150;
+                const menuHeight = 100;
+                const screenWidth = window.innerWidth;
+                const screenHeight = window.innerHeight;
+
+                let x = e.clientX;
+                let y = e.clientY;
+
+                if (x + menuWidth > screenWidth) {
+                    x = screenWidth - menuWidth - 10;
+                }
+
+                if (y + menuHeight > screenHeight) {
+                    y = screenHeight - menuHeight - 10;
+                }
+
+                if (x < 10) x = 10;
+                if (y < 10) y = 10;
+
+                bookmarkListContextMenu.style.left = x + 'px';
+                bookmarkListContextMenu.style.top = y + 'px';
+            }
+        });
+
+        // 북마크 리스트 클릭으로 컨텍스트 메뉴 닫기
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('#bookmark-list-context-menu')) {
+                bookmarkListContextMenu.style.display = 'none';
+            }
+        });
+
         addBookmarkBtn.addEventListener('click', addBookmark);
         addClipboardBtn.addEventListener('click', addClipboard);
         addDividerBtn.addEventListener('click', addDivider);
