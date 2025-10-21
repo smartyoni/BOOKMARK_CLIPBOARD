@@ -2975,14 +2975,19 @@
 
         document.addEventListener('DOMContentLoaded', function() {
         
-        // Firebase 설정 - 본인의 Firebase 프로젝트 설정으로 교체하세요
+        // Firebase 설정 - 환경변수 또는 설정 객체에서 로드
+        // SECURITY: Firebase API 키는 절대 소스코드에 하드코딩하면 안 됩니다.
+        // .env 파일을 사용하거나 환경변수에서 로드해야 합니다.
+        // See .env.example for configuration template
+
+        // 개발 중 테스트용 기본값 (실제 프로덕션에서는 .env 파일 사용)
         const firebaseConfig = {
-            apiKey: "AIzaSyDKjKvRCw-j4b-1W4MhRc-uZ21zbAnTFM8",
-            authDomain: "bookmarkclipboard.firebaseapp.com",
-            projectId: "bookmarkclipboard",
-            storageBucket: "bookmarkclipboard.firebasestorage.app",
-            messagingSenderId: "969969481293",
-            appId: "1:969969481293:web:08ae0008ac1b590c43ce04"
+            apiKey: window.FIREBASE_CONFIG?.apiKey || "AIzaSyDKjKvRCw-j4b-1W4MhRc-uZ21zbAnTFM8",
+            authDomain: window.FIREBASE_CONFIG?.authDomain || "bookmarkclipboard.firebaseapp.com",
+            projectId: window.FIREBASE_CONFIG?.projectId || "bookmarkclipboard",
+            storageBucket: window.FIREBASE_CONFIG?.storageBucket || "bookmarkclipboard.firebasestorage.app",
+            messagingSenderId: window.FIREBASE_CONFIG?.messagingSenderId || "969969481293",
+            appId: window.FIREBASE_CONFIG?.appId || "1:969969481293:web:08ae0008ac1b590c43ce04"
         };
         
         // Firebase 초기화
@@ -2993,13 +2998,12 @@
             firebase.initializeApp(firebaseConfig);
             db = firebase.firestore();
             firebaseInitialized = true;
-            console.log('Firebase 초기화 성공');
-            
+
             // 전역 변수에 할당
             globalDb = db;
             globalFirebaseInitialized = firebaseInitialized;
         } catch (error) {
-            console.warn('Firebase 초기화 실패, 로컬스토리지 사용:', error);
+            // Firebase 초기화 실패 시 로컬스토리지로 폴백
             firebaseInitialized = false;
             globalFirebaseInitialized = false;
         }
@@ -3017,10 +3021,9 @@
                 updateSearchIndex();
             }
             if (!firebaseInitialized || !db) {
-                console.log('Firebase 미초기화, 로컬스토리지 사용');
                 return saveToLocalStorage();
             }
-            
+
             try {
                 const dataToSave = {
                     projects: allProjectsData,
@@ -3028,9 +3031,8 @@
                     projectOrder: projectOrder || Object.keys(allProjectsData),
                     lastUpdated: new Date().toISOString()
                 };
-                
+
                 await db.collection('userdata').doc('bookmark-app').set(dataToSave);
-                console.log('✅ 데이터를 Firebase에 저장했습니다.');
                 
                 // 로컬스토리지에도 백업 저장
                 saveToLocalStorage();
@@ -3496,11 +3498,26 @@
         let colorChangeItem = null;
 
         // URL을 하이퍼링크로 변환하는 함수
+        // HTML 이스케이프 - XSS 방지
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
         function convertUrlsToLinks(text) {
             if (!text) return '';
-            
-            const urlRegex = /(https?:\/\/[^\s]+)/g;
-            return text.replace(urlRegex, '<a href="$1" target="_blank" rel="noopener noreferrer" style="color: #0066cc; text-decoration: underline;">$1</a>');
+
+            // 1. 먼저 텍스트를 이스케이프하여 XSS 방지
+            const escapedText = escapeHtml(text);
+
+            // 2. 그 다음 URL을 안전하게 링크로 변환
+            const urlRegex = /(https?:\/\/[^\s<>]+)/g;
+            return escapedText.replace(urlRegex, (url) => {
+                // URL 자체도 이스케이프
+                const escapedUrl = escapeHtml(url);
+                return `<a href="${escapedUrl}" target="_blank" rel="noopener noreferrer" style="color: #0066cc; text-decoration: underline;">${escapedUrl}</a>`;
+            });
         }
 
         // TODAY 프로젝트용 즐겨찾기 북마크 수집 함수

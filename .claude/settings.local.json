@@ -11,7 +11,11 @@
       "Bash(gh repo view:*)",
       "WebFetch(domain:github.com)",
       "Bash(python:*)",
-      "Bash(npx serve:*)"
+      "Bash(npx serve:*)",
+      "Bash(dir /s \"C:\\Users\\User\\Desktop\\앱개발\\북마크바클립보드바\")",
+      "Bash(dir /a)",
+      "Bash(git -C \"C:\\Users\\User\\Desktop\\앱개발\\북마크바클립보드바\" log --oneline -10)",
+      "Bash(git checkout security/improve-and-refactor)"
     ],
     "deny": [],
     "ask": []
