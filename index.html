@@ -583,11 +583,6 @@
         }
         .bookmark-header #add-bookmark-btn {
             margin-left: auto !important;
-            margin-right: 4px !important;
-        }
-        
-        .bookmark-header #add-bookmark-divider-btn {
-            margin-left: 0 !important;
         }
 
         .clipboard-header {
@@ -882,10 +877,6 @@
             position: relative;
         }
         
-        .divider[data-type="bookmark"] {
-            background: linear-gradient(90deg, #b19cd9, #6a4c93);
-        }
-        
         .divider[data-type="clipboard"] {
             background: linear-gradient(90deg, #a3d5a3, #28a745);
         }
@@ -893,11 +884,7 @@
         .divider:hover {
             opacity: 0.8;
         }
-        
-        .divider[data-type="bookmark"]:hover {
-            background: linear-gradient(90deg, #9b7bb8, #5a3d7a);
-        }
-        
+
         .divider[data-type="clipboard"]:hover {
             background: linear-gradient(90deg, #8cc48c, #1e7e34);
         }
@@ -1654,7 +1641,7 @@
             <div class="main-content">
                 <!-- 상단: 북마크 (전체 너비, 버튼 2줄 높이) -->
                 <div class="content-panel bookmark-panel top-bookmark">
-                    <h4 class="bookmark-header">북마크 <button id="add-bookmark-btn" class="add-section-btn">+</button> <button id="add-bookmark-divider-btn" class="add-section-btn">|</button></h4>
+                    <h4 class="bookmark-header">북마크 <button id="add-bookmark-btn" class="add-section-btn">+</button></h4>
                     <ul id="bookmark-list" class="item-list"></ul>
                 </div>
 
@@ -3215,7 +3202,6 @@
         const addBookmarkBtn = document.getElementById('add-bookmark-btn');
         const addClipboardBtn = document.getElementById('add-clipboard-btn');
         const addDividerBtn = document.getElementById('add-divider-btn');
-        const addBookmarkDividerBtn = document.getElementById('add-bookmark-divider-btn');
 
         const contextMenu = document.getElementById('context-menu');
         const contextEdit = document.getElementById('context-edit');
@@ -3466,18 +3452,7 @@
             clipboardList.innerHTML = '';
 
             projectData.bookmarks.forEach((item, index) => {
-                if (item.type === 'divider') {
-                    // 구분선 생성
-                    const divider = document.createElement('div');
-                    divider.className = 'divider draggable';
-                    divider.dataset.index = index;
-                    divider.dataset.type = 'bookmark';
-                    divider.draggable = true;
-                    
-                    divider.addEventListener('dragstart', handleItemDragStart);
-                    
-                    bookmarkList.appendChild(divider);
-                } else {
+                if (item.type !== 'divider') {
                     const button = document.createElement('button');
                     button.className = 'item-button bookmark-button draggable';
                     
@@ -3735,23 +3710,6 @@
             };
             
             projectData.clipboard.push(divider);
-            saveToFirebase();
-            renderProject(currentProject);
-        }
-
-        function addBookmarkDivider() {
-            if (!currentProject) {
-                alert('프로젝트를 먼저 선택해주세요.');
-                return;
-            }
-            
-            const projectData = allProjectsData[currentProject];
-            const divider = {
-                type: 'divider',
-                id: 'bookmark_divider_' + Date.now()
-            };
-            
-            projectData.bookmarks.push(divider);
             saveToFirebase();
             renderProject(currentProject);
         }
@@ -4229,7 +4187,6 @@
         addBookmarkBtn.addEventListener('click', addBookmark);
         addClipboardBtn.addEventListener('click', addClipboard);
         addDividerBtn.addEventListener('click', addDivider);
-        addBookmarkDividerBtn.addEventListener('click', addBookmarkDivider);
         
         // 연습장 탭 클릭 이벤트
         document.querySelectorAll('.practice-tab').forEach(tab => {
