@@ -824,6 +824,10 @@
             background-color: rgba(100, 71, 58, 0.1);
             cursor: copy; /* 복사 기능 강조 */
             position: relative;
+            width: calc(25% - 2px) !important;
+            min-width: unset !important;
+            max-width: unset !important;
+            flex: 0 0 calc(25% - 2px) !important;
         }
 
         /* 클립보드 버튼 툴팁 - 강화된 선택자 */
@@ -1210,6 +1214,11 @@
             gap: 6px;
         }
         
+        /* 클립보드 아이템 리스트 - 4개씩 한 줄 배치 */
+        .clipboard-panel .item-list {
+            gap: 4px;
+        }
+
         /* 클립보드 즐겨찾기 - 동적 플렉스박스 */
         #clipboard-favorites-list {
             display: flex;
@@ -1499,6 +1508,15 @@
                 padding: 8px;
                 line-height: 1.3;
                 transition: transform 0.1s ease, background-color 0.3s ease;
+            }
+
+            /* 모바일에서 클립보드 버튼은 전체 너비 사용 */
+            .item-button.clipboard-button {
+                width: 100% !important;
+                flex: 0 0 100% !important;
+                min-width: 100px !important;
+                max-width: calc(100vw - 40px) !important;
+                white-space: normal;
             }
             
             /* 모바일에서 길게 누르기 피드백 */
@@ -3129,20 +3147,7 @@
                         saveToFirebase();
                     }
                 }
-                
-                // TODAY 프로젝트가 없으면 자동 추가
-                if (!allProjectsData['TODAY']) {
-                    allProjectsData['TODAY'] = {
-                        bookmarks: [],
-                        clipboard: []
-                    };
-                } else {
-                    // TODAY가 존재하지만 clipboard가 없는 경우
-                    if (!allProjectsData['TODAY'].clipboard) {
-                        allProjectsData['TODAY'].clipboard = [];
-                    }
-                }
-                
+
                 // 기존 데이터 호환성 처리
                 ensureClipboardSummaryField();
 
@@ -3166,21 +3171,8 @@
                     currentProject = '가계약';
                     projectOrder = Object.keys(allProjectsData);
                 }
-                
-                // TODAY 프로젝트가 없으면 자동 추가 (에러 케이스에서도)
-                if (!allProjectsData['TODAY']) {
-                    allProjectsData['TODAY'] = {
-                        bookmarks: [],
-                        clipboard: []
-                    };
-                } else {
-                    // TODAY가 존재하지만 clipboard가 없는 경우
-                    if (!allProjectsData['TODAY'].clipboard) {
-                        allProjectsData['TODAY'].clipboard = [];
-                    }
-                }
 
-                // 기존 데이터 호환성 처리 (에러 케이스에서도)
+                // 기존 데이터 호환성 처리
                 ensureClipboardSummaryField();
 
                 renderProjectList();
@@ -3275,176 +3267,7 @@
 
         async function renderProject(projectName) {
             currentProject = projectName;
-            
-            // TODAY 프로젝트 특별 처리
-            if (projectName === 'TODAY') {
-                currentProjectTitle.textContent = '📅 TODAY - 즐겨찾기 모음';
-                bookmarkList.innerHTML = '';
-                clipboardList.innerHTML = '';
-                
-                // TODAY 프로젝트에 전용 클립보드 데이터 초기화
-                if (!allProjectsData['TODAY']) {
-                    allProjectsData['TODAY'] = {
-                        bookmarks: [],
-                        clipboard: []
-                    };
-                } else {
-                    // TODAY가 존재하지만 clipboard가 없는 경우
-                    if (!allProjectsData['TODAY'].clipboard) {
-                        allProjectsData['TODAY'].clipboard = [];
-                    }
-                }
-                
-                // 즐겨찾기 북마크들을 가져와서 렌더링
-                const favoriteBookmarks = getTodayBookmarks();
-                favoriteBookmarks.forEach((item, index) => {
-                    const button = document.createElement('button');
-                    button.className = 'item-button bookmark-button';
-                    
-                    const favoriteIcon = '⭐ ';
-                    const maxLength = 8 - favoriteIcon.length;
-                    const truncatedName = item.name.length > maxLength ? 
-                        item.name.substring(0, maxLength) : item.name;
-                    
-                    button.textContent = favoriteIcon + truncatedName;
-                    button.style.backgroundColor = item.color || '#f8f9fa';
-                    button.dataset.fullName = item.name;
-                    button.dataset.url = item.url;
-                    button.dataset.sourceProject = item.sourceProject;
-                    
-                    button.addEventListener('click', (e) => {
-                        if (e.button === 0) {
-                            window.open(item.url, '_blank');
-                        }
-                    });
-                    
-                    bookmarkList.appendChild(button);
-                });
-                
-                // TODAY 전용 클립보드 렌더링
-                const todayData = allProjectsData['TODAY'];
-                todayData.clipboard.forEach((item, index) => {
-                    if (item.type === 'divider') {
-                        const divider = document.createElement('div');
-                        divider.className = 'divider draggable';
-                        divider.dataset.index = index;
-                        divider.dataset.type = 'clipboard';
-                        divider.draggable = true;
-                        divider.addEventListener('dragstart', handleItemDragStart);
-                        clipboardList.appendChild(divider);
-                    } else {
-                        const button = document.createElement('button');
-                        button.className = 'item-button clipboard-button draggable';
 
-                        const favoriteIcon = item.favorite ? '⭐ ' : '';
-                        const buttonText = favoriteIcon + item.title.substring(0, 8 - favoriteIcon.length);
-
-                        button.style.backgroundColor = item.color || '#f8f9fa';
-                        button.dataset.index = index;
-                        button.dataset.type = 'clipboard';
-                        button.dataset.fullName = item.title;
-                        button.dataset.content = item.text;
-                        button.draggable = true;
-
-                        // 버튼 텍스트를 텍스트 노드로 추가
-                        const textNode = document.createTextNode(buttonText);
-                        button.appendChild(textNode);
-
-                        // JavaScript 기반 tooltip 이벤트
-                        let tooltipElement = null;
-
-                        button.addEventListener('mouseenter', (e) => {
-                            // 기존 tooltip 제거
-                            if (tooltipElement) tooltipElement.remove();
-
-                            // 새 tooltip 생성
-                            tooltipElement = document.createElement('div');
-                            tooltipElement.className = 'js-clipboard-tooltip';
-                            tooltipElement.textContent = item.summary || '요약없음';
-                            tooltipElement.style.cssText = `
-                                position: fixed;
-                                background: linear-gradient(135deg, #F0E68C 0%, #DDA0DD 100%);
-                                color: black;
-                                padding: 10px 14px;
-                                border-radius: 8px;
-                                font-size: 14px;
-                                font-weight: bold;
-                                z-index: 10000;
-                                pointer-events: none;
-                                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-                                max-width: 220px;
-                                word-wrap: break-word;
-                                white-space: normal;
-                            `;
-
-                            // 위치 계산 (버튼 아래에 표시)
-                            const rect = button.getBoundingClientRect();
-                            tooltipElement.style.left = (rect.left + rect.width / 2) + 'px';
-                            tooltipElement.style.top = (rect.bottom + 8) + 'px';
-                            tooltipElement.style.transform = 'translateX(-50%)';
-
-                            document.body.appendChild(tooltipElement);
-                        });
-
-                        button.addEventListener('mouseleave', () => {
-                            if (tooltipElement) {
-                                tooltipElement.remove();
-                                tooltipElement = null;
-                            }
-                        });
-
-                        // title 속성 제거 (JavaScript tooltip만 사용)
-                        
-                        let isDragging = false;
-                        button.addEventListener('mousedown', () => { isDragging = false; });
-                        button.addEventListener('dragstart', (e) => { 
-                            isDragging = true; 
-                            handleItemDragStart(e);
-                        });
-                        button.addEventListener('mouseup', async (e) => {
-                            setTimeout(async () => {
-                                if (!isDragging && e.button === 0) {
-                                    // 클립보드 상세 보기 모달 표시
-                                    const modal = document.getElementById('view-clipboard-modal');
-                                    const titleEl = document.getElementById('view-clipboard-title');
-                                    const contentEl = document.getElementById('view-clipboard-content');
-                                    const summaryEl = document.getElementById('view-clipboard-summary');
-                                    const summarySectionEl = document.getElementById('view-clipboard-summary-section');
-                                    const copyBtn = document.getElementById('view-clipboard-copy-btn');
-                                    const editBtn = document.getElementById('view-clipboard-edit-btn');
-
-                                    titleEl.textContent = item.title || '';
-                                    contentEl.innerHTML = convertUrlsToLinks(item.text);
-
-                                    // 요약 표시
-                                    if (item.summary && item.summary.trim()) {
-                                        summaryEl.textContent = item.summary;
-                                        summarySectionEl.style.display = 'block';
-                                    } else {
-                                        summaryEl.textContent = '요약없음';
-                                        summarySectionEl.style.display = 'block';
-                                    }
-
-                                    copyBtn.dataset.clipboardText = item.text;
-                                    editBtn.dataset.clipboardIndex = index;
-
-                                    modal.style.display = 'flex';
-                                }
-                            }, 50);
-                        });
-                        clipboardList.appendChild(button);
-                    }
-                });
-                
-                // 프로젝트 목록에서 활성 상태 업데이트
-                document.querySelectorAll('#project-list li').forEach(li => {
-                    li.classList.remove('active');
-                });
-                document.getElementById('project-TODAY')?.classList.add('active');
-                
-                return;
-            }
-            
             const projectData = allProjectsData[projectName];
             
             currentProjectTitle.textContent = projectName;
@@ -3724,27 +3547,9 @@
         function renderProjectList() {
             const projectList = document.getElementById('project-list');
             projectList.innerHTML = '';
-            
-            // TODAY 프로젝트를 최상단에 고정
-            const todayLi = document.createElement('li');
-            todayLi.id = 'project-TODAY';
-            todayLi.textContent = '📅 TODAY';
-            todayLi.classList.add('project-item', 'today-project');
-            todayLi.dataset.projectName = 'TODAY';
-            todayLi.style.fontWeight = 'bold';
-            todayLi.style.color = '#2563eb';
-            todayLi.style.borderBottom = '1px solid rgba(55, 53, 47, 0.09)';
-            todayLi.style.marginBottom = '4px';
-            todayLi.style.paddingBottom = '8px';
-            
-            if (currentProject === 'TODAY') {
-                todayLi.classList.add('active');
-            }
-            
-            projectList.appendChild(todayLi);
-            
-            // 나머지 프로젝트들 (TODAY 제외)
-            const orderedProjects = (projectOrder || Object.keys(allProjectsData)).filter(name => name !== 'TODAY');
+
+            // 모든 프로젝트 렌더링
+            const orderedProjects = (projectOrder || Object.keys(allProjectsData));
             orderedProjects.forEach((projectName, index) => {
                 // 존재하지 않는 프로젝트는 건너뛰기
                 if (!allProjectsData[projectName]) return;
