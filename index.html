@@ -1172,8 +1172,9 @@
         /* 북마크와 클립보드 패널 - 남은 공간 균등 분배 */
         .content-panel.bookmark-panel,
         .content-panel.clipboard-panel {
-            flex: 1 1 auto;
-            max-width: none;
+            flex: 1 1 auto !important;
+            max-width: none !important;
+            min-width: 400px;
         }
 
         /* 연습장 너비 확장 - 2배 크기 */
