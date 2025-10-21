@@ -1809,6 +1809,13 @@
         </ul>
     </div>
 
+    <div id="clipboard-list-context-menu" class="context-menu">
+        <ul>
+            <li id="clipboard-list-context-paste">붙여넣기</li>
+            <li id="clipboard-list-context-cancel">취소</li>
+        </ul>
+    </div>
+
     <!-- Custom Tooltip -->
     <div id="custom-tooltip" class="custom-tooltip"></div>
 
@@ -3211,11 +3218,15 @@
         const bookmarkListContextMenu = document.getElementById('bookmark-list-context-menu');
         const listContextPaste = document.getElementById('list-context-paste');
         const listContextCancel = document.getElementById('list-context-cancel');
+        const clipboardListContextMenu = document.getElementById('clipboard-list-context-menu');
+        const clipboardListContextPaste = document.getElementById('clipboard-list-context-paste');
+        const clipboardListContextCancel = document.getElementById('clipboard-list-context-cancel');
 
         let activeItem = null;
         let activeProject = null;
         let colorChangeItem = null;
         let copiedBookmark = null; // 복사된 북마크 저장
+        let copiedClipboard = null; // 복사된 클립보드 항목 저장
 
         // URL을 하이퍼링크로 변환하는 함수
         // HTML 이스케이프 - XSS 방지
@@ -3889,6 +3900,21 @@
                 }
                 contextMenu.style.display = 'none';
                 activeItem = null;
+            } else if (activeItem && activeItem.type === 'clipboard') {
+                const clipboardItem = allProjectsData[currentProject].clipboard[activeItem.index];
+                if (clipboardItem && clipboardItem.type !== 'divider') {
+                    // 클립보드 항목 복사
+                    copiedClipboard = {
+                        title: clipboardItem.title || '',
+                        text: clipboardItem.text || '',
+                        color: clipboardItem.color || '#f8f9fa',
+                        favorite: clipboardItem.favorite || false,
+                        summary: clipboardItem.summary || ''
+                    };
+                    showSaveStatus('success', '클립보드 항목 복사 완료! 붙여넣기 메뉴를 사용하세요.');
+                }
+                contextMenu.style.display = 'none';
+                activeItem = null;
             }
         });
 
@@ -3945,6 +3971,30 @@
             bookmarkListContextMenu.style.display = 'none';
         });
 
+        // 클립보드 리스트 컨텍스트 메뉴 이벤트
+        clipboardListContextPaste.addEventListener('click', () => {
+            if (copiedClipboard) {
+                // 복사된 클립보드 항목을 현재 프로젝트의 클립보드 리스트에 추가
+                const newClipboardItem = {
+                    title: copiedClipboard.title,
+                    text: copiedClipboard.text,
+                    color: copiedClipboard.color,
+                    favorite: copiedClipboard.favorite,
+                    summary: copiedClipboard.summary || '',
+                    createdAt: new Date().toISOString()
+                };
+                allProjectsData[currentProject].clipboard.push(newClipboardItem);
+                renderProject(currentProject);
+                clipboardListContextMenu.style.display = 'none';
+                showSaveStatus('success', '클립보드 항목 붙여넣기 완료!');
+                saveToFirebase();
+            }
+        });
+
+        clipboardListContextCancel.addEventListener('click', () => {
+            clipboardListContextMenu.style.display = 'none';
+        });
+
         // 북마크 리스트 우클릭 이벤트
         bookmarkList.addEventListener('contextmenu', (e) => {
             e.preventDefault();
@@ -3982,10 +4032,50 @@
             }
         });
 
+        // 클립보드 리스트 우클릭 이벤트
+        clipboardList.addEventListener('contextmenu', (e) => {
+            e.preventDefault();
+
+            // 클릭된 요소가 클립보드 버튼이 아닌 경우만 처리
+            if (!e.target.closest('.item-button')) {
+                // 붙여넣기 메뉴 활성화 여부 결정
+                clipboardListContextPaste.style.opacity = copiedClipboard ? '1' : '0.5';
+                clipboardListContextPaste.style.pointerEvents = copiedClipboard ? 'auto' : 'none';
+
+                clipboardListContextMenu.style.display = 'block';
+
+                // 화면 경계를 고려한 위치 계산
+                const menuWidth = 150;
+                const menuHeight = 100;
+                const screenWidth = window.innerWidth;
+                const screenHeight = window.innerHeight;
+
+                let x = e.clientX;
+                let y = e.clientY;
+
+                if (x + menuWidth > screenWidth) {
+                    x = screenWidth - menuWidth - 10;
+                }
+
+                if (y + menuHeight > screenHeight) {
+                    y = screenHeight - menuHeight - 10;
+                }
+
+                if (x < 10) x = 10;
+                if (y < 10) y = 10;
+
+                clipboardListContextMenu.style.left = x + 'px';
+                clipboardListContextMenu.style.top = y + 'px';
+            }
+        });
+
         // 북마크 리스트 클릭으로 컨텍스트 메뉴 닫기
         document.addEventListener('click', (e) => {
             if (!e.target.closest('#bookmark-list-context-menu')) {
                 bookmarkListContextMenu.style.display = 'none';
+            }
+            if (!e.target.closest('#clipboard-list-context-menu')) {
+                clipboardListContextMenu.style.display = 'none';
             }
         });
 
