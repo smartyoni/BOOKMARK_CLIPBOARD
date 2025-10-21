@@ -537,11 +537,10 @@
         .content-panels {
             display: flex;
             gap: 16px;
-            flex-grow: 1;
+            flex: 1;
             margin-top: 0;
             justify-content: flex-start;
             align-items: stretch;
-            height: 100%;
         }
         .content-panel {
             flex: 0 0 400px;
@@ -1169,18 +1168,23 @@
             opacity: 1;
         }
 
-        /* 북마크와 클립보드 패널 - 남은 공간 균등 분배 */
-        .content-panel.bookmark-panel,
-        .content-panel.clipboard-panel {
-            flex: 1 1 auto !important;
-            max-width: none !important;
-            min-width: 400px;
+        /* 상단 북마크 패널 - 전체 너비, 고정 높이 (버튼 2줄) */
+        .content-panel.bookmark-panel.top-bookmark {
+            flex: 0 0 150px !important;
+            width: 100%;
+            max-width: none;
+            height: 150px;
         }
 
-        /* 연습장 너비 확장 - 2배 크기 */
-        .content-panel.practice-panel {
-            flex: 0 0 800px;
-            max-width: 800px;
+        /* 하단 클립보드와 연습장 - 50% + 50% 분할 */
+        .content-panels .content-panel.clipboard-panel {
+            flex: 1 !important;
+            max-width: none !important;
+        }
+
+        .content-panels .content-panel.practice-panel {
+            flex: 1 !important;
+            max-width: none !important;
         }
 
         .favorite-item {
@@ -1403,41 +1407,36 @@
                 padding: 12px 8px; /* 좌우 패딩 줄임 */
             }
 
+            /* 모바일에서 상단 북마크 패널 */
+            .content-panel.bookmark-panel.top-bookmark {
+                height: auto;
+                margin-bottom: 16px;
+                display: block;
+            }
+
+            /* 모바일에서 하단 content-panels 세로 배치 */
             .content-panels {
                 flex-direction: column;
-                height: 100%;
-                gap: 0;
+                gap: 16px;
             }
 
             .content-panel {
                 flex: none;
                 max-width: none;
-                width: calc(100% - 8px); /* 패딩 고려 */
-                margin-bottom: 16px;
+                width: 100%;
                 min-height: 200px;
                 padding: 12px 8px; /* 내부 패딩 조정 */
                 box-sizing: border-box;
             }
 
             /* 모바일에서 각 패널별 표시/숨김 */
-            .content-panel.bookmark-panel {
-                display: none;
-            }
-
-            .content-panel.bookmark-panel.mobile-visible {
-                display: block;
-                height: calc(100% - 32px);
-                margin-bottom: 0;
-            }
-
             .content-panel.clipboard-panel {
                 display: none;
             }
 
             .content-panel.clipboard-panel.mobile-visible {
                 display: block;
-                height: calc(100% - 32px);
-                margin-bottom: 0;
+                height: auto;
             }
 
             .content-panel.practice-panel {
@@ -1446,8 +1445,7 @@
 
             .content-panel.practice-panel.mobile-visible {
                 display: block;
-                height: calc(100% - 32px);
-                margin-bottom: 0;
+                height: auto;
             }
 
             .dashboard-area {
@@ -1613,9 +1611,9 @@
     <!-- 모바일 탭 네비게이션 -->
     <div class="mobile-tabs">
         <button class="mobile-tab active" data-tab="projects">📁 프로젝트</button>
+        <button class="mobile-tab" data-tab="bookmarks">📌 북마크</button>
         <button class="mobile-tab" data-tab="clipboard">📋 클립보드</button>
         <button class="mobile-tab" data-tab="practice">📝 연습장</button>
-        <button class="mobile-tab" data-tab="bookmarks">📌 북마크</button>
     </div>
 
     <div class="app-container">
@@ -1640,30 +1638,33 @@
             </div>
             
             <div class="main-content">
-                <div class="content-panels">
-                <div class="content-panel clipboard-panel">
-                    <h4 class="clipboard-header">클립보드 <button id="add-clipboard-btn" class="add-section-btn">+</button> <button id="add-divider-btn" class="add-section-btn">|</button></h4>
-                    <ul id="clipboard-list" class="item-list"></ul>
-                </div>
-
-                <div class="content-panel bookmark-panel">
+                <!-- 상단: 북마크 (전체 너비, 버튼 2줄 높이) -->
+                <div class="content-panel bookmark-panel top-bookmark">
                     <h4 class="bookmark-header">북마크 <button id="add-bookmark-btn" class="add-section-btn">+</button> <button id="add-bookmark-divider-btn" class="add-section-btn">|</button></h4>
                     <ul id="bookmark-list" class="item-list"></ul>
                 </div>
 
-                <div class="content-panel practice-panel">
-                    <h4 class="practice-header">연습장 <div class="practice-tabs">
-                        <button class="practice-tab active" data-tab="1">1</button>
-                        <button class="practice-tab" data-tab="2">2</button>
-                        <button class="practice-tab" data-tab="3">3</button>
-                        <button class="practice-tab" data-tab="4">4</button>
-                        <button class="practice-tab" data-tab="5">5</button>
-                    </div></h4>
-                    <div class="practice-container">
-                        <textarea id="practice-textarea" class="practice-text" placeholder="자유롭게 텍스트를 입력하세요..."></textarea>
-                        <div class="practice-buttons">
-                            <button id="copy-practice-btn" class="practice-btn">복사</button>
-                            <button id="clear-practice-btn" class="practice-btn">초기화</button>
+                <!-- 하단: 클립보드와 연습장 (50% + 50%) -->
+                <div class="content-panels">
+                    <div class="content-panel clipboard-panel">
+                        <h4 class="clipboard-header">클립보드 <button id="add-clipboard-btn" class="add-section-btn">+</button> <button id="add-divider-btn" class="add-section-btn">|</button></h4>
+                        <ul id="clipboard-list" class="item-list"></ul>
+                    </div>
+
+                    <div class="content-panel practice-panel">
+                        <h4 class="practice-header">연습장 <div class="practice-tabs">
+                            <button class="practice-tab active" data-tab="1">1</button>
+                            <button class="practice-tab" data-tab="2">2</button>
+                            <button class="practice-tab" data-tab="3">3</button>
+                            <button class="practice-tab" data-tab="4">4</button>
+                            <button class="practice-tab" data-tab="5">5</button>
+                        </div></h4>
+                        <div class="practice-container">
+                            <textarea id="practice-textarea" class="practice-text" placeholder="자유롭게 텍스트를 입력하세요..."></textarea>
+                            <div class="practice-buttons">
+                                <button id="copy-practice-btn" class="practice-btn">복사</button>
+                                <button id="clear-practice-btn" class="practice-btn">초기화</button>
+                            </div>
                         </div>
                     </div>
                 </div>
