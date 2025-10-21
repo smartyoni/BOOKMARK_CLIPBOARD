@@ -1123,35 +1123,6 @@
             background-color: rgba(55, 53, 47, 0.16);
         }
 
-        /* Template Popup Modal Styles */
-        #template-popup-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 24px;
-        }
-
-        #template-popup-title {
-            margin: 0;
-            flex: 1;
-        }
-
-
-        #template-popup-content {
-            background-color: rgba(55, 53, 47, 0.04);
-            border-radius: 6px;
-            padding: 16px;
-            margin-bottom: 24px;
-            font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
-            font-size: 14px;
-            line-height: 1.6;
-            color: #37352f;
-            white-space: pre-wrap;
-            word-wrap: break-word;
-            max-height: 400px;
-            overflow-y: auto;
-            border: 1px solid rgba(55, 53, 47, 0.09);
-        }
 
         /* Color Palette Styles */
         .color-palette-grid {
@@ -1198,249 +1169,10 @@
             opacity: 1;
         }
 
-        /* Dashboard Styles */
-        .dashboard-area {
-            flex: 0 0 300px;
-            padding: 0;
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-            max-width: 300px;
-        }
-
-        .dashboard-widget {
-            background-color: #ffffff;
-            border: 1px solid rgba(55, 53, 47, 0.16);
-            border-radius: 6px;
-            overflow: hidden;
-        }
-
-        .dashboard-header {
-            background-color: #f1f3f4;
-            color: #37352f;
-            font-size: 14px;
-            font-weight: 600;
-            padding: 12px;
-            margin: 0;
-            border-bottom: 1px solid rgba(55, 53, 47, 0.1);
-        }
-
-        .dashboard-content {
-            padding: 12px;
-            max-height: 200px;
-            overflow-y: auto;
-        }
-
-        #template-list.dashboard-content {
-            max-height: calc(100vh - 200px);
-            height: calc(100vh - 200px);
-        }
-
-        /* 템플릿 관리 스타일 */
-        .template-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background-color: #f1f3f4;
-            border-bottom: 1px solid rgba(55, 53, 47, 0.1);
-            padding: 12px;
-        }
-
-        .template-header h4 {
-            margin: 0;
-            padding: 0;
-            border: none;
-            background: none;
-            color: #37352f;
-            font-size: 14px;
-            font-weight: 600;
-        }
-
-        .template-toolbar {
-            display: flex;
-            gap: 8px;
-            align-items: center;
-        }
-
-        .template-btn {
-            background-color: #64b5f6;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            padding: 6px 12px;
-            font-size: 12px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: background-color 0.2s;
-        }
-
-        .template-btn:hover {
-            background-color: #42a5f5;
-        }
-
-        .template-select {
-            background-color: white;
-            border: 1px solid rgba(55, 53, 47, 0.2);
-            border-radius: 4px;
-            padding: 6px 8px;
-            font-size: 12px;
-            color: #37352f;
-            cursor: pointer;
-        }
-
-        .template-card {
-            border: 1px solid rgba(55, 53, 47, 0.1);
-            border-radius: 6px;
-            background-color: #ffffff;
-            margin-bottom: 8px;
-            transition: box-shadow 0.2s;
-            cursor: pointer;
-        }
-
-        .template-card.parent-template {
-            border-left: 3px solid #2196F3;
-        }
-
-        .template-card.child-template {
-            margin-left: 20px;
-            background-color: #f8f9fa;
-            border-left: 2px solid #ddd;
-        }
-
-        .template-card:hover {
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-        }
-
-        .template-card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px;
-            border-bottom: 1px solid rgba(55, 53, 47, 0.1);
-        }
-
-        .template-title {
-            font-size: 13px;
-            font-weight: 500;
-            color: #37352f;
-            margin: 0;
-            cursor: pointer;
-        }
-
-        .accordion-toggle {
-            background: none;
-            border: none;
-            font-size: 12px;
-            cursor: pointer;
-            padding: 2px;
-            width: 16px;
-            height: 16px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .pin-icon {
-            font-size: 12px;
-            opacity: 0.7;
-        }
-
-        .child-count-badge {
-            background-color: #2196F3;
-            color: white;
-            font-size: 10px;
-            padding: 2px 6px;
-            border-radius: 10px;
-            font-weight: bold;
-        }
-
-        .template-children {
-            margin-bottom: 12px;
-        }
-
-        .template-actions {
-            display: flex;
-            gap: 6px;
-        }
-
-        .template-action-btn {
-            background-color: transparent;
-            border: 1px solid rgba(55, 53, 47, 0.2);
-            border-radius: 3px;
-            padding: 4px 8px;
-            font-size: 11px;
-            color: #37352f;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .template-action-btn:hover {
-            background-color: #f1f3f4;
-        }
-
-        .template-action-btn.copy-btn:hover {
-            background-color: #e3f2fd;
-            border-color: #64b5f6;
-            color: #1976d2;
-        }
-
-        .template-action-btn.delete-btn:hover {
-            background-color: #ffebee;
-            border-color: #f44336;
-            color: #d32f2f;
-        }
-
-
-
-        .template-usage {
-            text-align: right;
-            font-size: 10px;
-            color: rgba(55, 53, 47, 0.5);
-            padding: 4px 12px;
-        }
-
-        /* 변수 입력 버튼들 */
-        .variable-buttons {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 6px;
-            margin-bottom: 8px;
-            padding: 8px;
-            background-color: #f8f9fa;
-            border-radius: 4px;
-        }
-
-        .variable-btn {
-            background-color: #e3f2fd;
-            color: #1976d2;
-            border: 1px solid #bbdefb;
-            border-radius: 3px;
-            padding: 4px 8px;
-            font-size: 11px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .variable-btn:hover {
-            background-color: #bbdefb;
-            border-color: #90caf9;
-        }
-
-        .variable-btn:active {
-            background-color: #90caf9;
-            transform: translateY(1px);
-        }
-
-        .empty-var-btn {
-            background-color: #f0f0f0 !important;
-            color: #666 !important;
-            border-color: #ccc !important;
-        }
-
-        .empty-var-btn:hover {
-            background-color: #e0e0e0 !important;
-            border-color: #999 !important;
+        /* 연습장 너비 확장 - 2배 크기 */
+        .content-panel.practice-panel {
+            flex: 0 0 800px;
+            max-width: 800px;
         }
 
         .favorite-item {
@@ -1844,14 +1576,6 @@
                 font-size: 12px;
             }
 
-            /* 대시보드 위젯 모바일 최적화 */
-            .dashboard-widget {
-                margin-bottom: 16px;
-            }
-
-            .dashboard-content {
-                max-height: 300px;
-            }
 
             /* 컨텍스트 메뉴 모바일 최적화 */
             .context-menu {
@@ -1874,10 +1598,6 @@
                 flex: 0 0 300px;
                 max-width: 300px;
             }
-
-            .dashboard-area {
-                max-width: 250px;
-            }
         }
     </style>
 </head>
@@ -1888,7 +1608,6 @@
         <button class="mobile-tab" data-tab="clipboard">📋 클립보드</button>
         <button class="mobile-tab" data-tab="practice">📝 연습장</button>
         <button class="mobile-tab" data-tab="bookmarks">📌 북마크</button>
-        <button class="mobile-tab" data-tab="dashboard">📊 대시보드</button>
     </div>
 
     <div class="app-container">
@@ -1906,7 +1625,7 @@
                 <h1 id="current-project-title"></h1>
                 <div class="search-container">
                     <div class="search-icon">🔍</div>
-                    <input type="text" id="global-search" placeholder="프로젝트, 북마크, 클립보드, 템플릿 검색...">
+                    <input type="text" id="global-search" placeholder="프로젝트, 북마크, 클립보드 검색...">
                     <div id="search-results" class="search-results"></div>
                 </div>
                 <button id="settings-btn" class="icon-button">⚙️</button>
@@ -1939,18 +1658,6 @@
                             <button id="clear-practice-btn" class="practice-btn">초기화</button>
                         </div>
                     </div>
-                </div>
-                
-                <div class="dashboard-area">
-                <div class="dashboard-widget">
-                    <div class="template-header">
-                        <h4 class="dashboard-header">📝 템플릿 관리</h4>
-                        <div class="template-toolbar">
-                            <button id="add-template-btn" class="template-btn">+ 새 템플릿</button>
-                        </div>
-                    </div>
-                    <div id="template-list" class="dashboard-content"></div>
-                </div>
                 </div>
             </div>
         </div>
@@ -3008,8 +2715,6 @@
             globalFirebaseInitialized = false;
         }
 
-        // 템플릿 초기화
-        loadTemplates();
         
         // 데이터 저장 함수들 (Firebase + 로컬스토리지 백업)
         const STORAGE_KEY = 'bookmark-clipboard-app-data';
@@ -4816,32 +4521,6 @@
             renderProject(projectName);
         }
 
-        // 대시보드로 전환하는 함수
-        function switchToDashboard() {
-            // 모바일 환경에서는 대시보드 탭으로 전환
-            if (window.innerWidth <= 768) {
-                const mobileTabs = document.querySelectorAll('.mobile-tab');
-                const dashboardTab = Array.from(mobileTabs).find(tab => tab.dataset.tab === 'dashboard');
-                
-                if (dashboardTab) {
-                    // 모든 탭 비활성화
-                    mobileTabs.forEach(tab => tab.classList.remove('active'));
-                    
-                    // 대시보드 탭 활성화
-                    dashboardTab.classList.add('active');
-                    
-                    // 모든 패널 숨김
-                    document.getElementById('project-sidebar').classList.remove('mobile-visible');
-                    document.querySelector('.bookmark-panel').classList.remove('mobile-visible');
-                    document.querySelector('.clipboard-panel').classList.remove('mobile-visible');
-                    document.querySelector('.practice-panel').classList.remove('mobile-visible');
-                    
-                    // 대시보드 영역 표시
-                    document.querySelector('.dashboard-area').classList.add('mobile-visible');
-                }
-            }
-            // 데스크톱에서는 대시보드가 기본적으로 보이므로 별도 처리 불필요
-        }
 
 
         // 검색 하이라이트 효과 적용
@@ -5721,23 +5400,21 @@
             const bookmarkPanel = document.querySelector('.bookmark-panel');
             const clipboardPanel = document.querySelector('.clipboard-panel');
             const practicePanel = document.querySelector('.practice-panel');
-            const dashboardArea = document.querySelector('.dashboard-area');
-            
+
             mobileTabs.forEach(tab => {
                 tab.addEventListener('click', () => {
                     // 모든 탭 비활성화
                     mobileTabs.forEach(t => t.classList.remove('active'));
-                    
+
                     // 클릭된 탭 활성화
                     tab.classList.add('active');
-                    
+
                     // 모든 패널 숨김
                     projectSidebar.classList.remove('mobile-visible');
                     bookmarkPanel.classList.remove('mobile-visible');
                     clipboardPanel.classList.remove('mobile-visible');
                     practicePanel.classList.remove('mobile-visible');
-                    dashboardArea.classList.remove('mobile-visible');
-                    
+
                     // 선택된 탭에 따라 패널 표시
                     const tabType = tab.dataset.tab;
                     switch(tabType) {
@@ -5752,9 +5429,6 @@
                             break;
                         case 'practice':
                             practicePanel.classList.add('mobile-visible');
-                            break;
-                        case 'dashboard':
-                            dashboardArea.classList.add('mobile-visible');
                             break;
                     }
                 });
@@ -5854,7 +5528,6 @@
                 document.querySelector('.bookmark-panel').classList.remove('mobile-visible');
                 document.querySelector('.clipboard-panel').classList.remove('mobile-visible');
                 document.querySelector('.practice-panel').classList.remove('mobile-visible');
-                document.querySelector('.dashboard-area').classList.remove('mobile-visible');
             }
         }
 
@@ -6100,97 +5773,9 @@
                 checkPWAInstallability();
             }, 2000); // 2초 후 확인 (UI 로딩 완료 후)
 
-            // 템플릿 관련 이벤트 리스너들
-            document.getElementById('add-template-btn').addEventListener('click', addNewTemplate);
-            
-            // 템플릿 폼 이벤트 리스너
-            document.getElementById('template-form').addEventListener('submit', function(e) {
-                e.preventDefault();
-                saveTemplate(new FormData(e.target));
-            });
-            
-            // 템플릿 내용 변경 시 미리보기 업데이트
-            
         });
     });
     </script>
 
-    <!-- 템플릿 편집 모달 -->
-    <div id="template-edit-modal" class="modal">
-        <div class="modal-content">
-            <span class="close-button" onclick="closeTemplateModal()">&times;</span>
-            <h2>템플릿 편집</h2>
-            
-            <form id="template-form">
-                <div class="modal-form-group">
-                    <label for="template-title-input">제목:</label>
-                    <input type="text" id="template-title-input" name="title" placeholder="템플릿 제목을 입력하세요" required>
-                </div>
-                
-                
-                
-                <div class="modal-form-group">
-                    <label for="template-content-input">내용:</label>
-                    <div class="variable-buttons">
-                        <button type="button" class="variable-btn" onclick="insertVariable('{오늘날짜}')">{오늘날짜}</button>
-                        <button type="button" class="variable-btn" onclick="insertVariable('{현재시간}')">{현재시간}</button>
-                        <button type="button" class="variable-btn" onclick="insertVariable('{프로젝트명}')">{프로젝트명}</button>
-                        <button type="button" class="variable-btn" onclick="insertVariable('{고객명}')">{고객명}</button>
-                        <button type="button" class="variable-btn" onclick="insertVariable('{계약일}')">{계약일}</button>
-                        <button type="button" class="variable-btn" onclick="insertVariable('{금액}')">{금액}</button>
-                        <button type="button" class="variable-btn empty-var-btn" onclick="insertEmptyVariable()">{빈 변수}</button>
-                    </div>
-                    <textarea id="template-content-input" name="content" placeholder="템플릿 내용을 입력하세요. 위 버튼을 클릭하여 변수를 삽입할 수 있습니다."></textarea>
-                </div>
-                
-                
-                <div class="modal-actions">
-                    <button type="button" class="secondary-button" onclick="closeTemplateModal()">취소</button>
-                    <button type="submit" class="primary-button">저장</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- 템플릿 내용 팝업 모달 -->
-    <div id="template-popup-modal" class="modal">
-        <div class="modal-content">
-            <span class="close-button" onclick="closeTemplatePopup()">&times;</span>
-            <div id="template-popup-header">
-                <h2 id="template-popup-title"></h2>
-            </div>
-            <div id="template-popup-content">
-            </div>
-            <!-- 내용보기/변수입력 버튼 영역 -->
-            <div id="template-action-buttons" style="margin: 20px 0; display: flex; gap: 12px; justify-content: center;">
-                <button type="button" class="primary-button" onclick="showTemplateContent()" style="flex: 1;">내용보기</button>
-                <button type="button" class="secondary-button" onclick="showVariableInputs()" style="flex: 1;" id="template-variables-toggle-btn">변수입력</button>
-            </div>
-            <!-- 변수 입력 영역 -->
-            <div id="template-variables-section" style="display: none; margin: 20px 0; border: 1px solid #e0e0e0; border-radius: 6px; padding: 16px; background-color: #fafafa;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-                    <h4 style="margin: 0; color: #37352f; font-size: 14px;">변수 입력</h4>
-                    <div style="display: flex; gap: 8px; align-items: center;">
-                        <button type="button" class="primary-button" onclick="saveFormTemplate()" style="font-size: 12px; padding: 4px 8px;">양식 저장</button>
-                        <button type="button" class="secondary-button" onclick="resetVariables()" style="font-size: 12px; padding: 4px 8px;">초기화</button>
-                    </div>
-                </div>
-
-                <!-- 하위 템플릿 제목 입력란 (상위 템플릿에서만 표시) -->
-                <div id="child-template-title-section" style="margin-bottom: 12px; display: none;">
-                    <label for="child-template-title" style="display: block; margin-bottom: 4px; color: #37352f; font-size: 12px; font-weight: 500;">하위 템플릿 제목:</label>
-                    <input type="text" id="child-template-title" placeholder="하위 템플릿의 제목을 입력하세요" style="width: 100%; padding: 8px; border: 1px solid #e0e0e0; border-radius: 4px; font-size: 14px; box-sizing: border-box;">
-                </div>
-
-                <div id="template-variables-inputs"></div>
-            </div>
-            <div class="modal-actions">
-                <button type="button" class="primary-button" onclick="copyTemplateFromPopup()">복사</button>
-                <button type="button" class="secondary-button" onclick="editTemplateFromPopup()">편집</button>
-                <button type="button" class="secondary-button delete-btn" onclick="deleteTemplateFromPopup()">삭제</button>
-                <button type="button" class="secondary-button" onclick="closeTemplatePopup()">닫기</button>
-            </div>
-        </div>
-    </div>
 </body>
 </html>
