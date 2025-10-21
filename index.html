@@ -130,6 +130,7 @@
             display: flex;
             flex-direction: column;
             padding: 24px 20px;
+            gap: 24px;
             width: 100%;
             height: calc(100vh - 60px);
             box-sizing: border-box;
@@ -537,11 +538,10 @@
         .content-panels {
             display: flex;
             gap: 16px;
-            flex-grow: 1;
+            flex: 1;
             margin-top: 0;
             justify-content: flex-start;
             align-items: stretch;
-            height: 100%;
         }
         .content-panel {
             flex: 0 0 400px;
@@ -583,11 +583,6 @@
         }
         .bookmark-header #add-bookmark-btn {
             margin-left: auto !important;
-            margin-right: 4px !important;
-        }
-        
-        .bookmark-header #add-bookmark-divider-btn {
-            margin-left: 0 !important;
         }
 
         .clipboard-header {
@@ -829,6 +824,10 @@
             background-color: rgba(100, 71, 58, 0.1);
             cursor: copy; /* 복사 기능 강조 */
             position: relative;
+            width: calc(25% - 2px) !important;
+            min-width: unset !important;
+            max-width: unset !important;
+            flex: 0 0 calc(25% - 2px) !important;
         }
 
         /* 클립보드 버튼 툴팁 - 강화된 선택자 */
@@ -882,10 +881,6 @@
             position: relative;
         }
         
-        .divider[data-type="bookmark"] {
-            background: linear-gradient(90deg, #b19cd9, #6a4c93);
-        }
-        
         .divider[data-type="clipboard"] {
             background: linear-gradient(90deg, #a3d5a3, #28a745);
         }
@@ -893,11 +888,7 @@
         .divider:hover {
             opacity: 0.8;
         }
-        
-        .divider[data-type="bookmark"]:hover {
-            background: linear-gradient(90deg, #9b7bb8, #5a3d7a);
-        }
-        
+
         .divider[data-type="clipboard"]:hover {
             background: linear-gradient(90deg, #8cc48c, #1e7e34);
         }
@@ -1123,35 +1114,6 @@
             background-color: rgba(55, 53, 47, 0.16);
         }
 
-        /* Template Popup Modal Styles */
-        #template-popup-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 24px;
-        }
-
-        #template-popup-title {
-            margin: 0;
-            flex: 1;
-        }
-
-
-        #template-popup-content {
-            background-color: rgba(55, 53, 47, 0.04);
-            border-radius: 6px;
-            padding: 16px;
-            margin-bottom: 24px;
-            font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
-            font-size: 14px;
-            line-height: 1.6;
-            color: #37352f;
-            white-space: pre-wrap;
-            word-wrap: break-word;
-            max-height: 400px;
-            overflow-y: auto;
-            border: 1px solid rgba(55, 53, 47, 0.09);
-        }
 
         /* Color Palette Styles */
         .color-palette-grid {
@@ -1198,249 +1160,23 @@
             opacity: 1;
         }
 
-        /* Dashboard Styles */
-        .dashboard-area {
-            flex: 0 0 300px;
-            padding: 0;
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-            max-width: 300px;
+        /* 상단 북마크 패널 - 전체 너비, 고정 높이 (버튼 2줄) */
+        .content-panel.bookmark-panel.top-bookmark {
+            flex: 0 0 150px !important;
+            width: 100%;
+            max-width: none;
+            height: 150px;
         }
 
-        .dashboard-widget {
-            background-color: #ffffff;
-            border: 1px solid rgba(55, 53, 47, 0.16);
-            border-radius: 6px;
-            overflow: hidden;
+        /* 하단 클립보드와 연습장 - 50% + 50% 분할 */
+        .content-panels .content-panel.clipboard-panel {
+            flex: 1 !important;
+            max-width: none !important;
         }
 
-        .dashboard-header {
-            background-color: #f1f3f4;
-            color: #37352f;
-            font-size: 14px;
-            font-weight: 600;
-            padding: 12px;
-            margin: 0;
-            border-bottom: 1px solid rgba(55, 53, 47, 0.1);
-        }
-
-        .dashboard-content {
-            padding: 12px;
-            max-height: 200px;
-            overflow-y: auto;
-        }
-
-        #template-list.dashboard-content {
-            max-height: calc(100vh - 200px);
-            height: calc(100vh - 200px);
-        }
-
-        /* 템플릿 관리 스타일 */
-        .template-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background-color: #f1f3f4;
-            border-bottom: 1px solid rgba(55, 53, 47, 0.1);
-            padding: 12px;
-        }
-
-        .template-header h4 {
-            margin: 0;
-            padding: 0;
-            border: none;
-            background: none;
-            color: #37352f;
-            font-size: 14px;
-            font-weight: 600;
-        }
-
-        .template-toolbar {
-            display: flex;
-            gap: 8px;
-            align-items: center;
-        }
-
-        .template-btn {
-            background-color: #64b5f6;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            padding: 6px 12px;
-            font-size: 12px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: background-color 0.2s;
-        }
-
-        .template-btn:hover {
-            background-color: #42a5f5;
-        }
-
-        .template-select {
-            background-color: white;
-            border: 1px solid rgba(55, 53, 47, 0.2);
-            border-radius: 4px;
-            padding: 6px 8px;
-            font-size: 12px;
-            color: #37352f;
-            cursor: pointer;
-        }
-
-        .template-card {
-            border: 1px solid rgba(55, 53, 47, 0.1);
-            border-radius: 6px;
-            background-color: #ffffff;
-            margin-bottom: 8px;
-            transition: box-shadow 0.2s;
-            cursor: pointer;
-        }
-
-        .template-card.parent-template {
-            border-left: 3px solid #2196F3;
-        }
-
-        .template-card.child-template {
-            margin-left: 20px;
-            background-color: #f8f9fa;
-            border-left: 2px solid #ddd;
-        }
-
-        .template-card:hover {
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-        }
-
-        .template-card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px;
-            border-bottom: 1px solid rgba(55, 53, 47, 0.1);
-        }
-
-        .template-title {
-            font-size: 13px;
-            font-weight: 500;
-            color: #37352f;
-            margin: 0;
-            cursor: pointer;
-        }
-
-        .accordion-toggle {
-            background: none;
-            border: none;
-            font-size: 12px;
-            cursor: pointer;
-            padding: 2px;
-            width: 16px;
-            height: 16px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .pin-icon {
-            font-size: 12px;
-            opacity: 0.7;
-        }
-
-        .child-count-badge {
-            background-color: #2196F3;
-            color: white;
-            font-size: 10px;
-            padding: 2px 6px;
-            border-radius: 10px;
-            font-weight: bold;
-        }
-
-        .template-children {
-            margin-bottom: 12px;
-        }
-
-        .template-actions {
-            display: flex;
-            gap: 6px;
-        }
-
-        .template-action-btn {
-            background-color: transparent;
-            border: 1px solid rgba(55, 53, 47, 0.2);
-            border-radius: 3px;
-            padding: 4px 8px;
-            font-size: 11px;
-            color: #37352f;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .template-action-btn:hover {
-            background-color: #f1f3f4;
-        }
-
-        .template-action-btn.copy-btn:hover {
-            background-color: #e3f2fd;
-            border-color: #64b5f6;
-            color: #1976d2;
-        }
-
-        .template-action-btn.delete-btn:hover {
-            background-color: #ffebee;
-            border-color: #f44336;
-            color: #d32f2f;
-        }
-
-
-
-        .template-usage {
-            text-align: right;
-            font-size: 10px;
-            color: rgba(55, 53, 47, 0.5);
-            padding: 4px 12px;
-        }
-
-        /* 변수 입력 버튼들 */
-        .variable-buttons {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 6px;
-            margin-bottom: 8px;
-            padding: 8px;
-            background-color: #f8f9fa;
-            border-radius: 4px;
-        }
-
-        .variable-btn {
-            background-color: #e3f2fd;
-            color: #1976d2;
-            border: 1px solid #bbdefb;
-            border-radius: 3px;
-            padding: 4px 8px;
-            font-size: 11px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .variable-btn:hover {
-            background-color: #bbdefb;
-            border-color: #90caf9;
-        }
-
-        .variable-btn:active {
-            background-color: #90caf9;
-            transform: translateY(1px);
-        }
-
-        .empty-var-btn {
-            background-color: #f0f0f0 !important;
-            color: #666 !important;
-            border-color: #ccc !important;
-        }
-
-        .empty-var-btn:hover {
-            background-color: #e0e0e0 !important;
-            border-color: #999 !important;
+        .content-panels .content-panel.practice-panel {
+            flex: 1 !important;
+            max-width: none !important;
         }
 
         .favorite-item {
@@ -1478,6 +1214,11 @@
             gap: 6px;
         }
         
+        /* 클립보드 아이템 리스트 - 4개씩 한 줄 배치 */
+        .clipboard-panel .item-list {
+            gap: 4px;
+        }
+
         /* 클립보드 즐겨찾기 - 동적 플렉스박스 */
         #clipboard-favorites-list {
             display: flex;
@@ -1659,35 +1400,46 @@
             }
 
             .main-content {
-                height: calc(100% - 60px); /* 헤더 높이 제외 */
-                padding: 12px 8px; /* 좌우 패딩 줄임 */
-            }
-
-            .content-panels {
-                flex-direction: column;
                 height: 100%;
+                padding: 0;
                 gap: 0;
             }
 
-            .content-panel {
-                flex: none;
-                max-width: none;
-                width: calc(100% - 8px); /* 패딩 고려 */
-                margin-bottom: 16px;
-                min-height: 200px;
-                padding: 12px 8px; /* 내부 패딩 조정 */
+            /* 모바일에서 상단 북마크 패널 - 기본 숨김 */
+            .content-panel.bookmark-panel.top-bookmark {
+                display: none;
+                width: 100%;
+                height: 100%;
+                margin-bottom: 0;
+                padding: 12px 8px;
                 box-sizing: border-box;
+                overflow-y: auto;
+            }
+
+            /* 모바일에서 북마크 패널 표시 (탭 터치시) */
+            .content-panel.bookmark-panel.top-bookmark.mobile-visible {
+                display: block;
+            }
+
+            /* 모바일에서 하단 content-panels - 기본 숨김 */
+            .content-panels {
+                display: none;
+                flex-direction: column;
+                gap: 0;
+                width: 100%;
+                height: 100%;
             }
 
             /* 모바일에서 각 패널별 표시/숨김 */
-            .content-panel.bookmark-panel {
+            .content-panel {
+                flex: none;
+                max-width: none;
+                width: 100%;
+                height: 100%;
+                padding: 12px 8px;
+                box-sizing: border-box;
                 display: none;
-            }
-
-            .content-panel.bookmark-panel.mobile-visible {
-                display: block;
-                height: calc(100% - 32px);
-                margin-bottom: 0;
+                overflow-y: auto;
             }
 
             .content-panel.clipboard-panel {
@@ -1696,8 +1448,6 @@
 
             .content-panel.clipboard-panel.mobile-visible {
                 display: block;
-                height: calc(100% - 32px);
-                margin-bottom: 0;
             }
 
             .content-panel.practice-panel {
@@ -1706,8 +1456,6 @@
 
             .content-panel.practice-panel.mobile-visible {
                 display: block;
-                height: calc(100% - 32px);
-                margin-bottom: 0;
             }
 
             .dashboard-area {
@@ -1760,6 +1508,15 @@
                 padding: 8px;
                 line-height: 1.3;
                 transition: transform 0.1s ease, background-color 0.3s ease;
+            }
+
+            /* 모바일에서 클립보드 버튼은 전체 너비 사용 */
+            .item-button.clipboard-button {
+                width: 100% !important;
+                flex: 0 0 100% !important;
+                min-width: 100px !important;
+                max-width: calc(100vw - 40px) !important;
+                white-space: normal;
             }
             
             /* 모바일에서 길게 누르기 피드백 */
@@ -1844,14 +1601,6 @@
                 font-size: 12px;
             }
 
-            /* 대시보드 위젯 모바일 최적화 */
-            .dashboard-widget {
-                margin-bottom: 16px;
-            }
-
-            .dashboard-content {
-                max-height: 300px;
-            }
 
             /* 컨텍스트 메뉴 모바일 최적화 */
             .context-menu {
@@ -1874,10 +1623,6 @@
                 flex: 0 0 300px;
                 max-width: 300px;
             }
-
-            .dashboard-area {
-                max-width: 250px;
-            }
         }
     </style>
 </head>
@@ -1885,10 +1630,9 @@
     <!-- 모바일 탭 네비게이션 -->
     <div class="mobile-tabs">
         <button class="mobile-tab active" data-tab="projects">📁 프로젝트</button>
+        <button class="mobile-tab" data-tab="bookmarks">📌 북마크</button>
         <button class="mobile-tab" data-tab="clipboard">📋 클립보드</button>
         <button class="mobile-tab" data-tab="practice">📝 연습장</button>
-        <button class="mobile-tab" data-tab="bookmarks">📌 북마크</button>
-        <button class="mobile-tab" data-tab="dashboard">📊 대시보드</button>
     </div>
 
     <div class="app-container">
@@ -1906,51 +1650,42 @@
                 <h1 id="current-project-title"></h1>
                 <div class="search-container">
                     <div class="search-icon">🔍</div>
-                    <input type="text" id="global-search" placeholder="프로젝트, 북마크, 클립보드, 템플릿 검색...">
+                    <input type="text" id="global-search" placeholder="프로젝트, 북마크, 클립보드 검색...">
                     <div id="search-results" class="search-results"></div>
                 </div>
                 <button id="settings-btn" class="icon-button">⚙️</button>
             </div>
             
             <div class="main-content">
-                <div class="content-panels">
-                <div class="content-panel bookmark-panel">
-                    <h4 class="bookmark-header">북마크 <button id="add-bookmark-btn" class="add-section-btn">+</button> <button id="add-bookmark-divider-btn" class="add-section-btn">|</button></h4>
+                <!-- 상단: 북마크 (전체 너비, 버튼 2줄 높이) -->
+                <div class="content-panel bookmark-panel top-bookmark">
+                    <h4 class="bookmark-header">북마크 <button id="add-bookmark-btn" class="add-section-btn">+</button></h4>
                     <ul id="bookmark-list" class="item-list"></ul>
                 </div>
 
-                <div class="content-panel clipboard-panel">
-                    <h4 class="clipboard-header">클립보드 <button id="add-clipboard-btn" class="add-section-btn">+</button> <button id="add-divider-btn" class="add-section-btn">|</button></h4>
-                    <ul id="clipboard-list" class="item-list"></ul>
-                </div>
-                
-                <div class="content-panel practice-panel">
-                    <h4 class="practice-header">연습장 <div class="practice-tabs">
-                        <button class="practice-tab active" data-tab="1">1</button>
-                        <button class="practice-tab" data-tab="2">2</button>
-                        <button class="practice-tab" data-tab="3">3</button>
-                        <button class="practice-tab" data-tab="4">4</button>
-                        <button class="practice-tab" data-tab="5">5</button>
-                    </div></h4>
-                    <div class="practice-container">
-                        <textarea id="practice-textarea" class="practice-text" placeholder="자유롭게 텍스트를 입력하세요..."></textarea>
-                        <div class="practice-buttons">
-                            <button id="copy-practice-btn" class="practice-btn">복사</button>
-                            <button id="clear-practice-btn" class="practice-btn">초기화</button>
+                <!-- 하단: 클립보드와 연습장 (50% + 50%) -->
+                <div class="content-panels">
+                    <div class="content-panel clipboard-panel">
+                        <h4 class="clipboard-header">클립보드 <button id="add-clipboard-btn" class="add-section-btn">+</button> <button id="add-divider-btn" class="add-section-btn">|</button></h4>
+                        <ul id="clipboard-list" class="item-list"></ul>
+                    </div>
+
+                    <div class="content-panel practice-panel">
+                        <h4 class="practice-header">연습장 <div class="practice-tabs">
+                            <button class="practice-tab active" data-tab="1">1</button>
+                            <button class="practice-tab" data-tab="2">2</button>
+                            <button class="practice-tab" data-tab="3">3</button>
+                            <button class="practice-tab" data-tab="4">4</button>
+                            <button class="practice-tab" data-tab="5">5</button>
+                        </div></h4>
+                        <div class="practice-container">
+                            <textarea id="practice-textarea" class="practice-text" placeholder="자유롭게 텍스트를 입력하세요..."></textarea>
+                            <div class="practice-buttons">
+                                <button id="copy-practice-btn" class="practice-btn">복사</button>
+                                <button id="clear-practice-btn" class="practice-btn">초기화</button>
+                            </div>
                         </div>
                     </div>
-                </div>
-                
-                <div class="dashboard-area">
-                <div class="dashboard-widget">
-                    <div class="template-header">
-                        <h4 class="dashboard-header">📝 템플릿 관리</h4>
-                        <div class="template-toolbar">
-                            <button id="add-template-btn" class="template-btn">+ 새 템플릿</button>
-                        </div>
-                    </div>
-                    <div id="template-list" class="dashboard-content"></div>
-                </div>
                 </div>
             </div>
         </div>
@@ -2053,6 +1788,7 @@
             <li id="context-edit">편집</li>
             <li id="context-favorite">즐겨찾기</li>
             <li id="context-color">색상 변경</li>
+            <li id="context-copy-button">버튼 복사</li>
             <li id="context-delete">삭제</li>
             <li id="context-cancel">취소</li>
         </ul>
@@ -2063,6 +1799,13 @@
             <li id="project-context-rename">이름 수정</li>
             <li id="project-context-delete">삭제</li>
             <li id="project-context-cancel">취소</li>
+        </ul>
+    </div>
+
+    <div id="bookmark-list-context-menu" class="context-menu">
+        <ul>
+            <li id="list-context-paste">붙여넣기</li>
+            <li id="list-context-cancel">취소</li>
         </ul>
     </div>
 
@@ -2975,14 +2718,19 @@
 
         document.addEventListener('DOMContentLoaded', function() {
         
-        // Firebase 설정 - 본인의 Firebase 프로젝트 설정으로 교체하세요
+        // Firebase 설정 - 환경변수 또는 설정 객체에서 로드
+        // SECURITY: Firebase API 키는 절대 소스코드에 하드코딩하면 안 됩니다.
+        // .env 파일을 사용하거나 환경변수에서 로드해야 합니다.
+        // See .env.example for configuration template
+
+        // 개발 중 테스트용 기본값 (실제 프로덕션에서는 .env 파일 사용)
         const firebaseConfig = {
-            apiKey: "AIzaSyDKjKvRCw-j4b-1W4MhRc-uZ21zbAnTFM8",
-            authDomain: "bookmarkclipboard.firebaseapp.com",
-            projectId: "bookmarkclipboard",
-            storageBucket: "bookmarkclipboard.firebasestorage.app",
-            messagingSenderId: "969969481293",
-            appId: "1:969969481293:web:08ae0008ac1b590c43ce04"
+            apiKey: window.FIREBASE_CONFIG?.apiKey || "AIzaSyDKjKvRCw-j4b-1W4MhRc-uZ21zbAnTFM8",
+            authDomain: window.FIREBASE_CONFIG?.authDomain || "bookmarkclipboard.firebaseapp.com",
+            projectId: window.FIREBASE_CONFIG?.projectId || "bookmarkclipboard",
+            storageBucket: window.FIREBASE_CONFIG?.storageBucket || "bookmarkclipboard.firebasestorage.app",
+            messagingSenderId: window.FIREBASE_CONFIG?.messagingSenderId || "969969481293",
+            appId: window.FIREBASE_CONFIG?.appId || "1:969969481293:web:08ae0008ac1b590c43ce04"
         };
         
         // Firebase 초기화
@@ -2993,19 +2741,16 @@
             firebase.initializeApp(firebaseConfig);
             db = firebase.firestore();
             firebaseInitialized = true;
-            console.log('Firebase 초기화 성공');
-            
+
             // 전역 변수에 할당
             globalDb = db;
             globalFirebaseInitialized = firebaseInitialized;
         } catch (error) {
-            console.warn('Firebase 초기화 실패, 로컬스토리지 사용:', error);
+            // Firebase 초기화 실패 시 로컬스토리지로 폴백
             firebaseInitialized = false;
             globalFirebaseInitialized = false;
         }
 
-        // 템플릿 초기화
-        loadTemplates();
         
         // 데이터 저장 함수들 (Firebase + 로컬스토리지 백업)
         const STORAGE_KEY = 'bookmark-clipboard-app-data';
@@ -3017,10 +2762,9 @@
                 updateSearchIndex();
             }
             if (!firebaseInitialized || !db) {
-                console.log('Firebase 미초기화, 로컬스토리지 사용');
                 return saveToLocalStorage();
             }
-            
+
             try {
                 const dataToSave = {
                     projects: allProjectsData,
@@ -3028,9 +2772,8 @@
                     projectOrder: projectOrder || Object.keys(allProjectsData),
                     lastUpdated: new Date().toISOString()
                 };
-                
+
                 await db.collection('userdata').doc('bookmark-app').set(dataToSave);
-                console.log('✅ 데이터를 Firebase에 저장했습니다.');
                 
                 // 로컬스토리지에도 백업 저장
                 saveToLocalStorage();
@@ -3404,20 +3147,7 @@
                         saveToFirebase();
                     }
                 }
-                
-                // TODAY 프로젝트가 없으면 자동 추가
-                if (!allProjectsData['TODAY']) {
-                    allProjectsData['TODAY'] = {
-                        bookmarks: [],
-                        clipboard: []
-                    };
-                } else {
-                    // TODAY가 존재하지만 clipboard가 없는 경우
-                    if (!allProjectsData['TODAY'].clipboard) {
-                        allProjectsData['TODAY'].clipboard = [];
-                    }
-                }
-                
+
                 // 기존 데이터 호환성 처리
                 ensureClipboardSummaryField();
 
@@ -3441,21 +3171,8 @@
                     currentProject = '가계약';
                     projectOrder = Object.keys(allProjectsData);
                 }
-                
-                // TODAY 프로젝트가 없으면 자동 추가 (에러 케이스에서도)
-                if (!allProjectsData['TODAY']) {
-                    allProjectsData['TODAY'] = {
-                        bookmarks: [],
-                        clipboard: []
-                    };
-                } else {
-                    // TODAY가 존재하지만 clipboard가 없는 경우
-                    if (!allProjectsData['TODAY'].clipboard) {
-                        allProjectsData['TODAY'].clipboard = [];
-                    }
-                }
 
-                // 기존 데이터 호환성 처리 (에러 케이스에서도)
+                // 기존 데이터 호환성 처리
                 ensureClipboardSummaryField();
 
                 renderProjectList();
@@ -3477,12 +3194,12 @@
         const addBookmarkBtn = document.getElementById('add-bookmark-btn');
         const addClipboardBtn = document.getElementById('add-clipboard-btn');
         const addDividerBtn = document.getElementById('add-divider-btn');
-        const addBookmarkDividerBtn = document.getElementById('add-bookmark-divider-btn');
 
         const contextMenu = document.getElementById('context-menu');
         const contextEdit = document.getElementById('context-edit');
         const contextFavorite = document.getElementById('context-favorite');
         const contextColor = document.getElementById('context-color');
+        const contextCopyButton = document.getElementById('context-copy-button');
         const contextDelete = document.getElementById('context-delete');
         const contextCancel = document.getElementById('context-cancel');
 
@@ -3491,16 +3208,36 @@
         const projectContextDelete = document.getElementById('project-context-delete');
         const projectContextCancel = document.getElementById('project-context-cancel');
 
+        const bookmarkListContextMenu = document.getElementById('bookmark-list-context-menu');
+        const listContextPaste = document.getElementById('list-context-paste');
+        const listContextCancel = document.getElementById('list-context-cancel');
+
         let activeItem = null;
         let activeProject = null;
         let colorChangeItem = null;
+        let copiedBookmark = null; // 복사된 북마크 저장
 
         // URL을 하이퍼링크로 변환하는 함수
+        // HTML 이스케이프 - XSS 방지
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
         function convertUrlsToLinks(text) {
             if (!text) return '';
-            
-            const urlRegex = /(https?:\/\/[^\s]+)/g;
-            return text.replace(urlRegex, '<a href="$1" target="_blank" rel="noopener noreferrer" style="color: #0066cc; text-decoration: underline;">$1</a>');
+
+            // 1. 먼저 텍스트를 이스케이프하여 XSS 방지
+            const escapedText = escapeHtml(text);
+
+            // 2. 그 다음 URL을 안전하게 링크로 변환
+            const urlRegex = /(https?:\/\/[^\s<>]+)/g;
+            return escapedText.replace(urlRegex, (url) => {
+                // URL 자체도 이스케이프
+                const escapedUrl = escapeHtml(url);
+                return `<a href="${escapedUrl}" target="_blank" rel="noopener noreferrer" style="color: #0066cc; text-decoration: underline;">${escapedUrl}</a>`;
+            });
         }
 
         // TODAY 프로젝트용 즐겨찾기 북마크 수집 함수
@@ -3530,176 +3267,7 @@
 
         async function renderProject(projectName) {
             currentProject = projectName;
-            
-            // TODAY 프로젝트 특별 처리
-            if (projectName === 'TODAY') {
-                currentProjectTitle.textContent = '📅 TODAY - 즐겨찾기 모음';
-                bookmarkList.innerHTML = '';
-                clipboardList.innerHTML = '';
-                
-                // TODAY 프로젝트에 전용 클립보드 데이터 초기화
-                if (!allProjectsData['TODAY']) {
-                    allProjectsData['TODAY'] = {
-                        bookmarks: [],
-                        clipboard: []
-                    };
-                } else {
-                    // TODAY가 존재하지만 clipboard가 없는 경우
-                    if (!allProjectsData['TODAY'].clipboard) {
-                        allProjectsData['TODAY'].clipboard = [];
-                    }
-                }
-                
-                // 즐겨찾기 북마크들을 가져와서 렌더링
-                const favoriteBookmarks = getTodayBookmarks();
-                favoriteBookmarks.forEach((item, index) => {
-                    const button = document.createElement('button');
-                    button.className = 'item-button bookmark-button';
-                    
-                    const favoriteIcon = '⭐ ';
-                    const maxLength = 8 - favoriteIcon.length;
-                    const truncatedName = item.name.length > maxLength ? 
-                        item.name.substring(0, maxLength) : item.name;
-                    
-                    button.textContent = favoriteIcon + truncatedName;
-                    button.style.backgroundColor = item.color || '#f8f9fa';
-                    button.dataset.fullName = item.name;
-                    button.dataset.url = item.url;
-                    button.dataset.sourceProject = item.sourceProject;
-                    
-                    button.addEventListener('click', (e) => {
-                        if (e.button === 0) {
-                            window.open(item.url, '_blank');
-                        }
-                    });
-                    
-                    bookmarkList.appendChild(button);
-                });
-                
-                // TODAY 전용 클립보드 렌더링
-                const todayData = allProjectsData['TODAY'];
-                todayData.clipboard.forEach((item, index) => {
-                    if (item.type === 'divider') {
-                        const divider = document.createElement('div');
-                        divider.className = 'divider draggable';
-                        divider.dataset.index = index;
-                        divider.dataset.type = 'clipboard';
-                        divider.draggable = true;
-                        divider.addEventListener('dragstart', handleItemDragStart);
-                        clipboardList.appendChild(divider);
-                    } else {
-                        const button = document.createElement('button');
-                        button.className = 'item-button clipboard-button draggable';
 
-                        const favoriteIcon = item.favorite ? '⭐ ' : '';
-                        const buttonText = favoriteIcon + item.title.substring(0, 8 - favoriteIcon.length);
-
-                        button.style.backgroundColor = item.color || '#f8f9fa';
-                        button.dataset.index = index;
-                        button.dataset.type = 'clipboard';
-                        button.dataset.fullName = item.title;
-                        button.dataset.content = item.text;
-                        button.draggable = true;
-
-                        // 버튼 텍스트를 텍스트 노드로 추가
-                        const textNode = document.createTextNode(buttonText);
-                        button.appendChild(textNode);
-
-                        // JavaScript 기반 tooltip 이벤트
-                        let tooltipElement = null;
-
-                        button.addEventListener('mouseenter', (e) => {
-                            // 기존 tooltip 제거
-                            if (tooltipElement) tooltipElement.remove();
-
-                            // 새 tooltip 생성
-                            tooltipElement = document.createElement('div');
-                            tooltipElement.className = 'js-clipboard-tooltip';
-                            tooltipElement.textContent = item.summary || '요약없음';
-                            tooltipElement.style.cssText = `
-                                position: fixed;
-                                background: linear-gradient(135deg, #F0E68C 0%, #DDA0DD 100%);
-                                color: black;
-                                padding: 10px 14px;
-                                border-radius: 8px;
-                                font-size: 14px;
-                                font-weight: bold;
-                                z-index: 10000;
-                                pointer-events: none;
-                                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-                                max-width: 220px;
-                                word-wrap: break-word;
-                                white-space: normal;
-                            `;
-
-                            // 위치 계산 (버튼 아래에 표시)
-                            const rect = button.getBoundingClientRect();
-                            tooltipElement.style.left = (rect.left + rect.width / 2) + 'px';
-                            tooltipElement.style.top = (rect.bottom + 8) + 'px';
-                            tooltipElement.style.transform = 'translateX(-50%)';
-
-                            document.body.appendChild(tooltipElement);
-                        });
-
-                        button.addEventListener('mouseleave', () => {
-                            if (tooltipElement) {
-                                tooltipElement.remove();
-                                tooltipElement = null;
-                            }
-                        });
-
-                        // title 속성 제거 (JavaScript tooltip만 사용)
-                        
-                        let isDragging = false;
-                        button.addEventListener('mousedown', () => { isDragging = false; });
-                        button.addEventListener('dragstart', (e) => { 
-                            isDragging = true; 
-                            handleItemDragStart(e);
-                        });
-                        button.addEventListener('mouseup', async (e) => {
-                            setTimeout(async () => {
-                                if (!isDragging && e.button === 0) {
-                                    // 클립보드 상세 보기 모달 표시
-                                    const modal = document.getElementById('view-clipboard-modal');
-                                    const titleEl = document.getElementById('view-clipboard-title');
-                                    const contentEl = document.getElementById('view-clipboard-content');
-                                    const summaryEl = document.getElementById('view-clipboard-summary');
-                                    const summarySectionEl = document.getElementById('view-clipboard-summary-section');
-                                    const copyBtn = document.getElementById('view-clipboard-copy-btn');
-                                    const editBtn = document.getElementById('view-clipboard-edit-btn');
-
-                                    titleEl.textContent = item.title || '';
-                                    contentEl.innerHTML = convertUrlsToLinks(item.text);
-
-                                    // 요약 표시
-                                    if (item.summary && item.summary.trim()) {
-                                        summaryEl.textContent = item.summary;
-                                        summarySectionEl.style.display = 'block';
-                                    } else {
-                                        summaryEl.textContent = '요약없음';
-                                        summarySectionEl.style.display = 'block';
-                                    }
-
-                                    copyBtn.dataset.clipboardText = item.text;
-                                    editBtn.dataset.clipboardIndex = index;
-
-                                    modal.style.display = 'flex';
-                                }
-                            }, 50);
-                        });
-                        clipboardList.appendChild(button);
-                    }
-                });
-                
-                // 프로젝트 목록에서 활성 상태 업데이트
-                document.querySelectorAll('#project-list li').forEach(li => {
-                    li.classList.remove('active');
-                });
-                document.getElementById('project-TODAY')?.classList.add('active');
-                
-                return;
-            }
-            
             const projectData = allProjectsData[projectName];
             
             currentProjectTitle.textContent = projectName;
@@ -3707,18 +3275,7 @@
             clipboardList.innerHTML = '';
 
             projectData.bookmarks.forEach((item, index) => {
-                if (item.type === 'divider') {
-                    // 구분선 생성
-                    const divider = document.createElement('div');
-                    divider.className = 'divider draggable';
-                    divider.dataset.index = index;
-                    divider.dataset.type = 'bookmark';
-                    divider.draggable = true;
-                    
-                    divider.addEventListener('dragstart', handleItemDragStart);
-                    
-                    bookmarkList.appendChild(divider);
-                } else {
+                if (item.type !== 'divider') {
                     const button = document.createElement('button');
                     button.className = 'item-button bookmark-button draggable';
                     
@@ -3980,23 +3537,6 @@
             renderProject(currentProject);
         }
 
-        function addBookmarkDivider() {
-            if (!currentProject) {
-                alert('프로젝트를 먼저 선택해주세요.');
-                return;
-            }
-            
-            const projectData = allProjectsData[currentProject];
-            const divider = {
-                type: 'divider',
-                id: 'bookmark_divider_' + Date.now()
-            };
-            
-            projectData.bookmarks.push(divider);
-            saveToFirebase();
-            renderProject(currentProject);
-        }
-
         function addProject() {
             const modal = document.getElementById('add-project-modal');
             modal.style.display = 'flex';
@@ -4007,27 +3547,9 @@
         function renderProjectList() {
             const projectList = document.getElementById('project-list');
             projectList.innerHTML = '';
-            
-            // TODAY 프로젝트를 최상단에 고정
-            const todayLi = document.createElement('li');
-            todayLi.id = 'project-TODAY';
-            todayLi.textContent = '📅 TODAY';
-            todayLi.classList.add('project-item', 'today-project');
-            todayLi.dataset.projectName = 'TODAY';
-            todayLi.style.fontWeight = 'bold';
-            todayLi.style.color = '#2563eb';
-            todayLi.style.borderBottom = '1px solid rgba(55, 53, 47, 0.09)';
-            todayLi.style.marginBottom = '4px';
-            todayLi.style.paddingBottom = '8px';
-            
-            if (currentProject === 'TODAY') {
-                todayLi.classList.add('active');
-            }
-            
-            projectList.appendChild(todayLi);
-            
-            // 나머지 프로젝트들 (TODAY 제외)
-            const orderedProjects = (projectOrder || Object.keys(allProjectsData)).filter(name => name !== 'TODAY');
+
+            // 모든 프로젝트 렌더링
+            const orderedProjects = (projectOrder || Object.keys(allProjectsData));
             orderedProjects.forEach((projectName, index) => {
                 // 존재하지 않는 프로젝트는 건너뛰기
                 if (!allProjectsData[projectName]) return;
@@ -4351,6 +3873,25 @@
             }
         });
 
+        // 버튼 복사 이벤트
+        contextCopyButton.addEventListener('click', () => {
+            if (activeItem && activeItem.type === 'bookmark') {
+                const bookmark = allProjectsData[currentProject].bookmarks[activeItem.index];
+                if (bookmark && bookmark.type !== 'divider') {
+                    // 북마크 데이터 복사
+                    copiedBookmark = {
+                        name: bookmark.name,
+                        url: bookmark.url,
+                        color: bookmark.color || '#f8f9fa',
+                        favorite: bookmark.favorite || false
+                    };
+                    showSaveStatus('success', '북마크 복사 완료! 붙여넣기 메뉴를 사용하세요.');
+                }
+                contextMenu.style.display = 'none';
+                activeItem = null;
+            }
+        });
+
         contextDelete.addEventListener('click', () => {
             if (activeItem) {
                 const { type, index } = activeItem;
@@ -4381,11 +3922,76 @@
             contextMenu.style.display = 'none';
             activeItem = null;
         });
-        
+
+        // 북마크 리스트 컨텍스트 메뉴 이벤트
+        listContextPaste.addEventListener('click', () => {
+            if (copiedBookmark) {
+                // 복사된 북마크를 현재 프로젝트의 북마크 리스트에 추가
+                const newBookmark = {
+                    name: copiedBookmark.name,
+                    url: copiedBookmark.url,
+                    color: copiedBookmark.color,
+                    favorite: copiedBookmark.favorite
+                };
+                allProjectsData[currentProject].bookmarks.push(newBookmark);
+                renderProject(currentProject);
+                bookmarkListContextMenu.style.display = 'none';
+                showSaveStatus('success', '북마크 붙여넣기 완료!');
+                saveToFirebase();
+            }
+        });
+
+        listContextCancel.addEventListener('click', () => {
+            bookmarkListContextMenu.style.display = 'none';
+        });
+
+        // 북마크 리스트 우클릭 이벤트
+        bookmarkList.addEventListener('contextmenu', (e) => {
+            e.preventDefault();
+
+            // 클릭된 요소가 북마크 버튼이 아닌 경우만 처리
+            if (!e.target.closest('.item-button')) {
+                // 붙여넣기 메뉴 활성화 여부 결정
+                listContextPaste.style.opacity = copiedBookmark ? '1' : '0.5';
+                listContextPaste.style.pointerEvents = copiedBookmark ? 'auto' : 'none';
+
+                bookmarkListContextMenu.style.display = 'block';
+
+                // 화면 경계를 고려한 위치 계산
+                const menuWidth = 150;
+                const menuHeight = 100;
+                const screenWidth = window.innerWidth;
+                const screenHeight = window.innerHeight;
+
+                let x = e.clientX;
+                let y = e.clientY;
+
+                if (x + menuWidth > screenWidth) {
+                    x = screenWidth - menuWidth - 10;
+                }
+
+                if (y + menuHeight > screenHeight) {
+                    y = screenHeight - menuHeight - 10;
+                }
+
+                if (x < 10) x = 10;
+                if (y < 10) y = 10;
+
+                bookmarkListContextMenu.style.left = x + 'px';
+                bookmarkListContextMenu.style.top = y + 'px';
+            }
+        });
+
+        // 북마크 리스트 클릭으로 컨텍스트 메뉴 닫기
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('#bookmark-list-context-menu')) {
+                bookmarkListContextMenu.style.display = 'none';
+            }
+        });
+
         addBookmarkBtn.addEventListener('click', addBookmark);
         addClipboardBtn.addEventListener('click', addClipboard);
         addDividerBtn.addEventListener('click', addDivider);
-        addBookmarkDividerBtn.addEventListener('click', addBookmarkDivider);
         
         // 연습장 탭 클릭 이벤트
         document.querySelectorAll('.practice-tab').forEach(tab => {
@@ -4799,32 +4405,6 @@
             renderProject(projectName);
         }
 
-        // 대시보드로 전환하는 함수
-        function switchToDashboard() {
-            // 모바일 환경에서는 대시보드 탭으로 전환
-            if (window.innerWidth <= 768) {
-                const mobileTabs = document.querySelectorAll('.mobile-tab');
-                const dashboardTab = Array.from(mobileTabs).find(tab => tab.dataset.tab === 'dashboard');
-                
-                if (dashboardTab) {
-                    // 모든 탭 비활성화
-                    mobileTabs.forEach(tab => tab.classList.remove('active'));
-                    
-                    // 대시보드 탭 활성화
-                    dashboardTab.classList.add('active');
-                    
-                    // 모든 패널 숨김
-                    document.getElementById('project-sidebar').classList.remove('mobile-visible');
-                    document.querySelector('.bookmark-panel').classList.remove('mobile-visible');
-                    document.querySelector('.clipboard-panel').classList.remove('mobile-visible');
-                    document.querySelector('.practice-panel').classList.remove('mobile-visible');
-                    
-                    // 대시보드 영역 표시
-                    document.querySelector('.dashboard-area').classList.add('mobile-visible');
-                }
-            }
-            // 데스크톱에서는 대시보드가 기본적으로 보이므로 별도 처리 불필요
-        }
 
 
         // 검색 하이라이트 효과 적용
@@ -5704,23 +5284,21 @@
             const bookmarkPanel = document.querySelector('.bookmark-panel');
             const clipboardPanel = document.querySelector('.clipboard-panel');
             const practicePanel = document.querySelector('.practice-panel');
-            const dashboardArea = document.querySelector('.dashboard-area');
-            
+
             mobileTabs.forEach(tab => {
                 tab.addEventListener('click', () => {
                     // 모든 탭 비활성화
                     mobileTabs.forEach(t => t.classList.remove('active'));
-                    
+
                     // 클릭된 탭 활성화
                     tab.classList.add('active');
-                    
+
                     // 모든 패널 숨김
                     projectSidebar.classList.remove('mobile-visible');
                     bookmarkPanel.classList.remove('mobile-visible');
                     clipboardPanel.classList.remove('mobile-visible');
                     practicePanel.classList.remove('mobile-visible');
-                    dashboardArea.classList.remove('mobile-visible');
-                    
+
                     // 선택된 탭에 따라 패널 표시
                     const tabType = tab.dataset.tab;
                     switch(tabType) {
@@ -5735,9 +5313,6 @@
                             break;
                         case 'practice':
                             practicePanel.classList.add('mobile-visible');
-                            break;
-                        case 'dashboard':
-                            dashboardArea.classList.add('mobile-visible');
                             break;
                     }
                 });
@@ -5837,7 +5412,6 @@
                 document.querySelector('.bookmark-panel').classList.remove('mobile-visible');
                 document.querySelector('.clipboard-panel').classList.remove('mobile-visible');
                 document.querySelector('.practice-panel').classList.remove('mobile-visible');
-                document.querySelector('.dashboard-area').classList.remove('mobile-visible');
             }
         }
 
@@ -6083,97 +5657,9 @@
                 checkPWAInstallability();
             }, 2000); // 2초 후 확인 (UI 로딩 완료 후)
 
-            // 템플릿 관련 이벤트 리스너들
-            document.getElementById('add-template-btn').addEventListener('click', addNewTemplate);
-            
-            // 템플릿 폼 이벤트 리스너
-            document.getElementById('template-form').addEventListener('submit', function(e) {
-                e.preventDefault();
-                saveTemplate(new FormData(e.target));
-            });
-            
-            // 템플릿 내용 변경 시 미리보기 업데이트
-            
         });
     });
     </script>
 
-    <!-- 템플릿 편집 모달 -->
-    <div id="template-edit-modal" class="modal">
-        <div class="modal-content">
-            <span class="close-button" onclick="closeTemplateModal()">&times;</span>
-            <h2>템플릿 편집</h2>
-            
-            <form id="template-form">
-                <div class="modal-form-group">
-                    <label for="template-title-input">제목:</label>
-                    <input type="text" id="template-title-input" name="title" placeholder="템플릿 제목을 입력하세요" required>
-                </div>
-                
-                
-                
-                <div class="modal-form-group">
-                    <label for="template-content-input">내용:</label>
-                    <div class="variable-buttons">
-                        <button type="button" class="variable-btn" onclick="insertVariable('{오늘날짜}')">{오늘날짜}</button>
-                        <button type="button" class="variable-btn" onclick="insertVariable('{현재시간}')">{현재시간}</button>
-                        <button type="button" class="variable-btn" onclick="insertVariable('{프로젝트명}')">{프로젝트명}</button>
-                        <button type="button" class="variable-btn" onclick="insertVariable('{고객명}')">{고객명}</button>
-                        <button type="button" class="variable-btn" onclick="insertVariable('{계약일}')">{계약일}</button>
-                        <button type="button" class="variable-btn" onclick="insertVariable('{금액}')">{금액}</button>
-                        <button type="button" class="variable-btn empty-var-btn" onclick="insertEmptyVariable()">{빈 변수}</button>
-                    </div>
-                    <textarea id="template-content-input" name="content" placeholder="템플릿 내용을 입력하세요. 위 버튼을 클릭하여 변수를 삽입할 수 있습니다."></textarea>
-                </div>
-                
-                
-                <div class="modal-actions">
-                    <button type="button" class="secondary-button" onclick="closeTemplateModal()">취소</button>
-                    <button type="submit" class="primary-button">저장</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- 템플릿 내용 팝업 모달 -->
-    <div id="template-popup-modal" class="modal">
-        <div class="modal-content">
-            <span class="close-button" onclick="closeTemplatePopup()">&times;</span>
-            <div id="template-popup-header">
-                <h2 id="template-popup-title"></h2>
-            </div>
-            <div id="template-popup-content">
-            </div>
-            <!-- 내용보기/변수입력 버튼 영역 -->
-            <div id="template-action-buttons" style="margin: 20px 0; display: flex; gap: 12px; justify-content: center;">
-                <button type="button" class="primary-button" onclick="showTemplateContent()" style="flex: 1;">내용보기</button>
-                <button type="button" class="secondary-button" onclick="showVariableInputs()" style="flex: 1;" id="template-variables-toggle-btn">변수입력</button>
-            </div>
-            <!-- 변수 입력 영역 -->
-            <div id="template-variables-section" style="display: none; margin: 20px 0; border: 1px solid #e0e0e0; border-radius: 6px; padding: 16px; background-color: #fafafa;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-                    <h4 style="margin: 0; color: #37352f; font-size: 14px;">변수 입력</h4>
-                    <div style="display: flex; gap: 8px; align-items: center;">
-                        <button type="button" class="primary-button" onclick="saveFormTemplate()" style="font-size: 12px; padding: 4px 8px;">양식 저장</button>
-                        <button type="button" class="secondary-button" onclick="resetVariables()" style="font-size: 12px; padding: 4px 8px;">초기화</button>
-                    </div>
-                </div>
-
-                <!-- 하위 템플릿 제목 입력란 (상위 템플릿에서만 표시) -->
-                <div id="child-template-title-section" style="margin-bottom: 12px; display: none;">
-                    <label for="child-template-title" style="display: block; margin-bottom: 4px; color: #37352f; font-size: 12px; font-weight: 500;">하위 템플릿 제목:</label>
-                    <input type="text" id="child-template-title" placeholder="하위 템플릿의 제목을 입력하세요" style="width: 100%; padding: 8px; border: 1px solid #e0e0e0; border-radius: 4px; font-size: 14px; box-sizing: border-box;">
-                </div>
-
-                <div id="template-variables-inputs"></div>
-            </div>
-            <div class="modal-actions">
-                <button type="button" class="primary-button" onclick="copyTemplateFromPopup()">복사</button>
-                <button type="button" class="secondary-button" onclick="editTemplateFromPopup()">편집</button>
-                <button type="button" class="secondary-button delete-btn" onclick="deleteTemplateFromPopup()">삭제</button>
-                <button type="button" class="secondary-button" onclick="closeTemplatePopup()">닫기</button>
-            </div>
-        </div>
-    </div>
 </body>
 </html>
