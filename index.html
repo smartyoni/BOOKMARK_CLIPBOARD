@@ -1094,12 +1094,6 @@
             line-height: 1.5;
         }
 
-        /* 요약 textarea 전용 스타일 */
-        #add-clipboard-summary {
-            min-height: 80px !important; /* 제목 입력 필드 높이의 약 2배 */
-            max-height: 120px;
-        }
-
         .modal-actions {
             text-align: right;
             margin-top: 24px;
@@ -1770,8 +1764,9 @@
                 <textarea id="add-clipboard-content"></textarea>
             </div>
             <div class="modal-form-group">
-                <label for="add-clipboard-summary">요약:</label>
-                <textarea id="add-clipboard-summary" placeholder="클립보드 항목의 요약을 입력하세요 (선택사항)"></textarea>
+                <label for="add-clipboard-file">파일 (1MB 미만):</label>
+                <input type="file" id="add-clipboard-file">
+                <div id="file-info" style="font-size: 12px; color: #666; margin-top: 5px;"></div>
             </div>
             <div class="modal-actions">
                 <button id="add-clipboard-save" class="action-button">저장</button>
@@ -1908,15 +1903,19 @@
     <!-- View Clipboard Modal -->
     <div id="view-clipboard-modal" class="modal">
         <div class="modal-content">
-            <span class="close-button view-clipboard-close">&times;</span>
-            <h2 id="view-clipboard-title"></h2>
-            <div id="view-clipboard-content" style="white-space: pre-wrap; word-wrap: break-word; max-height: 600px; overflow-y: auto; margin-bottom: 15px;"></div>
-            <div id="view-clipboard-summary-section" style="margin-bottom: 20px;">
-                <h4 style="margin: 0 0 8px 0; color: #666; font-size: 14px;">요약</h4>
-                <div id="view-clipboard-summary" style="padding: 10px; background-color: #f8f9fa; border-radius: 4px; border-left: 3px solid #007acc; font-size: 14px; color: #555;"></div>
+            <div id="view-clipboard-header" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; margin: -40px -40px 0 -40px; background: linear-gradient(135deg, #D2691E 0%, #F4A460 50%, #DEB887 100%); border-radius: 4px 4px 0 0; border-bottom: 3px solid #8B4513;">
+                <h2 id="view-clipboard-title" style="margin: 0; color: white; font-size: 20px;"></h2>
+                <span class="close-button view-clipboard-close" style="color: white; font-size: 28px;">&times;</span>
+            </div>
+            <div id="view-clipboard-content" style="white-space: pre-wrap; word-wrap: break-word; max-height: 600px; overflow-y: auto; margin: 20px 0 15px 0; padding: 12px; border: 1px solid #ddd; border-radius: 4px; background-color: #fafafa; min-height: 100px;"></div>
+            <div id="view-clipboard-file-info" style="display: none; padding: 12px; background-color: #f5f5f5; border-radius: 4px; margin-bottom: 15px; font-size: 14px; color: #666;">
+                <div style="margin-bottom: 5px;">📎 <strong>첨부파일</strong></div>
+                <div id="view-clipboard-file-name" style="margin-left: 20px; margin-bottom: 3px;"></div>
+                <div id="view-clipboard-file-size" style="margin-left: 20px; font-size: 12px; color: #999;"></div>
             </div>
             <div class="modal-actions">
                 <button id="view-clipboard-copy-btn" class="action-button">복사</button>
+                <button id="view-clipboard-download-btn" class="action-button" style="display: none;">다운로드</button>
                 <button id="view-clipboard-edit-btn" class="action-button secondary-button">수정</button>
             </div>
         </div>
@@ -3133,19 +3132,6 @@
             5: ''
         };
 
-        // 기존 클립보드 데이터에 summary 필드 추가
-        function ensureClipboardSummaryField() {
-            Object.keys(allProjectsData).forEach(projectName => {
-                const project = allProjectsData[projectName];
-                if (project.clipboard && Array.isArray(project.clipboard)) {
-                    project.clipboard.forEach(item => {
-                        if (item.type !== 'divider' && !item.hasOwnProperty('summary')) {
-                            item.summary = '';
-                        }
-                    });
-                }
-            });
-        }
 
         async function initializeApp() {
             try {
@@ -3168,9 +3154,6 @@
                     }
                 }
 
-                // 기존 데이터 호환성 처리
-                ensureClipboardSummaryField();
-
                 // 전역 연습장 데이터 로드
                 await loadPracticeFromFirebase();
 
@@ -3192,9 +3175,6 @@
                     projectOrder = Object.keys(allProjectsData);
                 }
 
-                // 기존 데이터 호환성 처리
-                ensureClipboardSummaryField();
-
                 renderProjectList();
                 renderProject(currentProject);
                 
@@ -3203,6 +3183,66 @@
                     updateSearchIndex();
                 }
             }
+        }
+
+        // 파일 미리보기 렌더링 함수
+        function generateFilePreview(base64Data, fileType, fileName) {
+            const sizeKB = (fileName ? 0 : 0); // 크기는 별도로 계산됨
+
+            // 이미지 파일
+            if (fileType && fileType.startsWith('image/')) {
+                return `
+                    <div style="padding: 10px; text-align: center; background: #f5f5f5; border-radius: 8px;">
+                        <img src="data:${fileType};base64,${base64Data}"
+                             style="max-width: 100%; max-height: 400px; border-radius: 4px; margin-bottom: 10px;"
+                             alt="이미지 미리보기">
+                        <div style="font-size: 12px; color: #666;">파일명: ${fileName}</div>
+                    </div>
+                `;
+            }
+
+            // 텍스트 파일
+            if (fileType && (fileType.startsWith('text/') || fileType === 'application/json')) {
+                try {
+                    const byteCharacters = atob(base64Data);
+                    let textContent = byteCharacters;
+
+                    // UTF-8 디코딩 시도
+                    try {
+                        const binaryString = String.fromCharCode.apply(null,
+                            new Uint8Array(byteCharacters.split('').map(c => c.charCodeAt(0))));
+                        textContent = decodeURIComponent(escape(binaryString));
+                    } catch (e) {
+                        // 디코딩 실패시 원본 사용
+                    }
+
+                    // 처음 500자까지만 표시
+                    const previewText = textContent.substring(0, 500);
+                    const isLonger = textContent.length > 500;
+
+                    return `
+                        <div style="padding: 10px; background: #f5f5f5; border-radius: 8px;">
+                            <pre style="margin: 0; font-size: 12px; max-height: 300px; overflow-y: auto; white-space: pre-wrap; word-wrap: break-word;">${previewText}${isLonger ? '\n\n... (더 많은 내용이 있습니다)' : ''}</pre>
+                            <div style="font-size: 12px; color: #666; margin-top: 10px;">파일명: ${fileName}</div>
+                        </div>
+                    `;
+                } catch (e) {
+                    return `
+                        <div style="padding: 20px; text-align: center; background: #f5f5f5; border-radius: 8px;">
+                            <div style="font-size: 32px; margin-bottom: 10px;">📄</div>
+                            <div style="font-size: 12px; color: #666;">파일명: ${fileName}</div>
+                        </div>
+                    `;
+                }
+            }
+
+            // 기타 파일
+            return `
+                <div style="padding: 20px; text-align: center; background: #f5f5f5; border-radius: 8px;">
+                    <div style="font-size: 32px; margin-bottom: 10px;">📎</div>
+                    <div style="font-size: 12px; color: #666;">파일명: ${fileName}</div>
+                </div>
+            `;
         }
 
         // UI 요소 가져오기
@@ -3346,66 +3386,36 @@
                     // 일반 클립보드 버튼 생성
                     const button = document.createElement('button');
                     button.className = 'item-button clipboard-button draggable';
-                    
+
                     const favoriteIcon = item.favorite ? '⭐ ' : '';
-                    const buttonText = item.title || item.text || '';
-                    const fullButtonText = favoriteIcon + buttonText.substring(0, 10 - favoriteIcon.length);
+                    const fileIcon = item.isFile ? '📎 ' : '';
+                    const displayTitle = item.title || (item.isFile ? item.fileInfo?.name : item.text) || '';
+                    let buttonText = fileIcon + displayTitle;
+
+                    // 파일인 경우 파일 크기 표시
+                    if (item.isFile && item.fileInfo) {
+                        const sizeKB = (item.fileInfo.size / 1024).toFixed(1);
+                        buttonText = `${fileIcon}${item.title} (${sizeKB}KB)`;
+                    }
+
+                    const fullButtonText = favoriteIcon + buttonText.substring(0, 12 - favoriteIcon.length);
 
                     button.style.backgroundColor = item.color || '#f8f9fa';
                     button.dataset.index = index;
                     button.dataset.type = 'clipboard';
                     button.dataset.fullText = item.text;
                     button.dataset.title = item.title || '';
+                    button.dataset.isFile = item.isFile || false;
+                    if (item.isFile && item.fileInfo) {
+                        button.dataset.fileName = item.fileInfo.name;
+                        button.dataset.fileType = item.fileInfo.type;
+                    }
                     button.draggable = true;
 
                     // 버튼 텍스트를 텍스트 노드로 추가
                     const textNode = document.createTextNode(fullButtonText);
                     button.appendChild(textNode);
 
-                    // JavaScript 기반 tooltip 이벤트
-                    let tooltipElement = null;
-
-                    button.addEventListener('mouseenter', (e) => {
-                        // 기존 tooltip 제거
-                        if (tooltipElement) tooltipElement.remove();
-
-                        // 새 tooltip 생성
-                        tooltipElement = document.createElement('div');
-                        tooltipElement.className = 'js-clipboard-tooltip';
-                        tooltipElement.textContent = item.summary || '요약없음';
-                        tooltipElement.style.cssText = `
-                            position: fixed;
-                            background: linear-gradient(135deg, #F0E68C 0%, #DDA0DD 100%);
-                            color: black;
-                            padding: 10px 14px;
-                            border-radius: 8px;
-                            font-size: 14px;
-                            font-weight: bold;
-                            z-index: 10000;
-                            pointer-events: none;
-                            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-                            max-width: 220px;
-                            word-wrap: break-word;
-                            white-space: normal;
-                        `;
-
-                        // 위치 계산 (버튼 아래에 표시)
-                        const rect = button.getBoundingClientRect();
-                        tooltipElement.style.left = (rect.left + rect.width / 2) + 'px';
-                        tooltipElement.style.top = (rect.bottom + 8) + 'px';
-                        tooltipElement.style.transform = 'translateX(-50%)';
-
-                        document.body.appendChild(tooltipElement);
-                    });
-
-                    button.addEventListener('mouseleave', () => {
-                        if (tooltipElement) {
-                            tooltipElement.remove();
-                            tooltipElement = null;
-                        }
-                    });
-
-                    // title 속성 제거 (JavaScript tooltip만 사용)
 
                     let isDragging = false;
                     button.addEventListener('mousedown', () => { isDragging = false; });
@@ -3416,29 +3426,50 @@
                     button.addEventListener('mouseup', (e) => {
                         setTimeout(() => {
                             if (!isDragging && e.button === 0) {
+                                // 모든 클립보드 항목은 상세 모달로 표시
                                 const modal = document.getElementById('view-clipboard-modal');
                                 const titleEl = document.getElementById('view-clipboard-title');
                                 const contentEl = document.getElementById('view-clipboard-content');
-                                const summaryEl = document.getElementById('view-clipboard-summary');
-                                const summarySectionEl = document.getElementById('view-clipboard-summary-section');
                                 const copyBtn = document.getElementById('view-clipboard-copy-btn');
+                                const downloadBtn = document.getElementById('view-clipboard-download-btn');
                                 const editBtn = document.getElementById('view-clipboard-edit-btn');
 
                                 titleEl.textContent = item.title || '';
-                                contentEl.innerHTML = convertUrlsToLinks(item.text);
 
-                                // 요약 표시
-                                if (item.summary && item.summary.trim()) {
-                                    summaryEl.textContent = item.summary;
-                                    summarySectionEl.style.display = 'block';
+                                // 텍스트 내용 표시
+                                const textToDisplay = item.textContent || item.text || '';
+                                if (item.isFile && item.fileInfo && !item.textContent) {
+                                    // 파일이 있고 텍스트가 없는 경우 - 공백
+                                    contentEl.innerHTML = '';
                                 } else {
-                                    summaryEl.textContent = '요약없음';
-                                    summarySectionEl.style.display = 'block';
+                                    // 텍스트가 있으면 표시
+                                    contentEl.innerHTML = convertUrlsToLinks(textToDisplay);
+                                }
+                                copyBtn.dataset.clipboardText = textToDisplay;
+
+                                // 파일이 첨부된 경우
+                                const fileInfoDiv = document.getElementById('view-clipboard-file-info');
+                                if (item.isFile && item.fileInfo) {
+                                    const fileInfo = item.fileInfo;
+                                    const sizeKB = (fileInfo.size / 1024).toFixed(1);
+
+                                    document.getElementById('view-clipboard-file-name').textContent = fileInfo.name;
+                                    document.getElementById('view-clipboard-file-size').textContent = `크기: ${sizeKB}KB`;
+                                    fileInfoDiv.style.display = 'block';
+
+                                    copyBtn.style.display = 'inline-block';
+                                    downloadBtn.style.display = 'inline-block';
+                                    downloadBtn.dataset.fileData = item.fileData;
+                                    downloadBtn.dataset.fileName = fileInfo.name;
+                                    downloadBtn.dataset.fileType = fileInfo.type;
+                                } else {
+                                    // 파일이 없는 경우
+                                    fileInfoDiv.style.display = 'none';
+                                    copyBtn.style.display = 'inline-block';
+                                    downloadBtn.style.display = 'none';
                                 }
 
-                                copyBtn.dataset.clipboardText = item.text;
                                 editBtn.dataset.clipboardIndex = index;
-
                                 modal.style.display = 'flex';
                             }
                         }, 50);
@@ -3535,10 +3566,11 @@
             const modal = document.getElementById('add-clipboard-modal');
             document.querySelector('#add-clipboard-modal h2').textContent = '클립보드 추가';
             modal.style.display = 'flex';
-            
+
             document.getElementById('add-clipboard-title').value = '';
             document.getElementById('add-clipboard-content').value = '';
-            document.getElementById('add-clipboard-summary').value = '';
+            document.getElementById('add-clipboard-file').value = '';
+            document.getElementById('file-info').textContent = '';
 
             delete modal.dataset.editMode;
             delete modal.dataset.editIndex;
@@ -3833,7 +3865,6 @@
                     document.querySelector('#add-clipboard-modal h2').textContent = '클립보드 편집';
                     document.getElementById('add-clipboard-title').value = item.title || '';
                     document.getElementById('add-clipboard-content').value = item.text;
-                    document.getElementById('add-clipboard-summary').value = item.summary || '';
                     modal.style.display = 'flex';
                     modal.dataset.editMode = 'true';
                     modal.dataset.editIndex = index;
@@ -3993,7 +4024,6 @@
                     text: copiedClipboard.text,
                     color: copiedClipboard.color,
                     favorite: copiedClipboard.favorite,
-                    summary: copiedClipboard.summary || '',
                     createdAt: new Date().toISOString()
                 };
                 allProjectsData[currentProject].clipboard.push(newClipboardItem);
@@ -4153,14 +4183,54 @@
         const addClipboardSave = document.getElementById('add-clipboard-save');
         const addClipboardCancel = document.getElementById('add-clipboard-cancel');
         const addClipboardClose = document.querySelector('.add-clipboard-close');
-        
+        const addClipboardFileInput = document.getElementById('add-clipboard-file');
+        const fileInfoDiv = document.getElementById('file-info');
+
+        // 파일 선택 이벤트 처리
+        let selectedFileData = null;
+
+        addClipboardFileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            selectedFileData = null;
+            fileInfoDiv.textContent = '';
+
+            if (file) {
+                const maxSize = 1024 * 1024; // 1MB
+
+                if (file.size > maxSize) {
+                    fileInfoDiv.textContent = '❌ 파일이 너무 큽니다. 1MB 미만의 파일을 선택해주세요.';
+                    fileInfoDiv.style.color = '#d32f2f';
+                    e.target.value = '';
+                    return;
+                }
+
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    selectedFileData = {
+                        name: file.name,
+                        type: file.type,
+                        size: file.size,
+                        data: event.target.result
+                    };
+                    fileInfoDiv.textContent = `✓ ${file.name} (${(file.size / 1024).toFixed(1)}KB)`;
+                    fileInfoDiv.style.color = '#4caf50';
+                };
+                reader.readAsArrayBuffer(file);
+            }
+        });
+
         addClipboardSave.addEventListener('click', () => {
             const title = document.getElementById('add-clipboard-title').value.trim();
             const content = document.getElementById('add-clipboard-content').value.trim();
-            const summary = document.getElementById('add-clipboard-summary').value.trim();
 
-            if (!title || !content) {
-                alert('제목과 내용을 모두 입력해주세요.');
+            // 파일 또는 텍스트 중 하나는 반드시 있어야 함
+            if (!title) {
+                alert('제목을 입력해주세요.');
+                return;
+            }
+
+            if (!selectedFileData && !content) {
+                alert('파일을 선택하거나 내용을 입력해주세요.');
                 return;
             }
 
@@ -4172,17 +4242,51 @@
             if (addClipboardModal.dataset.editMode === 'true') {
                 const index = parseInt(addClipboardModal.dataset.editIndex);
                 allProjectsData[currentProject].clipboard[index].title = title;
-                allProjectsData[currentProject].clipboard[index].text = content;
-                allProjectsData[currentProject].clipboard[index].summary = summary;
+
+                if (selectedFileData) {
+                    // 파일이 선택된 경우
+                    const binaryString = String.fromCharCode.apply(null, new Uint8Array(selectedFileData.data));
+                    const base64 = btoa(binaryString);
+                    allProjectsData[currentProject].clipboard[index].fileData = base64;
+                    allProjectsData[currentProject].clipboard[index].textContent = content; // 텍스트는 별도로 저장
+                    allProjectsData[currentProject].clipboard[index].isFile = true;
+                    allProjectsData[currentProject].clipboard[index].fileInfo = {
+                        name: selectedFileData.name,
+                        type: selectedFileData.type,
+                        size: selectedFileData.size
+                    };
+                } else if (content) {
+                    // 텍스트만 입력된 경우
+                    allProjectsData[currentProject].clipboard[index].textContent = content;
+                    allProjectsData[currentProject].clipboard[index].isFile = false;
+                    delete allProjectsData[currentProject].clipboard[index].fileData;
+                    delete allProjectsData[currentProject].clipboard[index].fileInfo;
+                }
             } else {
-                allProjectsData[currentProject].clipboard.push({
+                const clipboardItem = {
                     title: title,
-                    text: content,
-                    summary: '',
+                    textContent: content, // 텍스트 내용을 별도 필드에 저장
                     color: '#f8f9fa',
                     favorite: false
-                });
+                };
+
+                if (selectedFileData) {
+                    const binaryString = String.fromCharCode.apply(null, new Uint8Array(selectedFileData.data));
+                    const base64 = btoa(binaryString);
+                    clipboardItem.fileData = base64; // 파일은 fileData에 저장
+                    clipboardItem.isFile = true;
+                    clipboardItem.fileInfo = {
+                        name: selectedFileData.name,
+                        type: selectedFileData.type,
+                        size: selectedFileData.size
+                    };
+                } else {
+                    clipboardItem.isFile = false;
+                }
+
+                allProjectsData[currentProject].clipboard.push(clipboardItem);
             }
+
             renderProject(currentProject);
             addClipboardModal.style.display = 'none';
             saveToFirebase();
@@ -5357,6 +5461,37 @@
                     alert('복사에 실패했습니다. 수동으로 복사해 주세요.');
                 }
             });
+        });
+
+        // View Clipboard Download Button
+        const viewClipboardDownloadBtn = document.getElementById('view-clipboard-download-btn');
+        viewClipboardDownloadBtn.addEventListener('click', (e) => {
+            const base64Data = e.target.dataset.fileData;
+            const fileName = e.target.dataset.fileName;
+            const fileType = e.target.dataset.fileType;
+
+            try {
+                const byteCharacters = atob(base64Data);
+                const byteNumbers = new Array(byteCharacters.length);
+                for (let i = 0; i < byteCharacters.length; i++) {
+                    byteNumbers[i] = byteCharacters.charCodeAt(i);
+                }
+                const byteArray = new Uint8Array(byteNumbers);
+                const blob = new Blob([byteArray], { type: fileType || 'application/octet-stream' });
+
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = fileName;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(link.href);
+
+                viewClipboardModal.style.display = 'none';
+            } catch (error) {
+                console.error('파일 다운로드 실패:', error);
+                alert('파일 다운로드에 실패했습니다.');
+            }
         });
 
         viewClipboardEditBtn.addEventListener('click', (e) => {
