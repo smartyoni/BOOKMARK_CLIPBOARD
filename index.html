@@ -1763,7 +1763,7 @@
             <h2>클립보드 추가</h2>
             <div class="modal-form-group">
                 <label>타입:</label>
-                <div style="display: flex; gap: 20px; margin-top: 8px;">
+                <div style="display: flex; gap: 20px; align-items: center; margin-top: 8px;">
                     <label style="display: flex; align-items: center; font-weight: 400; margin: 0;">
                         <input type="radio" name="clipboard-type" value="normal" checked style="margin-right: 6px;">
                         일반 클립보드
@@ -1772,9 +1772,12 @@
                         <input type="radio" name="clipboard-type" value="template" style="margin-right: 6px;">
                         템플릿 (예: {변수명})
                     </label>
+                    <button id="insert-variable-btn" type="button" class="action-button secondary-button" style="padding: 6px 10px; font-size: 12px; display: none; margin-left: auto;">
+                        변수 삽입 {}
+                    </button>
                 </div>
                 <div id="template-hint" style="font-size: 12px; color: #999; margin-top: 8px; display: none;">
-                    💡 본문에 {변수명} 형식으로 변수를 배치하면 사용할 때 값을 입력받습니다.
+                    💡 본문에 {변수명} 형식으로 변수를 배치하면 사용할 때 값을 입력받습니다. 변수 삽입 버튼을 클릭해 괄호를 삽입할 수 있습니다.
                 </div>
             </div>
             <div class="modal-form-group">
@@ -4488,12 +4491,31 @@
         document.querySelectorAll('input[name="clipboard-type"]').forEach(radio => {
             radio.addEventListener('change', () => {
                 const templateHint = document.getElementById('template-hint');
+                const insertVariableBtn = document.getElementById('insert-variable-btn');
                 if (radio.value === 'template') {
                     templateHint.style.display = 'block';
+                    insertVariableBtn.style.display = 'block';
                 } else {
                     templateHint.style.display = 'none';
+                    insertVariableBtn.style.display = 'none';
                 }
             });
+        });
+
+        // 변수 삽입 버튼 이벤트
+        document.getElementById('insert-variable-btn').addEventListener('click', () => {
+            const textarea = document.getElementById('add-clipboard-content');
+            const start = textarea.selectionStart;
+            const end = textarea.selectionEnd;
+            const beforeText = textarea.value.substring(0, start);
+            const afterText = textarea.value.substring(end);
+
+            // {} 괄호 삽입 (커서가 괄호 사이에 위치하도록)
+            textarea.value = beforeText + '{}' + afterText;
+
+            // 커서를 괄호 안에 위치
+            textarea.focus();
+            textarea.setSelectionRange(start + 1, start + 1);
         });
 
         // 템플릿 사용 모달 이벤트
