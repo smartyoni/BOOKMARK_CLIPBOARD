@@ -5506,7 +5506,7 @@
             const addClipboardModal = document.getElementById('add-clipboard-modal');
             document.querySelector('#add-clipboard-modal h2').textContent = '클립보드 편집';
             document.getElementById('add-clipboard-title').value = item.title || '';
-            document.getElementById('add-clipboard-content').value = item.text;
+            document.getElementById('add-clipboard-content').value = item.textContent || item.text || '';
             
             // 편집 모드 설정
             addClipboardModal.dataset.editMode = 'true';
