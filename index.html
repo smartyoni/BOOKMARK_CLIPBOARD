@@ -3652,28 +3652,108 @@
         }
 
         // 템플릿 변수 추출 함수
+        // 변수 파싱: {이름}, {이름=기본값}, {이름:type}, {이름:type=기본값}, {선택:select=옵션1|옵션2} 지원
+        function parseVariable(varStr) {
+            // varStr 예: "이름", "이름=홍길동", "날짜:date", "날짜:date=2025-10-23", "선택:select=옵션1|옵션2"
+            let name = '';
+            let type = 'text';
+            let defaultValue = '';
+            let options = [];
+
+            // 기본값 추출 (= 기준)
+            if (varStr.includes('=')) {
+                const [beforeEqual, afterEqual] = varStr.split('=');
+                const defaultVal = afterEqual.trim();
+
+                // select 타입인 경우 옵션 파싱
+                if (beforeEqual.includes(':select')) {
+                    const namePart = beforeEqual.split(':')[0].trim();
+                    name = namePart;
+                    type = 'select';
+                    options = defaultVal.split('|').map(opt => opt.trim());
+                    // 첫 번째 옵션을 기본값으로 (또는 지정된 기본값)
+                    defaultValue = options[0];
+                } else {
+                    const [namePart, typePart] = beforeEqual.split(':');
+                    name = namePart.trim();
+                    type = typePart ? typePart.trim() : 'text';
+                    defaultValue = defaultVal;
+                }
+            } else {
+                // 타입만 있는 경우
+                if (varStr.includes(':')) {
+                    const [namePart, typePart] = varStr.split(':');
+                    name = namePart.trim();
+                    type = typePart.trim();
+
+                    // select 타입 옵션 파싱
+                    if (type.includes('=')) {
+                        const [typeOnly, opts] = type.split('=');
+                        type = typeOnly.trim();
+                        if (type === 'select') {
+                            options = opts.split('|').map(opt => opt.trim());
+                            defaultValue = options[0];
+                        }
+                    }
+                } else {
+                    name = varStr.trim();
+                    type = 'text';
+                }
+            }
+
+            return { name, type, defaultValue, options };
+        }
+
         function extractVariables(text) {
             const regex = /\{([^}]+)\}/g;
             const variables = [];
+            const variableMap = {};
             let match;
+
             while ((match = regex.exec(text)) !== null) {
-                if (!variables.includes(match[1])) {
-                    variables.push(match[1]);
+                const varStr = match[1];
+                const parsed = parseVariable(varStr);
+
+                // 중복 체크 (name 기준)
+                if (!variableMap[parsed.name]) {
+                    variables.push(parsed);
+                    variableMap[parsed.name] = true;
                 }
             }
+
             return variables;
         }
 
-        // 템플릿 변수 치환 함수
+        // 변수 히스토리 관리 함수
+        function getVariableHistory(varName) {
+            const history = localStorage.getItem(`template-history-${varName}`);
+            return history ? JSON.parse(history) : [];
+        }
+
+        function saveVariableHistory(varName, value) {
+            if (!value) return;
+
+            let history = getVariableHistory(varName);
+            // 중복 제거하고 앞에 추가
+            history = history.filter(h => h !== value);
+            history.unshift(value);
+            // 최근 10개만 저장
+            history = history.slice(0, 10);
+
+            localStorage.setItem(`template-history-${varName}`, JSON.stringify(history));
+        }
+
+        // 템플릿 변수 치환 함수 (개선)
         function replaceVariables(template, values) {
             let result = template;
             for (const [key, value] of Object.entries(values)) {
-                result = result.replace(new RegExp(`\\{${key}\\}`, 'g'), value);
+                // 다양한 형식의 변수 치환: {key}, {key=...}, {key:type}, {key:type=...}
+                result = result.replace(new RegExp(`\\{${key}[^}]*\\}`, 'g'), value);
             }
             return result;
         }
 
-        // 템플릿 사용 모달 열기
+        // 템플릿 사용 모달 열기 (타입별 입력 필드 지원)
         function openTemplateUseModal(item) {
             const modal = document.getElementById('template-use-modal');
             const variables = extractVariables(item.textContent || item.text || '');
@@ -3685,23 +3765,99 @@
             formDiv.innerHTML = '';
 
             const variableValues = {};
+            const inputElements = {};
 
-            variables.forEach(varName => {
+            variables.forEach(varData => {
+                const varName = varData.name;
+                const varType = varData.type;
+                const defaultValue = varData.defaultValue;
+                const options = varData.options;
+
                 const formGroup = document.createElement('div');
                 formGroup.className = 'modal-form-group';
-                formGroup.innerHTML = `
-                    <label for="template-var-${varName}">${varName}:</label>
-                    <input type="text" id="template-var-${varName}" class="template-input">
-                `;
+
+                const label = document.createElement('label');
+                label.htmlFor = `template-var-${varName}`;
+                label.textContent = `${varName}:`;
+                formGroup.appendChild(label);
+
+                let inputElement;
+                const history = getVariableHistory(varName);
+
+                // 변수 타입에 따른 입력 필드 생성
+                if (varType === 'date') {
+                    inputElement = document.createElement('input');
+                    inputElement.type = 'date';
+                    inputElement.id = `template-var-${varName}`;
+                    inputElement.className = 'template-input';
+                    inputElement.value = defaultValue || new Date().toISOString().split('T')[0];
+                } else if (varType === 'time') {
+                    inputElement = document.createElement('input');
+                    inputElement.type = 'time';
+                    inputElement.id = `template-var-${varName}`;
+                    inputElement.className = 'template-input';
+                    inputElement.value = defaultValue || '00:00';
+                } else if (varType === 'select' && options.length > 0) {
+                    inputElement = document.createElement('select');
+                    inputElement.id = `template-var-${varName}`;
+                    inputElement.className = 'template-input';
+
+                    options.forEach(opt => {
+                        const optionEl = document.createElement('option');
+                        optionEl.value = opt;
+                        optionEl.textContent = opt;
+                        optionEl.selected = (opt === defaultValue);
+                        inputElement.appendChild(optionEl);
+                    });
+                } else {
+                    // 기본 text 타입
+                    inputElement = document.createElement('input');
+                    inputElement.type = 'text';
+                    inputElement.id = `template-var-${varName}`;
+                    inputElement.className = 'template-input';
+                    inputElement.value = defaultValue || '';
+                    inputElement.placeholder = history.length > 0 ? `최근: ${history[0]}` : '';
+
+                    // 히스토리 드롭다운 추가
+                    if (history.length > 0) {
+                        const historyDiv = document.createElement('div');
+                        historyDiv.style.cssText = 'font-size: 11px; color: #999; margin-top: 4px; max-height: 100px; overflow-y: auto;';
+                        historyDiv.innerHTML = '<strong>최근 입력:</strong><br>' +
+                            history.map((h, i) => `<span style="display: inline-block; background: #f0f0f0; padding: 2px 6px; margin: 2px 2px 2px 0; border-radius: 3px; cursor: pointer;" data-history-index="${i}" class="history-item">${h}</span>`).join('');
+
+                        formGroup.appendChild(inputElement);
+                        formGroup.appendChild(historyDiv);
+
+                        // 히스토리 아이템 클릭 이벤트
+                        historyDiv.querySelectorAll('.history-item').forEach(item => {
+                            item.addEventListener('click', () => {
+                                const idx = parseInt(item.dataset.historyIndex);
+                                inputElement.value = history[idx];
+                                updatePreview();
+                            });
+                        });
+
+                        inputElements[varName] = inputElement;
+                        formDiv.appendChild(formGroup);
+                        variableValues[varName] = defaultValue || '';
+                        return;
+                    }
+                }
+
+                formGroup.appendChild(inputElement);
                 formDiv.appendChild(formGroup);
-                variableValues[varName] = '';
+                inputElements[varName] = inputElement;
+                variableValues[varName] = inputElement.value;
             });
 
             // 미리보기 업데이트 함수
             const updatePreview = () => {
-                variables.forEach(varName => {
-                    const input = document.getElementById(`template-var-${varName}`);
-                    variableValues[varName] = input.value;
+                variables.forEach(varData => {
+                    const varName = varData.name;
+                    const input = inputElements[varName];
+                    if (input) {
+                        variableValues[varName] = input.value;
+                    }
                 });
 
                 const preview = replaceVariables(item.textContent || item.text || '', variableValues);
@@ -3709,9 +3865,9 @@
             };
 
             // 입력 필드에 이벤트 리스너 추가
-            variables.forEach(varName => {
-                const input = document.getElementById(`template-var-${varName}`);
+            Object.values(inputElements).forEach(input => {
                 input.addEventListener('input', updatePreview);
+                input.addEventListener('change', updatePreview);
             });
 
             // 초기 미리보기 표시
@@ -3719,6 +3875,15 @@
 
             // 완료 버튼 클릭 시
             document.getElementById('template-generate-btn').onclick = () => {
+                // 변수값을 히스토리에 저장
+                variables.forEach(varData => {
+                    const varName = varData.name;
+                    const value = variableValues[varName];
+                    if (varData.type === 'text' && value) {
+                        saveVariableHistory(varName, value);
+                    }
+                });
+
                 const result = replaceVariables(item.textContent || item.text || '', variableValues);
                 showTemplateResultModal(result);
                 modal.style.display = 'none';
