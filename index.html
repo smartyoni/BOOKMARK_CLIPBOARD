@@ -763,6 +763,182 @@
             border-color: #000000;
             transform: scale(1.05);
         }
+
+        /* 플로팅 계산기 스타일 */
+        .floating-calculator {
+            position: fixed;
+            width: 320px;
+            background-color: #ffffff;
+            border: 2px solid #37352f;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+            z-index: 3000;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            cursor: move;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .calculator-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 16px;
+            background: linear-gradient(135deg, #37352f 0%, #555 100%);
+            color: white;
+            border-radius: 10px 10px 0 0;
+            cursor: grab;
+            user-select: none;
+        }
+
+        .calculator-header:active {
+            cursor: grabbing;
+        }
+
+        .calculator-title {
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .calculator-close-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            padding: 0;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .calculator-close-btn:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+        }
+
+        .calculator-display {
+            padding: 12px;
+            background-color: #f5f5f5;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .calculator-input {
+            width: 100%;
+            padding: 12px;
+            font-size: 24px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            text-align: right;
+            background-color: #ffffff;
+            color: #37352f;
+            font-weight: 500;
+            box-sizing: border-box;
+        }
+
+        .calculator-buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 4px;
+            padding: 12px;
+            background-color: #fafafa;
+        }
+
+        .calc-btn {
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            background-color: #ffffff;
+            color: #37352f;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.1s ease;
+        }
+
+        .calc-btn:hover {
+            background-color: #f0f0f0;
+            border-color: #999;
+        }
+
+        .calc-btn:active {
+            background-color: #e0e0e0;
+            transform: scale(0.98);
+        }
+
+        .calc-btn.quick-btn {
+            background-color: #FFE4B5;
+            border-color: #D2691E;
+            font-weight: 600;
+            color: #8B4513;
+        }
+
+        .calc-btn.quick-btn:hover {
+            background-color: #FFD699;
+        }
+
+        .calculator-history {
+            padding: 12px;
+            border-top: 1px solid #ddd;
+            background-color: #fafafa;
+            max-height: 120px;
+            overflow-y: auto;
+        }
+
+        .history-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: #666;
+            margin-bottom: 6px;
+        }
+
+        .history-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .history-item {
+            padding: 6px 8px;
+            background-color: #ffffff;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            margin-bottom: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            color: #37352f;
+            transition: all 0.1s ease;
+        }
+
+        .history-item:hover {
+            background-color: #e8f4f8;
+            border-color: #2ea2dc;
+        }
+
+        .calculator-actions {
+            display: flex;
+            gap: 8px;
+            padding: 12px;
+            border-top: 1px solid #ddd;
+            background-color: #fafafa;
+        }
+
+        /* 모바일 반응형 */
+        @media (max-width: 768px) {
+            .floating-calculator {
+                width: calc(100vw - 40px);
+                max-width: 300px;
+            }
+
+            .calculator-buttons {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+
         .icon-button {
             background: none;
             border: none;
@@ -1679,7 +1855,7 @@
                 <!-- 하단: 클립보드와 연습장 (50% + 50%) -->
                 <div class="content-panels">
                     <div class="content-panel clipboard-panel">
-                        <h4 class="clipboard-header">클립보드 <button id="add-clipboard-btn" class="add-section-btn">+</button> <button id="add-divider-btn" class="add-section-btn">|</button></h4>
+                        <h4 class="clipboard-header">클립보드 <button id="calculator-btn" class="add-section-btn" title="계산기">🧮</button> <button id="add-clipboard-btn" class="add-section-btn">+</button> <button id="add-divider-btn" class="add-section-btn">|</button></h4>
                         <ul id="clipboard-list" class="item-list"></ul>
                     </div>
 
@@ -1879,6 +2055,49 @@
                 <button id="template-save-btn" class="action-button" style="background-color: #27ae60;">새 클립보드로 저장</button>
                 <button id="template-result-cancel" class="action-button secondary-button">닫기</button>
             </div>
+        </div>
+    </div>
+
+    <!-- Floating Calculator -->
+    <div id="floating-calculator" class="floating-calculator" style="display: none;">
+        <div class="calculator-header">
+            <span class="calculator-title">계산기</span>
+            <button class="calculator-close-btn">✕</button>
+        </div>
+        <div class="calculator-display">
+            <input type="text" id="calculator-input" class="calculator-input" value="0" readonly>
+        </div>
+        <div class="calculator-buttons">
+            <button class="calc-btn quick-btn" data-value="126">126%</button>
+            <button class="calc-btn quick-btn" data-value="90">90%</button>
+            <button class="calc-btn" data-action="clear">C</button>
+            <button class="calc-btn" data-action="delete">CE</button>
+            <button class="calc-btn" data-action="backspace">←</button>
+            <button class="calc-btn" data-operator="/">÷</button>
+            <button class="calc-btn" data-value="7">7</button>
+            <button class="calc-btn" data-value="8">8</button>
+            <button class="calc-btn" data-value="9">9</button>
+            <button class="calc-btn" data-operator="*">×</button>
+            <button class="calc-btn" data-value="4">4</button>
+            <button class="calc-btn" data-value="5">5</button>
+            <button class="calc-btn" data-value="6">6</button>
+            <button class="calc-btn" data-operator="-">−</button>
+            <button class="calc-btn" data-value="1">1</button>
+            <button class="calc-btn" data-value="2">2</button>
+            <button class="calc-btn" data-value="3">3</button>
+            <button class="calc-btn" data-operator="+">+</button>
+            <button class="calc-btn" data-value="0" style="grid-column: 1 / 3;">0</button>
+            <button class="calc-btn" data-value=".">.</button>
+            <button class="calc-btn" data-operator="%">%</button>
+            <button class="calc-btn" data-action="equals" style="background-color: #2ea2dc; color: white;">=</button>
+        </div>
+        <div class="calculator-history">
+            <div class="history-title">계산 이력:</div>
+            <ul id="calculator-history-list" class="history-list"></ul>
+        </div>
+        <div class="calculator-actions">
+            <button id="calculator-copy-btn" class="action-button secondary-button" style="flex: 1;">복사</button>
+            <button id="calculator-save-btn" class="action-button" style="flex: 1; background-color: #27ae60;">저장</button>
         </div>
     </div>
 
@@ -5964,6 +6183,238 @@
 
             addClipboardModal.style.display = 'flex';
         });
+
+        // 플로팅 계산기 기능
+        class Calculator {
+            constructor() {
+                this.display = document.getElementById('calculator-input');
+                this.currentValue = '0';
+                this.previousValue = '';
+                this.operation = null;
+                this.history = this.loadHistory();
+                this.init();
+            }
+
+            init() {
+                document.getElementById('calculator-btn').addEventListener('click', () => this.toggle());
+                document.querySelector('.calculator-close-btn').addEventListener('click', () => this.toggle());
+
+                // 버튼 이벤트
+                document.querySelectorAll('.calc-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => this.handleButtonClick(e.target));
+                });
+
+                // 드래그 기능
+                this.setupDragable();
+
+                // 클립보드 연동
+                document.getElementById('calculator-copy-btn').addEventListener('click', () => this.copy());
+                document.getElementById('calculator-save-btn').addEventListener('click', () => this.save());
+
+                // 키보드 입력
+                document.addEventListener('keydown', (e) => this.handleKeyboard(e));
+
+                this.updateHistory();
+            }
+
+            handleButtonClick(btn) {
+                const value = btn.dataset.value;
+                const action = btn.dataset.action;
+                const operator = btn.dataset.operator;
+
+                if (value !== undefined) {
+                    this.inputNumber(value);
+                } else if (operator) {
+                    this.setOperation(operator);
+                } else if (action === 'clear') {
+                    this.clear();
+                } else if (action === 'delete') {
+                    this.deleteEntry();
+                } else if (action === 'backspace') {
+                    this.backspace();
+                } else if (action === 'equals') {
+                    this.equals();
+                }
+            }
+
+            inputNumber(num) {
+                if (this.currentValue === '0' && num !== '.') {
+                    this.currentValue = num;
+                } else if (!(num === '.' && this.currentValue.includes('.'))) {
+                    this.currentValue += num;
+                }
+                this.updateDisplay();
+            }
+
+            setOperation(op) {
+                if (this.currentValue === '') return;
+
+                if (this.previousValue !== '' && this.operation) {
+                    this.equals();
+                }
+
+                this.previousValue = this.currentValue;
+                this.operation = op;
+                this.currentValue = '';
+            }
+
+            equals() {
+                if (this.operation === null || this.previousValue === '') return;
+
+                const prev = parseFloat(this.previousValue);
+                const curr = parseFloat(this.currentValue);
+                let result;
+
+                switch (this.operation) {
+                    case '+': result = prev + curr; break;
+                    case '-': result = prev - curr; break;
+                    case '*': result = prev * curr; break;
+                    case '/': result = prev / curr; break;
+                    case '%': result = prev % curr; break;
+                    default: return;
+                }
+
+                const expression = `${prev} ${this.operation} ${curr}`;
+                this.addToHistory(expression, result);
+                this.currentValue = result.toString();
+                this.previousValue = '';
+                this.operation = null;
+                this.updateDisplay();
+            }
+
+            clear() {
+                this.currentValue = '0';
+                this.previousValue = '';
+                this.operation = null;
+                this.updateDisplay();
+            }
+
+            deleteEntry() {
+                this.currentValue = '0';
+                this.updateDisplay();
+            }
+
+            backspace() {
+                if (this.currentValue.length > 1) {
+                    this.currentValue = this.currentValue.slice(0, -1);
+                } else {
+                    this.currentValue = '0';
+                }
+                this.updateDisplay();
+            }
+
+            updateDisplay() {
+                this.display.value = this.currentValue;
+            }
+
+            loadHistory() {
+                const saved = localStorage.getItem('calculator-history');
+                return saved ? JSON.parse(saved) : [];
+            }
+
+            saveHistory() {
+                const toSave = this.history.slice(0, 5);
+                localStorage.setItem('calculator-history', JSON.stringify(toSave));
+            }
+
+            addToHistory(expression, result) {
+                this.history.unshift({ expression, result });
+                this.saveHistory();
+                this.updateHistory();
+            }
+
+            updateHistory() {
+                const list = document.getElementById('calculator-history-list');
+                list.innerHTML = this.history.slice(0, 5).map((item, i) =>
+                    `<li class="history-item" data-index="${i}">${item.expression} = ${item.result}</li>`
+                ).join('');
+
+                list.querySelectorAll('.history-item').forEach(item => {
+                    item.addEventListener('click', (e) => {
+                        const idx = parseInt(e.target.dataset.index);
+                        this.currentValue = this.history[idx].result.toString();
+                        this.updateDisplay();
+                    });
+                });
+            }
+
+            toggle() {
+                const calc = document.getElementById('floating-calculator');
+                calc.style.display = calc.style.display === 'none' ? 'flex' : 'none';
+            }
+
+            setupDragable() {
+                const calc = document.getElementById('floating-calculator');
+                const header = document.querySelector('.calculator-header');
+                let isDragging = false;
+                let offsetX = 0;
+                let offsetY = 0;
+
+                header.addEventListener('mousedown', (e) => {
+                    isDragging = true;
+                    const rect = calc.getBoundingClientRect();
+                    offsetX = e.clientX - rect.left;
+                    offsetY = e.clientY - rect.top;
+                });
+
+                document.addEventListener('mousemove', (e) => {
+                    if (!isDragging) return;
+                    calc.style.top = (e.clientY - offsetY) + 'px';
+                    calc.style.left = (e.clientX - offsetX) + 'px';
+                    calc.style.transform = 'none';
+                });
+
+                document.addEventListener('mouseup', () => {
+                    isDragging = false;
+                });
+            }
+
+            copy() {
+                navigator.clipboard.writeText(this.currentValue).then(() => {
+                    alert('복사되었습니다!');
+                });
+            }
+
+            save() {
+                if (!currentProject) {
+                    alert('프로젝트를 먼저 선택해주세요.');
+                    return;
+                }
+
+                const clipboardItem = {
+                    title: `계산: ${this.currentValue}`,
+                    textContent: this.currentValue,
+                    color: '#f8f9fa',
+                    favorite: false,
+                    type: 'normal',
+                    isFile: false
+                };
+
+                allProjectsData[currentProject].clipboard.push(clipboardItem);
+                renderProject(currentProject);
+                saveToFirebase();
+                alert('클립보드에 저장되었습니다!');
+                this.toggle();
+            }
+
+            handleKeyboard(e) {
+                if (document.getElementById('floating-calculator').style.display === 'none') return;
+
+                if (e.key >= '0' && e.key <= '9' || e.key === '.') {
+                    this.inputNumber(e.key);
+                } else if (['+', '-', '*', '/'].includes(e.key)) {
+                    this.setOperation(e.key === '*' ? '*' : e.key === '/' ? '/' : e.key);
+                } else if (e.key === 'Enter') {
+                    e.preventDefault();
+                    this.equals();
+                } else if (e.key === 'Backspace') {
+                    e.preventDefault();
+                    this.backspace();
+                }
+            }
+        }
+
+        const calculator = new Calculator();
 
         // 모바일 탭 네비게이션 처리
         function initMobileTabs() {
