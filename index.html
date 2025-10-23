@@ -1421,9 +1421,9 @@
                 display: block;
             }
 
-            /* 모바일에서 하단 content-panels - 기본 숨김 */
+            /* 모바일에서 하단 content-panels - 항상 표시 */
             .content-panels {
-                display: none;
+                display: flex;
                 flex-direction: column;
                 gap: 0;
                 width: 100%;
@@ -1447,7 +1447,14 @@
             }
 
             .content-panel.clipboard-panel.mobile-visible {
-                display: block;
+                display: flex !important;
+                flex-direction: column;
+                height: calc(100% - 12px);
+                padding: 12px 8px;
+                width: 100%;
+                box-sizing: border-box;
+                overflow-y: auto;
+                margin: 0;
             }
 
             .content-panel.practice-panel {
@@ -1455,7 +1462,14 @@
             }
 
             .content-panel.practice-panel.mobile-visible {
-                display: block;
+                display: flex !important;
+                flex-direction: column;
+                height: calc(100% - 12px);
+                padding: 12px 8px;
+                width: 100%;
+                box-sizing: border-box;
+                overflow-y: auto;
+                margin: 0;
             }
 
             .dashboard-area {
@@ -1630,7 +1644,6 @@
     <!-- 모바일 탭 네비게이션 -->
     <div class="mobile-tabs">
         <button class="mobile-tab active" data-tab="projects">📁 프로젝트</button>
-        <button class="mobile-tab" data-tab="bookmarks">📌 북마크</button>
         <button class="mobile-tab" data-tab="clipboard">📋 클립보드</button>
         <button class="mobile-tab" data-tab="practice">📝 연습장</button>
     </div>
@@ -5394,9 +5407,6 @@
                     switch(tabType) {
                         case 'projects':
                             projectSidebar.classList.add('mobile-visible');
-                            break;
-                        case 'bookmarks':
-                            bookmarkPanel.classList.add('mobile-visible');
                             break;
                         case 'clipboard':
                             clipboardPanel.classList.add('mobile-visible');
