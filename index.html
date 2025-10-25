@@ -2168,16 +2168,16 @@
                     </div>
                 </div>
             </div>
-            <div style="padding: 15px 40px; border-top: 1px solid #e0e0e0; background-color: #fafafa; flex-shrink: 0;">
-                <div class="modal-form-group">
-                    <label for="add-clipboard-file">파일 (1MB 미만):</label>
-                    <input type="file" id="add-clipboard-file">
-                    <div id="file-info" style="font-size: 12px; color: #666; margin-top: 5px;"></div>
+            <div class="modal-actions" style="padding: 15px 40px; border-top: 1px solid #e0e0e0; background-color: #fafafa; flex-shrink: 0; display: flex; justify-content: space-between; align-items: center;">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <label for="add-clipboard-file" style="font-size: 12px; color: #666; cursor: pointer;">📎 파일 첨부</label>
+                    <input type="file" id="add-clipboard-file" style="display: none;">
+                    <div id="file-info" style="font-size: 12px; color: #666;"></div>
                 </div>
-            </div>
-            <div class="modal-actions" style="padding: 15px 40px; border-top: 1px solid #e0e0e0; background-color: #fafafa; flex-shrink: 0; text-align: right;">
-                <button id="add-clipboard-save" class="action-button">저장</button>
-                <button id="add-clipboard-cancel" class="action-button secondary-button">취소</button>
+                <div style="display: flex; gap: 8px;">
+                    <button id="add-clipboard-save" class="action-button">저장</button>
+                    <button id="add-clipboard-cancel" class="action-button secondary-button">취소</button>
+                </div>
             </div>
         </div>
     </div>
@@ -2240,28 +2240,41 @@
         </ul>
     </div>
 
+    <!-- View Checklist Item Context Menu -->
+    <div id="view-checklist-item-context-menu" class="context-menu">
+        <ul>
+            <li id="view-checklist-item-context-edit">수정</li>
+            <li id="view-checklist-item-context-delete">삭제</li>
+            <li id="view-checklist-item-context-cancel">취소</li>
+        </ul>
+    </div>
+
     <!-- Checklist Detail Modal -->
-    <div id="checklist-detail-modal" class="modal">
-        <div class="modal-content" style="display: flex; flex-direction: column; max-width: 800px; height: 90vh; max-height: 90vh; padding: 0; position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);">
+    <div id="checklist-detail-modal" class="modal" style="z-index: 10000;">
+        <div class="modal-content" style="display: flex; flex-direction: column; max-width: 800px; height: 90vh; max-height: 90vh; padding: 0; position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); z-index: 10000;">
             <!-- Header (Draggable) -->
-            <div class="draggable-header" style="display: flex; justify-content: space-between; align-items: center; padding: 14.4px 19.2px; background: linear-gradient(135deg, #d8c5e8 0%, #e5d9f0 100%); border-radius: 8px 8px 0 0; flex-shrink: 0; box-shadow: 0 2px 4px rgba(0,0,0,0.05); cursor: grab; user-select: none;">
+            <div class="draggable-header" style="display: flex; justify-content: space-between; align-items: center; padding: 14.4px 19.2px; background: linear-gradient(135deg, #d8c5e8 0%, #e5d9f0 100%); border-radius: 8px 8px 0 0; flex-shrink: 0; box-shadow: 0 2px 4px rgba(0,0,0,0.05); cursor: grab; user-select: none; z-index: 10000;">
                 <h2 id="checklist-detail-title" style="margin: 0; color: #5a4a7a; font-size: 24px; font-weight: 700; letter-spacing: 0.3px;"></h2>
                 <span class="close-button checklist-detail-close" style="color: #7a6a9a; font-size: 16.8px; position: relative; top: 0; right: 0; margin: 0; cursor: pointer; opacity: 0.7; transition: opacity 0.2s;">&times;</span>
             </div>
 
             <!-- Content Area -->
             <div style="flex: 1; padding: 30px; overflow: hidden; display: flex; flex-direction: column;">
-                <!-- Toolbar -->
-                <div style="margin-bottom: 12px; display: flex; gap: 8px;">
-                    <button id="hyperlink-convert-btn" style="background-color: #5a4a7a; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-weight: 500; font-size: 12px; transition: all 0.2s;">🔗 하이퍼링크 변환</button>
-                </div>
                 <textarea id="checklist-detail-content" style="flex: 1; width: 100%; padding: 15px; border: 2px solid #000000; border-radius: 4px; font-size: 14px; font-family: inherit; resize: none; box-sizing: border-box;"></textarea>
             </div>
 
-            <!-- Footer -->
-            <div style="padding: 12px 19.2px; background: linear-gradient(135deg, #e8e8e8 0%, #f0f0f0 100%); border-top: 1px solid rgba(0,0,0,0.1); flex-shrink: 0; text-align: right; box-shadow: 0 -2px 4px rgba(0,0,0,0.05);">
+            <!-- Footer - Edit Mode -->
+            <div id="checklist-detail-footer-edit" style="padding: 12px 19.2px; background: linear-gradient(135deg, #e8e8e8 0%, #f0f0f0 100%); border-top: 1px solid rgba(0,0,0,0.1); flex-shrink: 0; text-align: right; box-shadow: 0 -2px 4px rgba(0,0,0,0.05);">
                 <button id="checklist-detail-save" class="action-button" style="background-color: #5a4a7a; color: white; border: none; padding: 9.9px 21.6px; border-radius: 6px; cursor: pointer; font-weight: 500; font-size: 12.6px; margin-left: 6px; transition: all 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">저장</button>
                 <button id="checklist-detail-cancel" class="action-button secondary-button" style="background-color: #d0d0d0; color: #666; border: none; padding: 9.9px 21.6px; border-radius: 6px; cursor: pointer; font-weight: 500; font-size: 12.6px; margin-left: 6px; transition: all 0.2s;">취소</button>
+            </div>
+
+            <!-- Footer - View Mode -->
+            <div id="checklist-detail-footer-view" style="padding: 12px 19.2px; background: linear-gradient(135deg, #e8e8e8 0%, #f0f0f0 100%); border-top: 1px solid rgba(0,0,0,0.1); flex-shrink: 0; display: none; text-align: right; box-shadow: 0 -2px 4px rgba(0,0,0,0.05);">
+                <button id="checklist-detail-copy" class="action-button" style="background-color: #2d7c3e; color: white; border: none; padding: 9.9px 21.6px; border-radius: 6px; cursor: pointer; font-weight: 500; font-size: 12.6px; margin-left: 6px; transition: all 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">📋 복사</button>
+                <button id="checklist-detail-edit" class="action-button" style="background-color: #5a4a7a; color: white; border: none; padding: 9.9px 21.6px; border-radius: 6px; cursor: pointer; font-weight: 500; font-size: 12.6px; margin-left: 6px; transition: all 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">✏️ 수정</button>
+                <button id="checklist-detail-delete" class="action-button" style="background-color: #dc2626; color: white; border: none; padding: 9.9px 21.6px; border-radius: 6px; cursor: pointer; font-weight: 500; font-size: 12.6px; margin-left: 6px; transition: all 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">🗑️ 삭제</button>
+                <button id="checklist-detail-close-view" class="action-button secondary-button" style="background-color: #d0d0d0; color: #666; border: none; padding: 9.9px 21.6px; border-radius: 6px; cursor: pointer; font-weight: 500; font-size: 12.6px; margin-left: 6px; transition: all 0.2s;">닫기</button>
             </div>
         </div>
     </div>
@@ -4252,6 +4265,7 @@
 
         // 체크리스트 상세내용 모달 열기
         let currentDetailItemIndex = null;
+        let currentDetailClipboardIndex = null;
 
         function openChecklistDetailModal(itemIndex) {
             const item = checklistItems[itemIndex];
@@ -4262,8 +4276,67 @@
             titleEl.textContent = `"${item.text}" 상세내용`;
             contentEl.value = item.detail || '';
             currentDetailItemIndex = itemIndex;
+            currentDetailClipboardIndex = null; // 추가 중인 항목임을 표시
 
+            // 에디트 모드로 열기
+            setChecklistDetailModalMode(true);
             modal.style.display = 'flex';
+        }
+
+        // 저장된 체크리스트의 상세내용 모달 열기
+        let currentEditingChecklistItem = null;
+
+        // 모달 모드 전환 함수
+        function setChecklistDetailModalMode(isEditMode) {
+            const contentEl = document.getElementById('checklist-detail-content');
+            const footerEdit = document.getElementById('checklist-detail-footer-edit');
+            const footerView = document.getElementById('checklist-detail-footer-view');
+
+            if (isEditMode) {
+                contentEl.readOnly = false;
+                contentEl.style.backgroundColor = 'white';
+                footerEdit.style.display = 'block';
+                footerView.style.display = 'none';
+            } else {
+                contentEl.readOnly = true;
+                contentEl.style.backgroundColor = '#f9f9f9';
+                contentEl.style.color = '#333';
+                footerEdit.style.display = 'none';
+                footerView.style.display = 'block';
+            }
+        }
+
+        function openSavedChecklistDetailModal(clipboardIndex, itemIndex) {
+            const modal = document.getElementById('checklist-detail-modal');
+            const titleEl = document.getElementById('checklist-detail-title');
+            const contentEl = document.getElementById('checklist-detail-content');
+
+            // 현재 보여지는 view-checklist-container의 항목에서 데이터 가져오기
+            const viewChecklistItems = document.getElementById('view-checklist-items');
+            const items = viewChecklistItems.querySelectorAll('li');
+
+            if (items[itemIndex]) {
+                const liElement = items[itemIndex];
+                const textLabel = liElement.querySelector('label');
+                const itemText = textLabel ? textLabel.textContent : '';
+
+                // 현재 수정 중인 항목 정보 저장
+                currentEditingChecklistItem = {
+                    text: itemText,
+                    itemIndex: itemIndex,
+                    clipboardIndex: clipboardIndex,
+                    liElement: liElement
+                };
+                currentDetailItemIndex = itemIndex;
+                currentDetailClipboardIndex = clipboardIndex;
+
+                titleEl.textContent = `"${itemText}" 상세내용`;
+                contentEl.value = liElement.dataset.detail || '';
+
+                // 뷰 모드로 열기
+                setChecklistDetailModalMode(false);
+                modal.style.display = 'flex';
+            }
         }
 
         // 템플릿 사용 모달 열기 (타입별 입력 필드 지원)
@@ -4284,13 +4357,19 @@
             if (item.items && item.items.length > 0) {
                 item.items.forEach((checkItem, itemIndex) => {
                     const li = document.createElement('li');
-                    li.style.cssText = 'padding: 12px; margin-bottom: 8px; background-color: white; border-radius: 3px; display: flex; align-items: center; border: 1px solid #ddd; gap: 12px;';
+                    li.style.cssText = 'padding: 12px; margin-bottom: 8px; background-color: white; border-radius: 3px; display: flex; align-items: center; border: 1px solid #ddd; gap: 12px; position: relative;';
+                    li.dataset.itemIndex = itemIndex;
+                    li.dataset.detail = checkItem.detail || ''; // 상세내용 저장
 
                     const checkbox = document.createElement('input');
                     checkbox.type = 'checkbox';
                     checkbox.checked = checkItem.checked || false;
                     checkbox.style.cssText = 'width: 18px; height: 18px; cursor: pointer; flex-shrink: 0;';
                     checkbox.dataset.itemIndex = itemIndex;
+
+                    // 텍스트와 버튼을 감싸는 컨테이너
+                    const textContainer = document.createElement('div');
+                    textContainer.style.cssText = 'flex: 1; display: flex; align-items: center; gap: 8px; cursor: pointer;';
 
                     const label = document.createElement('label');
                     label.textContent = checkItem.text;
@@ -4303,8 +4382,45 @@
                         saveToFirebase();
                     });
 
+                    // 텍스트 영역 클릭 시 상세내용 모달 열기
+                    textContainer.addEventListener('click', (e) => {
+                        // 버튼이 아닌 경우에만 모달 열기
+                        if (!e.target.closest('button')) {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            openSavedChecklistDetailModal(index, itemIndex);
+                        }
+                    });
+
+                    // 문서 이모지 버튼
+                    const docBtn = document.createElement('button');
+                    docBtn.textContent = '📄';
+                    docBtn.style.cssText = 'background: none; border: none; font-size: 16px; cursor: pointer; padding: 0; flex-shrink: 0;';
+                    docBtn.dataset.itemIndex = itemIndex;
+                    docBtn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        openSavedChecklistDetailModal(index, itemIndex);
+                    });
+
+                    textContainer.appendChild(label);
+                    textContainer.appendChild(docBtn);
+
                     li.appendChild(checkbox);
-                    li.appendChild(label);
+                    li.appendChild(textContainer);
+
+                    // 우클릭 컨텍스트 메뉴
+                    li.addEventListener('contextmenu', (e) => {
+                        e.preventDefault();
+                        const menu = document.getElementById('view-checklist-item-context-menu');
+                        if (!menu) return;
+
+                        menu.style.display = 'block';
+                        menu.style.left = e.clientX + 'px';
+                        menu.style.top = e.clientY + 'px';
+                        menu.dataset.clipboardIndex = index;
+                        menu.dataset.itemIndex = itemIndex;
+                    });
+
                     viewChecklistItems.appendChild(li);
                 });
             } else {
@@ -5418,53 +5534,124 @@
         checklistDetailSave.addEventListener('click', () => {
             if (currentDetailItemIndex !== null) {
                 const content = document.getElementById('checklist-detail-content').value.trim();
-                checklistItems[currentDetailItemIndex].detail = content;
+
+                // 저장된 클립보드의 체크리스트인지 확인
+                if (currentEditingChecklistItem && currentEditingChecklistItem.liElement) {
+                    // li 요소의 dataset에 상세내용 업데이트
+                    currentEditingChecklistItem.liElement.dataset.detail = content;
+                    saveToFirebase();
+                } else {
+                    // 추가 중인 체크리스트
+                    checklistItems[currentDetailItemIndex].detail = content;
+                }
+
+                currentDetailItemIndex = null;
+                currentDetailClipboardIndex = null;
+                currentEditingChecklistItem = null;
                 checklistDetailModal.style.display = 'none';
             }
         });
 
         checklistDetailCancel.addEventListener('click', () => {
+            currentDetailItemIndex = null;
+            currentDetailClipboardIndex = null;
             checklistDetailModal.style.display = 'none';
         });
 
         checklistDetailClose.addEventListener('click', () => {
+            currentDetailItemIndex = null;
+            currentDetailClipboardIndex = null;
             checklistDetailModal.style.display = 'none';
         });
 
-        // 하이퍼링크 변환 기능
-        const hyperlinkConvertBtn = document.getElementById('hyperlink-convert-btn');
-        hyperlinkConvertBtn.addEventListener('click', () => {
-            const textarea = document.getElementById('checklist-detail-content');
-            const text = textarea.value;
+        // 뷰 모드 버튼 이벤트 핸들러
+        const checklistDetailCopyBtn = document.getElementById('checklist-detail-copy');
+        const checklistDetailEditBtn = document.getElementById('checklist-detail-edit');
+        const checklistDetailDeleteBtn = document.getElementById('checklist-detail-delete');
+        const checklistDetailCloseViewBtn = document.getElementById('checklist-detail-close-view');
 
-            // URL 패턴 정규식 (http://, https://, www. 포함)
-            const urlRegex = /(?:https?:\/\/|www\.)[^\s]+|(?<![/:@])[a-zA-Z0-9][a-zA-Z0-9-]*\.[a-zA-Z]{2,}(?:\/[^\s]*)?/g;
+        checklistDetailCopyBtn.addEventListener('click', () => {
+            const contentEl = document.getElementById('checklist-detail-content');
+            const text = contentEl.value;
+            if (text) {
+                navigator.clipboard.writeText(text).then(() => {
+                    alert('복사되었습니다!');
+                }).catch(() => {
+                    alert('복사에 실패했습니다.');
+                });
+            }
+        });
 
-            // URL을 링크로 변환
-            let convertedText = text.replace(urlRegex, (url) => {
-                // 이미 링크로 감싸져 있으면 스킵
-                if (url.startsWith('http://') || url.startsWith('https://')) {
-                    return `[${url}](${url})`;
-                } else if (url.startsWith('www.')) {
-                    return `[${url}](https://${url})`;
-                } else {
-                    // 도메인 형식인 경우 https:// 추가
-                    return `[${url}](https://${url})`;
+        checklistDetailEditBtn.addEventListener('click', () => {
+            setChecklistDetailModalMode(true);
+        });
+
+        checklistDetailDeleteBtn.addEventListener('click', () => {
+            if (confirm('이 항목을 삭제하시겠습니까?')) {
+                try {
+                    if (currentEditingChecklistItem) {
+                        console.log('삭제 시작:', currentEditingChecklistItem);
+
+                        // li 요소 삭제
+                        if (currentEditingChecklistItem.liElement) {
+                            currentEditingChecklistItem.liElement.remove();
+                        }
+
+                        // 데이터 구조에서도 삭제
+                        const clipboardIndex = currentEditingChecklistItem.clipboardIndex;
+                        const itemIndex = currentEditingChecklistItem.itemIndex;
+
+                        console.log('클립보드 인덱스:', clipboardIndex, '항목 인덱스:', itemIndex);
+                        console.log('현재 프로젝트:', currentProject);
+                        console.log('allProjectsData:', allProjectsData);
+
+                        // 간단한 방식: view-checklist-items에서 직접 삭제
+                        const viewChecklistItems = document.getElementById('view-checklist-items');
+                        if (viewChecklistItems) {
+                            const items = viewChecklistItems.querySelectorAll('li');
+                            if (items[itemIndex]) {
+                                items[itemIndex].remove();
+                            }
+                        }
+
+                        // 프로젝트 데이터에서도 삭제
+                        if (currentProject && allProjectsData && allProjectsData[currentProject]) {
+                            const projectData = allProjectsData[currentProject];
+                            console.log('프로젝트 데이터:', projectData);
+
+                            const clipboardArray = projectData.clipboard || projectData.clipboards;
+                            if (clipboardArray && clipboardArray[clipboardIndex]) {
+                                const clipboard = clipboardArray[clipboardIndex];
+                                console.log('클립보드:', clipboard);
+
+                                if (clipboard.items && clipboard.items.length > 0) {
+                                    console.log('삭제 전 항목:', clipboard.items.length);
+                                    clipboard.items.splice(itemIndex, 1);
+                                    console.log('삭제 후 항목:', clipboard.items.length);
+                                }
+                            }
+                        }
+
+                        saveToFirebase();
+                        checklistDetailModal.style.display = 'none';
+                        currentDetailItemIndex = null;
+                        currentDetailClipboardIndex = null;
+                        currentEditingChecklistItem = null;
+
+                        alert('항목이 삭제되었습니다.');
+                    }
+                } catch (error) {
+                    console.error('삭제 중 에러 발생:', error);
+                    alert('삭제 중 오류가 발생했습니다: ' + error.message);
                 }
-            });
+            }
+        });
 
-            textarea.value = convertedText;
-
-            // 변환 완료 알림
-            const btn = hyperlinkConvertBtn;
-            const originalText = btn.textContent;
-            btn.textContent = '✓ 변환 완료!';
-            btn.style.backgroundColor = '#4a7a5a';
-
-            setTimeout(() => {
-                btn.textContent = originalText;
-                btn.style.backgroundColor = '#5a4a7a';
-            }, 2000);
+        checklistDetailCloseViewBtn.addEventListener('click', () => {
+            currentDetailItemIndex = null;
+            currentDetailClipboardIndex = null;
+            currentEditingChecklistItem = null;
+            checklistDetailModal.style.display = 'none';
         });
 
         // 체크리스트 상세내용 모달 드래그 기능
@@ -5511,6 +5698,83 @@
                 document.body.style.userSelect = 'auto';
             }
         });
+
+        // 모든 모달에 드래그 기능 추가
+        function initializeModalDrag() {
+            const modals = document.querySelectorAll('.modal');
+
+            modals.forEach(modal => {
+                const modalContent = modal.querySelector('.modal-content');
+                if (!modalContent) return;
+
+                // 이미 드래그 가능한 헤더가 있으면 스킵 (체크리스트 상세 모달)
+                if (modalContent.style.position === 'absolute') return;
+
+                // 모달 컨텐츠를 absolute 위치로 설정
+                modalContent.style.position = 'absolute';
+                modalContent.style.left = '50%';
+                modalContent.style.top = '50%';
+                modalContent.style.transform = 'translate(-50%, -50%)';
+
+                let isDraggingModal = false;
+                let startX, startY, startLeft, startTop;
+
+                // h2 또는 헤더 찾기
+                let header = modalContent.querySelector('h2');
+                if (!header) {
+                    header = modalContent.querySelector('[style*="h2"]');
+                }
+                if (!header) {
+                    // 헤더가 없으면 첫 번째 자식을 헤더로 사용
+                    header = modalContent.firstElementChild;
+                }
+
+                if (header) {
+                    header.style.cursor = 'grab';
+                    header.style.userSelect = 'none';
+
+                    header.addEventListener('mousedown', (e) => {
+                        // 닫기 버튼이나 input/button 클릭은 제외
+                        if (e.target.closest('.close-button, button, input, label')) return;
+
+                        isDraggingModal = true;
+                        startX = e.clientX;
+                        startY = e.clientY;
+                        startLeft = parseFloat(modalContent.style.left) || 50;
+                        startTop = parseFloat(modalContent.style.top) || 50;
+                        header.style.cursor = 'grabbing';
+                    });
+
+                    document.addEventListener('mousemove', (e) => {
+                        if (!isDraggingModal) return;
+
+                        const deltaX = e.clientX - startX;
+                        const deltaY = e.clientY - startY;
+
+                        const newLeft = startLeft + (deltaX / window.innerWidth * 100);
+                        const newTop = startTop + (deltaY / window.innerHeight * 100);
+
+                        modalContent.style.left = newLeft + '%';
+                        modalContent.style.top = newTop + '%';
+                        modalContent.style.transform = 'translate(-50%, -50%)';
+                    });
+
+                    document.addEventListener('mouseup', () => {
+                        if (isDraggingModal) {
+                            isDraggingModal = false;
+                            header.style.cursor = 'grab';
+                        }
+                    });
+                }
+            });
+        }
+
+        // DOM이 모두 로드된 후 실행
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initializeModalDrag);
+        } else {
+            initializeModalDrag();
+        }
 
         // 타입 라디오 버튼 이벤트 (템플릿 선택 시 힌트 표시)
         document.querySelectorAll('input[name="clipboard-type"]').forEach(radio => {
@@ -6759,6 +7023,89 @@
                     alert('복사에 실패했습니다. 수동으로 복사해 주세요.');
                 }
             });
+        });
+
+        // 저장된 체크리스트 아이템 컨텍스트 메뉴 이벤트
+        const viewChecklistItemContextMenu = document.getElementById('view-checklist-item-context-menu');
+        const viewChecklistItemContextEdit = document.getElementById('view-checklist-item-context-edit');
+        const viewChecklistItemContextDelete = document.getElementById('view-checklist-item-context-delete');
+        const viewChecklistItemContextCancel = document.getElementById('view-checklist-item-context-cancel');
+
+        viewChecklistItemContextEdit.addEventListener('click', () => {
+            const clipboardIndex = parseInt(viewChecklistItemContextMenu.dataset.clipboardIndex);
+            const itemIndex = parseInt(viewChecklistItemContextMenu.dataset.itemIndex);
+            openSavedChecklistDetailModal(clipboardIndex, itemIndex);
+            viewChecklistItemContextMenu.style.display = 'none';
+        });
+
+        viewChecklistItemContextDelete.addEventListener('click', () => {
+            try {
+                const clipboardIndex = parseInt(viewChecklistItemContextMenu.dataset.clipboardIndex);
+                const itemIndex = parseInt(viewChecklistItemContextMenu.dataset.itemIndex);
+
+                console.log('컨텍스트 메뉴 삭제 클릭');
+                console.log('clipboardIndex:', clipboardIndex, 'itemIndex:', itemIndex);
+                console.log('currentProject:', currentProject);
+                console.log('allProjectsData:', allProjectsData);
+
+                if (confirm('이 항목을 삭제하시겠습니까?')) {
+                    console.log('삭제 확인됨');
+
+                    // allProjectsData에서 항목 삭제
+                    if (currentProject && allProjectsData && allProjectsData[currentProject]) {
+                        const projectData = allProjectsData[currentProject];
+                        console.log('projectData:', projectData);
+
+                        // clipboard (단수) 키 확인
+                        const clipboardArray = projectData.clipboard || projectData.clipboards;
+                        console.log('clipboardArray:', clipboardArray);
+
+                        if (clipboardArray && clipboardArray[clipboardIndex]) {
+                            const clipboard = clipboardArray[clipboardIndex];
+                            console.log('clipboard:', clipboard);
+                            console.log('삭제 전 items:', clipboard.items);
+
+                            if (clipboard.items && clipboard.items[itemIndex]) {
+                                console.log('항목 삭제 시작');
+                                clipboard.items.splice(itemIndex, 1);
+                                console.log('삭제 후 items:', clipboard.items);
+
+                                saveToFirebase();
+
+                                // 체크리스트 다시 렌더링
+                                openChecklistModal(clipboard, clipboardIndex);
+                                alert('항목이 삭제되었습니다.');
+                            } else {
+                                console.log('항목을 찾을 수 없음');
+                                alert('삭제할 항목을 찾을 수 없습니다.');
+                            }
+                        } else {
+                            console.log('클립보드를 찾을 수 없음');
+                            alert('클립보드를 찾을 수 없습니다.');
+                        }
+                    } else {
+                        console.log('프로젝트 데이터를 찾을 수 없음');
+                        alert('프로젝트 데이터를 찾을 수 없습니다.');
+                    }
+                }
+
+                viewChecklistItemContextMenu.style.display = 'none';
+            } catch (error) {
+                console.error('삭제 중 에러 발생:', error);
+                alert('삭제 중 오류가 발생했습니다: ' + error.message);
+                viewChecklistItemContextMenu.style.display = 'none';
+            }
+        });
+
+        viewChecklistItemContextCancel.addEventListener('click', () => {
+            viewChecklistItemContextMenu.style.display = 'none';
+        });
+
+        // 다른 곳 클릭 시 컨텍스트 메뉴 닫기
+        document.addEventListener('click', () => {
+            if (viewChecklistItemContextMenu) {
+                viewChecklistItemContextMenu.style.display = 'none';
+            }
         });
 
         // View Clipboard Download Button
