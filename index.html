@@ -2117,42 +2117,65 @@
 
     <!-- Add Clipboard Modal -->
     <div id="add-clipboard-modal" class="modal">
-        <div class="modal-content">
-            <span class="close-button add-clipboard-close">&times;</span>
-            <h2>클립보드 추가</h2>
-            <div class="modal-form-group">
-                <label>타입:</label>
-                <div style="display: flex; gap: 20px; align-items: center; margin-top: 8px;">
-                    <label style="display: flex; align-items: center; font-weight: 400; margin: 0;">
+        <div class="modal-content" style="display: flex; flex-direction: column; height: 90vh; max-height: 90vh; padding: 0;">
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: linear-gradient(135deg, #2d7c3e 0%, #3da050 50%, #4db860 100%); border-radius: 4px 4px 0 0; border-bottom: 3px solid #1b4a27; flex-shrink: 0;">
+                <h2 id="clipboard-edit-title" style="margin: 0; color: white; font-size: 20px;">클립보드 추가</h2>
+                <div style="display: flex; gap: 15px; align-items: center;">
+                    <label style="display: flex; align-items: center; font-weight: 400; margin: 0; color: white;">
                         <input type="radio" name="clipboard-type" value="normal" checked style="margin-right: 6px;">
-                        일반 클립보드
+                        텍스트
                     </label>
-                    <label style="display: flex; align-items: center; font-weight: 400; margin: 0;">
+                    <label style="display: flex; align-items: center; font-weight: 400; margin: 0; color: white;">
                         <input type="radio" name="clipboard-type" value="template" style="margin-right: 6px;">
-                        템플릿 (예: {변수명})
+                        템플릿
                     </label>
-                    <button id="insert-variable-btn" type="button" class="action-button secondary-button" style="padding: 6px 10px; font-size: 12px; display: none; margin-left: auto;">
+                    <label style="display: flex; align-items: center; font-weight: 400; margin: 0; color: white;">
+                        <input type="radio" name="clipboard-type" value="checklist" style="margin-right: 6px;">
+                        체크리스트
+                    </label>
+                    <button id="insert-variable-btn" type="button" class="action-button secondary-button" style="padding: 6px 10px; font-size: 12px; display: none;">
                         변수 삽입 {}
                     </button>
                 </div>
-                <div id="template-hint" style="font-size: 12px; color: #999; margin-top: 8px; display: none;">
-                    💡 본문에 {변수명} 형식으로 변수를 배치하면 사용할 때 값을 입력받습니다. 변수 삽입 버튼을 클릭해 괄호를 삽입할 수 있습니다.
+                <span class="close-button add-clipboard-close" style="color: white; font-size: 28px; position: relative; top: 0; right: 0; margin: 0;">&times;</span>
+            </div>
+            <div id="template-hint" style="font-size: 12px; color: #999; padding: 12px 40px 0; display: none;">
+                💡 본문에 {변수명} 형식으로 변수를 배치하면 사용할 때 값을 입력받습니다. 변수 삽입 버튼을 클릭해 괄호를 삽입할 수 있습니다.
+            </div>
+            <div style="flex: 1; overflow-y: auto; padding: 20px 40px; display: flex; flex-direction: column;">
+                <!-- 일반 모드 (텍스트, 템플릿) -->
+                <div id="normal-mode-container" style="flex: 1; display: flex; flex-direction: column;">
+                    <div class="modal-form-group">
+                        <label for="add-clipboard-title">제목 (10글자 이내):</label>
+                        <input type="text" id="add-clipboard-title" maxlength="10">
+                    </div>
+                    <div class="modal-form-group" style="flex: 1; display: flex; flex-direction: column;">
+                        <label for="add-clipboard-content">내용:</label>
+                        <textarea id="add-clipboard-content" style="flex: 1; border: 2px solid #000000; resize: none;"></textarea>
+                    </div>
+                </div>
+
+                <!-- 체크리스트 모드 -->
+                <div id="checklist-mode-container" style="flex: 1; display: none; flex-direction: column;">
+                    <div class="modal-form-group" style="flex: 1; display: flex; flex-direction: column;">
+                        <label>체크리스트 항목:</label>
+                        <div style="display: flex; gap: 8px; margin-bottom: 12px;">
+                            <input type="text" id="checklist-item-input" placeholder="항목 입력 후 추가 버튼 클릭" style="flex: 1; padding: 8px 12px; border: 1px solid rgba(55, 53, 47, 0.25); border-radius: 3px; font-size: 14px;">
+                            <button id="checklist-add-btn" type="button" class="action-button" style="padding: 8px 16px; font-size: 12px;">추가</button>
+                        </div>
+                        <ul id="checklist-items-list" style="flex: 1; list-style: none; padding: 12px; border: 2px solid #000000; border-radius: 4px; background-color: #fafafa; margin: 0; overflow-y: auto;">
+                        </ul>
+                    </div>
                 </div>
             </div>
-            <div class="modal-form-group">
-                <label for="add-clipboard-title">제목 (10글자 이내):</label>
-                <input type="text" id="add-clipboard-title" maxlength="10">
+            <div style="padding: 15px 40px; border-top: 1px solid #e0e0e0; background-color: #fafafa; flex-shrink: 0;">
+                <div class="modal-form-group">
+                    <label for="add-clipboard-file">파일 (1MB 미만):</label>
+                    <input type="file" id="add-clipboard-file">
+                    <div id="file-info" style="font-size: 12px; color: #666; margin-top: 5px;"></div>
+                </div>
             </div>
-            <div class="modal-form-group">
-                <label for="add-clipboard-content">내용:</label>
-                <textarea id="add-clipboard-content"></textarea>
-            </div>
-            <div class="modal-form-group">
-                <label for="add-clipboard-file">파일 (1MB 미만):</label>
-                <input type="file" id="add-clipboard-file">
-                <div id="file-info" style="font-size: 12px; color: #666; margin-top: 5px;"></div>
-            </div>
-            <div class="modal-actions">
+            <div class="modal-actions" style="padding: 15px 40px; border-top: 1px solid #e0e0e0; background-color: #fafafa; flex-shrink: 0; text-align: right;">
                 <button id="add-clipboard-save" class="action-button">저장</button>
                 <button id="add-clipboard-cancel" class="action-button secondary-button">취소</button>
             </div>
@@ -2206,6 +2229,41 @@
             <li id="clipboard-list-context-paste">붙여넣기</li>
             <li id="clipboard-list-context-cancel">취소</li>
         </ul>
+    </div>
+
+    <!-- Checklist Item Context Menu -->
+    <div id="checklist-item-context-menu" class="context-menu">
+        <ul>
+            <li id="checklist-item-context-edit">수정</li>
+            <li id="checklist-item-context-delete">삭제</li>
+            <li id="checklist-item-context-cancel">취소</li>
+        </ul>
+    </div>
+
+    <!-- Checklist Detail Modal -->
+    <div id="checklist-detail-modal" class="modal">
+        <div class="modal-content" style="display: flex; flex-direction: column; max-width: 800px; height: 90vh; max-height: 90vh; padding: 0; position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);">
+            <!-- Header (Draggable) -->
+            <div class="draggable-header" style="display: flex; justify-content: space-between; align-items: center; padding: 14.4px 19.2px; background: linear-gradient(135deg, #d8c5e8 0%, #e5d9f0 100%); border-radius: 8px 8px 0 0; flex-shrink: 0; box-shadow: 0 2px 4px rgba(0,0,0,0.05); cursor: grab; user-select: none;">
+                <h2 id="checklist-detail-title" style="margin: 0; color: #5a4a7a; font-size: 24px; font-weight: 700; letter-spacing: 0.3px;"></h2>
+                <span class="close-button checklist-detail-close" style="color: #7a6a9a; font-size: 16.8px; position: relative; top: 0; right: 0; margin: 0; cursor: pointer; opacity: 0.7; transition: opacity 0.2s;">&times;</span>
+            </div>
+
+            <!-- Content Area -->
+            <div style="flex: 1; padding: 30px; overflow: hidden; display: flex; flex-direction: column;">
+                <!-- Toolbar -->
+                <div style="margin-bottom: 12px; display: flex; gap: 8px;">
+                    <button id="hyperlink-convert-btn" style="background-color: #5a4a7a; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-weight: 500; font-size: 12px; transition: all 0.2s;">🔗 하이퍼링크 변환</button>
+                </div>
+                <textarea id="checklist-detail-content" style="flex: 1; width: 100%; padding: 15px; border: 2px solid #000000; border-radius: 4px; font-size: 14px; font-family: inherit; resize: none; box-sizing: border-box;"></textarea>
+            </div>
+
+            <!-- Footer -->
+            <div style="padding: 12px 19.2px; background: linear-gradient(135deg, #e8e8e8 0%, #f0f0f0 100%); border-top: 1px solid rgba(0,0,0,0.1); flex-shrink: 0; text-align: right; box-shadow: 0 -2px 4px rgba(0,0,0,0.05);">
+                <button id="checklist-detail-save" class="action-button" style="background-color: #5a4a7a; color: white; border: none; padding: 9.9px 21.6px; border-radius: 6px; cursor: pointer; font-weight: 500; font-size: 12.6px; margin-left: 6px; transition: all 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">저장</button>
+                <button id="checklist-detail-cancel" class="action-button secondary-button" style="background-color: #d0d0d0; color: #666; border: none; padding: 9.9px 21.6px; border-radius: 6px; cursor: pointer; font-weight: 500; font-size: 12.6px; margin-left: 6px; transition: all 0.2s;">취소</button>
+            </div>
+        </div>
     </div>
 
     <!-- Template Variable Input Modal -->
@@ -2384,18 +2442,29 @@
 
     <!-- View Clipboard Modal -->
     <div id="view-clipboard-modal" class="modal">
-        <div class="modal-content">
-            <div id="view-clipboard-header" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; margin: -40px -40px 0 -40px; background: linear-gradient(135deg, #D2691E 0%, #F4A460 50%, #DEB887 100%); border-radius: 4px 4px 0 0; border-bottom: 3px solid #8B4513;">
+        <div class="modal-content" style="display: flex; flex-direction: column; height: 90vh; max-height: 90vh; padding: 0;">
+            <div id="view-clipboard-header" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: linear-gradient(135deg, #D2691E 0%, #F4A460 50%, #DEB887 100%); border-radius: 4px 4px 0 0; border-bottom: 3px solid #8B4513; flex-shrink: 0;">
                 <h2 id="view-clipboard-title" style="margin: 0; color: white; font-size: 20px;"></h2>
-                <span class="close-button view-clipboard-close" style="color: white; font-size: 28px;">&times;</span>
+                <span class="close-button view-clipboard-close" style="color: white; font-size: 28px; position: relative; top: 0; right: 0;">&times;</span>
             </div>
-            <div id="view-clipboard-content" style="white-space: pre-wrap; word-wrap: break-word; max-height: 600px; overflow-y: auto; margin: 20px 0 15px 0; padding: 12px; border: 1px solid #ddd; border-radius: 4px; background-color: #fafafa; min-height: 100px; color: #222; font-weight: 500; line-height: 1.6;"></div>
-            <div id="view-clipboard-file-info" style="display: none; padding: 12px; background-color: #f5f5f5; border-radius: 4px; margin-bottom: 15px; font-size: 14px; color: #666;">
-                <div style="margin-bottom: 5px;">📎 <strong>첨부파일</strong></div>
-                <div id="view-clipboard-file-name" style="margin-left: 20px; margin-bottom: 3px;"></div>
-                <div id="view-clipboard-file-size" style="margin-left: 20px; font-size: 12px; color: #999;"></div>
+            <div style="flex: 1; overflow-y: auto; padding: 20px 16px; display: flex; flex-direction: column;">
+                <!-- 일반 텍스트 모드 -->
+                <div id="view-content-container" style="flex: 1; display: flex; flex-direction: column;">
+                    <div id="view-clipboard-content" style="white-space: pre-wrap; word-wrap: break-word; flex: 1; overflow-y: auto; padding: 12px; border: 2px solid #000000; border-radius: 4px; background-color: #fafafa; min-height: 200px; color: #222; font-weight: 500; line-height: 1.6;"></div>
+                    <div id="view-clipboard-file-info" style="display: none; padding: 12px; background-color: #f5f5f5; border-radius: 4px; margin-top: 15px; font-size: 14px; color: #666;">
+                        <div style="margin-bottom: 5px;">📎 <strong>첨부파일</strong></div>
+                        <div id="view-clipboard-file-name" style="margin-left: 20px; margin-bottom: 3px;"></div>
+                        <div id="view-clipboard-file-size" style="margin-left: 20px; font-size: 12px; color: #999;"></div>
+                    </div>
+                </div>
+
+                <!-- 체크리스트 모드 -->
+                <div id="view-checklist-container" style="flex: 1; display: none; flex-direction: column;">
+                    <ul id="view-checklist-items" style="flex: 1; list-style: none; padding: 12px; border: 2px solid #000000; border-radius: 4px; background-color: #fafafa; margin: 0; overflow-y: auto;">
+                    </ul>
+                </div>
             </div>
-            <div class="modal-actions">
+            <div class="modal-actions" style="padding: 20px 40px; border-top: 1px solid #e0e0e0; background-color: #fafafa; flex-shrink: 0; text-align: right;">
                 <button id="view-clipboard-copy-btn" class="action-button">복사</button>
                 <button id="view-clipboard-download-btn" class="action-button" style="display: none;">다운로드</button>
                 <button id="view-clipboard-edit-btn" class="action-button secondary-button">수정</button>
@@ -3896,8 +3965,9 @@
                     const favoriteIcon = item.favorite ? '⭐ ' : '';
                     const fileIcon = item.isFile ? '📎 ' : '';
                     const templateIcon = item.type === 'template' ? '📋 ' : '';
+                    const checklistIcon = item.type === 'checklist' ? '☑️ ' : '';
                     const displayTitle = item.title || (item.isFile ? item.fileInfo?.name : item.text) || '';
-                    let buttonText = templateIcon + fileIcon + displayTitle;
+                    let buttonText = checklistIcon + templateIcon + fileIcon + displayTitle;
 
                     // 파일인 경우 파일 크기 표시
                     if (item.isFile && item.fileInfo) {
@@ -3937,6 +4007,9 @@
                                 // 템플릿인 경우 템플릿 사용 모달 열기
                                 if (item.type === 'template') {
                                     openTemplateUseModal(item);
+                                } else if (item.type === 'checklist') {
+                                    // 체크리스트 표시
+                                    openChecklistModal(item, index);
                                 } else {
                                     // 일반 클립보드는 상세 모달로 표시
                                     const modal = document.getElementById('view-clipboard-modal');
@@ -4177,7 +4250,71 @@
             return result;
         }
 
+        // 체크리스트 상세내용 모달 열기
+        let currentDetailItemIndex = null;
+
+        function openChecklistDetailModal(itemIndex) {
+            const item = checklistItems[itemIndex];
+            const modal = document.getElementById('checklist-detail-modal');
+            const titleEl = document.getElementById('checklist-detail-title');
+            const contentEl = document.getElementById('checklist-detail-content');
+
+            titleEl.textContent = `"${item.text}" 상세내용`;
+            contentEl.value = item.detail || '';
+            currentDetailItemIndex = itemIndex;
+
+            modal.style.display = 'flex';
+        }
+
         // 템플릿 사용 모달 열기 (타입별 입력 필드 지원)
+        function openChecklistModal(item, index) {
+            const modal = document.getElementById('view-clipboard-modal');
+            const titleEl = document.getElementById('view-clipboard-title');
+            const viewContentContainer = document.getElementById('view-content-container');
+            const viewChecklistContainer = document.getElementById('view-checklist-container');
+            const viewChecklistItems = document.getElementById('view-checklist-items');
+            const editBtn = document.getElementById('view-clipboard-edit-btn');
+
+            titleEl.textContent = item.title || '';
+            viewContentContainer.style.display = 'none';
+            viewChecklistContainer.style.display = 'flex';
+
+            // 체크리스트 항목 렌더링
+            viewChecklistItems.innerHTML = '';
+            if (item.items && item.items.length > 0) {
+                item.items.forEach((checkItem, itemIndex) => {
+                    const li = document.createElement('li');
+                    li.style.cssText = 'padding: 12px; margin-bottom: 8px; background-color: white; border-radius: 3px; display: flex; align-items: center; border: 1px solid #ddd; gap: 12px;';
+
+                    const checkbox = document.createElement('input');
+                    checkbox.type = 'checkbox';
+                    checkbox.checked = checkItem.checked || false;
+                    checkbox.style.cssText = 'width: 18px; height: 18px; cursor: pointer; flex-shrink: 0;';
+                    checkbox.dataset.itemIndex = itemIndex;
+
+                    const label = document.createElement('label');
+                    label.textContent = checkItem.text;
+                    label.style.cssText = 'flex: 1; cursor: pointer; ' + (checkbox.checked ? 'text-decoration: line-through; color: #999;' : '');
+
+                    checkbox.addEventListener('change', (e) => {
+                        item.items[itemIndex].checked = e.target.checked;
+                        label.style.textDecoration = e.target.checked ? 'line-through' : 'none';
+                        label.style.color = e.target.checked ? '#999' : '#222';
+                        saveToFirebase();
+                    });
+
+                    li.appendChild(checkbox);
+                    li.appendChild(label);
+                    viewChecklistItems.appendChild(li);
+                });
+            } else {
+                viewChecklistItems.innerHTML = '<li style="padding: 12px; color: #999;">항목이 없습니다.</li>';
+            }
+
+            editBtn.dataset.clipboardIndex = index;
+            modal.style.display = 'flex';
+        }
+
         function openTemplateUseModal(item) {
             const modal = document.getElementById('template-use-modal');
             const variables = extractVariables(item.textContent || item.text || '');
@@ -4329,7 +4466,7 @@
 
         function addClipboard() {
             const modal = document.getElementById('add-clipboard-modal');
-            document.querySelector('#add-clipboard-modal h2').textContent = '클립보드 추가';
+            document.getElementById('clipboard-edit-title').textContent = '클립보드 추가';
             modal.style.display = 'flex';
 
             document.getElementById('add-clipboard-title').value = '';
@@ -4340,6 +4477,12 @@
             // 타입 선택 초기화
             document.querySelector('input[name="clipboard-type"][value="normal"]').checked = true;
             document.getElementById('template-hint').style.display = 'none';
+
+            // 체크리스트 초기화
+            checklistItems = [];
+            renderChecklistItems();
+            normalModeContainer.style.display = 'flex';
+            checklistModeContainer.style.display = 'none';
 
             delete modal.dataset.editMode;
             delete modal.dataset.editIndex;
@@ -4631,9 +4774,33 @@
                 } else if (type === 'clipboard') {
                     const item = projectData.clipboard[index];
                     const modal = document.getElementById('add-clipboard-modal');
-                    document.querySelector('#add-clipboard-modal h2').textContent = '클립보드 편집';
+                    document.getElementById('clipboard-edit-title').textContent = '클립보드 편집';
                     document.getElementById('add-clipboard-title').value = item.title || '';
-                    document.getElementById('add-clipboard-content').value = item.text;
+
+                    // 타입에 따라 UI 설정
+                    const itemType = item.type || 'normal';
+                    document.querySelector(`input[name="clipboard-type"][value="${itemType}"]`).checked = true;
+
+                    if (itemType === 'checklist') {
+                        // 체크리스트 모드
+                        checklistItems = (item.items || []).map(it => ({
+                            id: it.id,
+                            text: it.text,
+                            checked: it.checked || false,
+                            detail: it.detail || ''
+                        }));
+                        renderChecklistItems();
+                        normalModeContainer.style.display = 'none';
+                        checklistModeContainer.style.display = 'flex';
+                    } else {
+                        // 일반 또는 템플릿 모드
+                        document.getElementById('add-clipboard-content').value = item.textContent || item.text || '';
+                        checklistItems = [];
+                        renderChecklistItems();
+                        normalModeContainer.style.display = 'flex';
+                        checklistModeContainer.style.display = 'none';
+                    }
+
                     modal.style.display = 'flex';
                     modal.dataset.editMode = 'true';
                     modal.dataset.editIndex = index;
@@ -4955,6 +5122,104 @@
         const addClipboardFileInput = document.getElementById('add-clipboard-file');
         const fileInfoDiv = document.getElementById('file-info');
 
+        // 체크리스트 관련 요소
+        let checklistItems = [];
+        const normalModeContainer = document.getElementById('normal-mode-container');
+        const checklistModeContainer = document.getElementById('checklist-mode-container');
+        const checklistItemInput = document.getElementById('checklist-item-input');
+        const checklistAddBtn = document.getElementById('checklist-add-btn');
+        const checklistItemsList = document.getElementById('checklist-items-list');
+
+        // 클립보드 타입 변경 이벤트
+        document.querySelectorAll('input[name="clipboard-type"]').forEach(radio => {
+            radio.addEventListener('change', (e) => {
+                const type = e.target.value;
+                if (type === 'checklist') {
+                    normalModeContainer.style.display = 'none';
+                    checklistModeContainer.style.display = 'flex';
+                    checklistItems = [];
+                    renderChecklistItems();
+                } else {
+                    normalModeContainer.style.display = 'flex';
+                    checklistModeContainer.style.display = 'none';
+                }
+            });
+        });
+
+        // 체크리스트 항목 렌더링 함수
+        function renderChecklistItems() {
+            checklistItemsList.innerHTML = '';
+            checklistItems.forEach((item, index) => {
+                const li = document.createElement('li');
+                li.style.cssText = 'padding: 8px; margin-bottom: 4px; background-color: white; border-radius: 3px; display: flex; align-items: center; border: 1px solid #ddd; gap: 8px;';
+                li.dataset.index = index;
+
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.checked = item.checked || false;
+                checkbox.style.cssText = 'width: 18px; height: 18px; cursor: pointer; flex-shrink: 0;';
+                checkbox.dataset.index = index;
+
+                const textSpan = document.createElement('span');
+                textSpan.textContent = item.text;
+                textSpan.style.cssText = 'flex: 1; ' + (item.checked ? 'text-decoration: line-through; color: #999;' : '');
+
+                const detailBtn = document.createElement('button');
+                detailBtn.type = 'button';
+                detailBtn.textContent = '📄';
+                detailBtn.dataset.index = index;
+                detailBtn.className = 'checklist-detail-btn';
+                detailBtn.style.cssText = 'background-color: transparent; border: none; cursor: pointer; font-size: 18px; padding: 0; flex-shrink: 0;';
+
+                li.appendChild(checkbox);
+                li.appendChild(textSpan);
+                li.appendChild(detailBtn);
+                checklistItemsList.appendChild(li);
+
+                // 체크박스 변경 이벤트
+                checkbox.addEventListener('change', (e) => {
+                    checklistItems[index].checked = e.target.checked;
+                    textSpan.style.textDecoration = e.target.checked ? 'line-through' : 'none';
+                    textSpan.style.color = e.target.checked ? '#999' : '#222';
+                });
+
+                // 상세내용 버튼 이벤트
+                detailBtn.addEventListener('click', () => {
+                    openChecklistDetailModal(index);
+                });
+
+                // 우클릭 이벤트
+                li.addEventListener('contextmenu', (e) => {
+                    e.preventDefault();
+                    const contextMenu = document.getElementById('checklist-item-context-menu');
+                    contextMenu.style.display = 'block';
+                    contextMenu.style.position = 'fixed';
+                    contextMenu.style.left = e.clientX + 'px';
+                    contextMenu.style.top = e.clientY + 'px';
+                    contextMenu.dataset.itemIndex = index;
+                });
+            });
+        }
+
+        // 체크리스트 항목 추가
+        checklistAddBtn.addEventListener('click', () => {
+            const text = checklistItemInput.value.trim();
+            if (!text) {
+                alert('항목을 입력해주세요.');
+                return;
+            }
+            checklistItems.push({ id: Date.now(), text: text, checked: false });
+            checklistItemInput.value = '';
+            renderChecklistItems();
+        });
+
+        // 엔터 키로도 항목 추가
+        checklistItemInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                checklistAddBtn.click();
+            }
+        });
+
         // 파일 선택 이벤트 처리
         let selectedFileData = null;
 
@@ -4990,15 +5255,23 @@
 
         addClipboardSave.addEventListener('click', () => {
             const title = document.getElementById('add-clipboard-title').value.trim();
+            const selectedType = document.querySelector('input[name="clipboard-type"]:checked').value;
             const content = document.getElementById('add-clipboard-content').value.trim();
 
-            // 파일 또는 텍스트 중 하나는 반드시 있어야 함
+            // 제목 확인
             if (!title) {
                 alert('제목을 입력해주세요.');
                 return;
             }
 
-            if (!selectedFileData && !content) {
+            // 체크리스트 모드일 때는 항목 확인
+            if (selectedType === 'checklist') {
+                if (checklistItems.length === 0) {
+                    alert('체크리스트에 항목을 추가해주세요.');
+                    return;
+                }
+            } else if (!selectedFileData && !content) {
+                // 일반 모드일 때는 파일 또는 텍스트 확인
                 alert('파일을 선택하거나 내용을 입력해주세요.');
                 return;
             }
@@ -5010,12 +5283,19 @@
 
             if (addClipboardModal.dataset.editMode === 'true') {
                 const index = parseInt(addClipboardModal.dataset.editIndex);
-                const selectedType = document.querySelector('input[name="clipboard-type"]:checked').value;
 
                 allProjectsData[currentProject].clipboard[index].title = title;
                 allProjectsData[currentProject].clipboard[index].type = selectedType;
 
-                if (selectedFileData) {
+                if (selectedType === 'checklist') {
+                    // 체크리스트 모드
+                    allProjectsData[currentProject].clipboard[index].items = checklistItems.map(item => ({
+                        id: item.id,
+                        text: item.text,
+                        checked: item.checked || false,
+                        detail: item.detail || ''
+                    }));
+                } else if (selectedFileData) {
                     // 파일이 선택된 경우
                     const binaryString = String.fromCharCode.apply(null, new Uint8Array(selectedFileData.data));
                     const base64 = btoa(binaryString);
@@ -5035,21 +5315,27 @@
                     delete allProjectsData[currentProject].clipboard[index].fileInfo;
                 }
             } else {
-                // 타입 선택 가져오기
-                const selectedType = document.querySelector('input[name="clipboard-type"]:checked').value;
-
                 const clipboardItem = {
                     title: title,
-                    textContent: content, // 텍스트 내용을 별도 필드에 저장
                     color: '#f8f9fa',
                     favorite: false,
-                    type: selectedType // 템플릿 또는 일반 타입 저장
+                    type: selectedType
                 };
 
-                if (selectedFileData) {
+                if (selectedType === 'checklist') {
+                    // 체크리스트 모드
+                    clipboardItem.items = checklistItems.map(item => ({
+                        id: item.id,
+                        text: item.text,
+                        checked: item.checked || false,
+                        detail: item.detail || ''
+                    }));
+                } else if (selectedFileData) {
+                    // 파일이 선택된 경우
                     const binaryString = String.fromCharCode.apply(null, new Uint8Array(selectedFileData.data));
                     const base64 = btoa(binaryString);
-                    clipboardItem.fileData = base64; // 파일은 fileData에 저장
+                    clipboardItem.fileData = base64;
+                    clipboardItem.textContent = content;
                     clipboardItem.isFile = true;
                     clipboardItem.fileInfo = {
                         name: selectedFileData.name,
@@ -5057,6 +5343,8 @@
                         size: selectedFileData.size
                     };
                 } else {
+                    // 일반 텍스트 모드
+                    clipboardItem.textContent = content;
                     clipboardItem.isFile = false;
                 }
 
@@ -5065,15 +5353,163 @@
 
             renderProject(currentProject);
             addClipboardModal.style.display = 'none';
+            // 체크리스트 초기화
+            checklistItems = [];
+            renderChecklistItems();
             saveToFirebase();
         });
         
         addClipboardCancel.addEventListener('click', () => {
             addClipboardModal.style.display = 'none';
+            // 모달 닫을 때 초기화
+            checklistItems = [];
+            renderChecklistItems();
         });
-        
+
         addClipboardClose.addEventListener('click', () => {
             addClipboardModal.style.display = 'none';
+            // 모달 닫을 때 초기화
+            checklistItems = [];
+            renderChecklistItems();
+        });
+
+        // 체크리스트 항목 컨텍스트 메뉴 이벤트
+        const checklistContextMenu = document.getElementById('checklist-item-context-menu');
+        const checklistContextEdit = document.getElementById('checklist-item-context-edit');
+        const checklistContextDelete = document.getElementById('checklist-item-context-delete');
+        const checklistContextCancel = document.getElementById('checklist-item-context-cancel');
+
+        checklistContextEdit.addEventListener('click', () => {
+            const itemIndex = parseInt(checklistContextMenu.dataset.itemIndex);
+            const item = checklistItems[itemIndex];
+            const newText = prompt('항목을 수정하세요:', item.text);
+            if (newText && newText.trim()) {
+                checklistItems[itemIndex].text = newText.trim();
+                renderChecklistItems();
+            }
+            checklistContextMenu.style.display = 'none';
+        });
+
+        checklistContextDelete.addEventListener('click', () => {
+            const itemIndex = parseInt(checklistContextMenu.dataset.itemIndex);
+            checklistItems.splice(itemIndex, 1);
+            renderChecklistItems();
+            checklistContextMenu.style.display = 'none';
+        });
+
+        checklistContextCancel.addEventListener('click', () => {
+            checklistContextMenu.style.display = 'none';
+        });
+
+        // 다른 곳 클릭 시 컨텍스트 메뉴 닫기
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('#checklist-item-context-menu') &&
+                !e.target.closest('#checklist-items-list li')) {
+                checklistContextMenu.style.display = 'none';
+            }
+        });
+
+        // 체크리스트 상세내용 모달 버튼 이벤트
+        const checklistDetailModal = document.getElementById('checklist-detail-modal');
+        const checklistDetailSave = document.getElementById('checklist-detail-save');
+        const checklistDetailCancel = document.getElementById('checklist-detail-cancel');
+        const checklistDetailClose = document.querySelector('.checklist-detail-close');
+
+        checklistDetailSave.addEventListener('click', () => {
+            if (currentDetailItemIndex !== null) {
+                const content = document.getElementById('checklist-detail-content').value.trim();
+                checklistItems[currentDetailItemIndex].detail = content;
+                checklistDetailModal.style.display = 'none';
+            }
+        });
+
+        checklistDetailCancel.addEventListener('click', () => {
+            checklistDetailModal.style.display = 'none';
+        });
+
+        checklistDetailClose.addEventListener('click', () => {
+            checklistDetailModal.style.display = 'none';
+        });
+
+        // 하이퍼링크 변환 기능
+        const hyperlinkConvertBtn = document.getElementById('hyperlink-convert-btn');
+        hyperlinkConvertBtn.addEventListener('click', () => {
+            const textarea = document.getElementById('checklist-detail-content');
+            const text = textarea.value;
+
+            // URL 패턴 정규식 (http://, https://, www. 포함)
+            const urlRegex = /(?:https?:\/\/|www\.)[^\s]+|(?<![/:@])[a-zA-Z0-9][a-zA-Z0-9-]*\.[a-zA-Z]{2,}(?:\/[^\s]*)?/g;
+
+            // URL을 링크로 변환
+            let convertedText = text.replace(urlRegex, (url) => {
+                // 이미 링크로 감싸져 있으면 스킵
+                if (url.startsWith('http://') || url.startsWith('https://')) {
+                    return `[${url}](${url})`;
+                } else if (url.startsWith('www.')) {
+                    return `[${url}](https://${url})`;
+                } else {
+                    // 도메인 형식인 경우 https:// 추가
+                    return `[${url}](https://${url})`;
+                }
+            });
+
+            textarea.value = convertedText;
+
+            // 변환 완료 알림
+            const btn = hyperlinkConvertBtn;
+            const originalText = btn.textContent;
+            btn.textContent = '✓ 변환 완료!';
+            btn.style.backgroundColor = '#4a7a5a';
+
+            setTimeout(() => {
+                btn.textContent = originalText;
+                btn.style.backgroundColor = '#5a4a7a';
+            }, 2000);
+        });
+
+        // 체크리스트 상세내용 모달 드래그 기능
+        const checklistDetailHeader = checklistDetailModal.querySelector('.draggable-header');
+        const modalContent = checklistDetailModal.querySelector('.modal-content');
+        let isDragging = false;
+        let startX, startY, startLeft, startTop;
+
+        checklistDetailHeader.addEventListener('mousedown', (e) => {
+            // 닫기 버튼이나 다른 요소를 드래그하지 않도록
+            if (e.target.closest('.close-button')) return;
+
+            isDragging = true;
+            startX = e.clientX;
+            startY = e.clientY;
+
+            // 현재 위치 계산 (transform 값 무시하고 left, top 사용)
+            const rect = modalContent.getBoundingClientRect();
+            startLeft = parseFloat(modalContent.style.left) || 0;
+            startTop = parseFloat(modalContent.style.top) || 0;
+
+            checklistDetailHeader.style.cursor = 'grabbing';
+            document.body.style.userSelect = 'none';
+        });
+
+        document.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+
+            const deltaX = e.clientX - startX;
+            const deltaY = e.clientY - startY;
+
+            const newLeft = startLeft + deltaX;
+            const newTop = startTop + deltaY;
+
+            modalContent.style.left = newLeft + 'px';
+            modalContent.style.top = newTop + 'px';
+            modalContent.style.transform = 'none'; // transform 제거
+        });
+
+        document.addEventListener('mouseup', () => {
+            if (isDragging) {
+                isDragging = false;
+                checklistDetailHeader.style.cursor = 'grab';
+                document.body.style.userSelect = 'auto';
+            }
         });
 
         // 타입 라디오 버튼 이벤트 (템플릿 선택 시 힌트 표시)
@@ -6366,20 +6802,40 @@
 
             // 편집 모달 열기
             const addClipboardModal = document.getElementById('add-clipboard-modal');
-            document.querySelector('#add-clipboard-modal h2').textContent = '클립보드 편집';
+            document.getElementById('clipboard-edit-title').textContent = '클립보드 편집';
             document.getElementById('add-clipboard-title').value = item.title || '';
-            document.getElementById('add-clipboard-content').value = item.textContent || item.text || '';
 
             // 타입 설정 (기존 항목은 'normal', 신규 템플릿은 'template')
             const itemType = item.type || 'normal';
             document.querySelector(`input[name="clipboard-type"][value="${itemType}"]`).checked = true;
 
-            // 템플릿 힌트 표시/숨김
-            const templateHint = document.getElementById('template-hint');
-            if (itemType === 'template') {
-                templateHint.style.display = 'block';
+            if (itemType === 'checklist') {
+                // 체크리스트 모드
+                checklistItems = (item.items || []).map(it => ({
+                    id: it.id,
+                    text: it.text,
+                    checked: it.checked || false,
+                    detail: it.detail || ''
+                }));
+                renderChecklistItems();
+                normalModeContainer.style.display = 'none';
+                checklistModeContainer.style.display = 'flex';
+                document.getElementById('template-hint').style.display = 'none';
             } else {
-                templateHint.style.display = 'none';
+                // 일반 또는 템플릿 모드
+                document.getElementById('add-clipboard-content').value = item.textContent || item.text || '';
+                checklistItems = [];
+                renderChecklistItems();
+                normalModeContainer.style.display = 'flex';
+                checklistModeContainer.style.display = 'none';
+
+                // 템플릿 힌트 표시/숨김
+                const templateHint = document.getElementById('template-hint');
+                if (itemType === 'template') {
+                    templateHint.style.display = 'block';
+                } else {
+                    templateHint.style.display = 'none';
+                }
             }
 
             // 편집 모드 설정
