@@ -2249,7 +2249,7 @@
     </div>
 
     <!-- Checklist Detail Item Context Menu -->
-    <div id="checklist-detail-item-context-menu" class="context-menu">
+    <div id="checklist-detail-item-context-menu" class="context-menu" style="z-index: 10002;">
         <ul>
             <li id="checklist-detail-item-context-delete">삭제</li>
             <li id="checklist-detail-item-context-cancel">취소</li>
@@ -4314,10 +4314,33 @@
                 textSpan.style.cssText = 'flex: 1; white-space: pre-wrap; word-break: break-word; line-height: 1.5; color: #333; ' + (item.checked ? 'text-decoration: line-through; color: #999;' : '');
                 textSpan.textContent = item.text;
 
+                // 3점 메뉴 버튼
+                const menuBtn = document.createElement('button');
+                menuBtn.textContent = '⋮';
+                menuBtn.style.cssText = 'background: none; border: none; font-size: 18px; cursor: pointer; padding: 0; flex-shrink: 0; color: #666;';
+                menuBtn.dataset.index = index;
+
                 li.appendChild(checkbox);
                 li.appendChild(textContainer);
                 textContainer.appendChild(textSpan);
+                li.appendChild(menuBtn);
                 list.appendChild(li);
+
+                // 3점 메뉴 버튼 클릭 이벤트
+                menuBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const menu = document.getElementById('checklist-detail-item-context-menu');
+                    if (!menu) return;
+
+                    menu.style.display = 'block';
+                    menu.style.position = 'fixed';
+                    menu.style.zIndex = '10002';
+
+                    const rect = menuBtn.getBoundingClientRect();
+                    menu.style.left = (rect.left - 100) + 'px';
+                    menu.style.top = (rect.bottom + 5) + 'px';
+                    menu.dataset.itemIndex = index;
+                });
 
                 // 인라인 편집 함수
                 function enableInlineEdit() {
@@ -4386,17 +4409,6 @@
                         textSpan.style.color = '';
                     }
                 });
-
-                // 우클릭 이벤트
-                li.addEventListener('contextmenu', (e) => {
-                    e.preventDefault();
-                    const contextMenu = document.getElementById('checklist-detail-item-context-menu');
-                    contextMenu.style.display = 'block';
-                    contextMenu.style.position = 'fixed';
-                    contextMenu.style.left = e.clientX + 'px';
-                    contextMenu.style.top = e.clientY + 'px';
-                    contextMenu.dataset.itemIndex = index;
-                });
             });
         }
 
@@ -4423,10 +4435,31 @@
                 textSpan.style.cssText = 'flex: 1; white-space: pre-wrap; word-break: break-word; line-height: 1.5; color: #333; ' + (item.checked ? 'text-decoration: line-through; color: #999;' : '');
                 textSpan.textContent = item.text;
 
+                const menuBtn = document.createElement('button');
+                menuBtn.textContent = '⋮';
+                menuBtn.style.cssText = 'background: none; border: none; font-size: 18px; cursor: pointer; padding: 0; flex-shrink: 0; color: #666;';
+                menuBtn.dataset.index = index;
+
                 li.appendChild(checkbox);
                 li.appendChild(textContainer);
                 textContainer.appendChild(textSpan);
+                li.appendChild(menuBtn);
                 list.appendChild(li);
+
+                menuBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const menu = document.getElementById('checklist-detail-item-context-menu');
+                    if (!menu) return;
+
+                    menu.style.display = 'block';
+                    menu.style.position = 'fixed';
+                    menu.style.zIndex = '10002';
+
+                    const rect = menuBtn.getBoundingClientRect();
+                    menu.style.left = (rect.left - 100) + 'px';
+                    menu.style.top = (rect.bottom + 5) + 'px';
+                    menu.dataset.itemIndex = index;
+                });
 
                 // 인라인 편집 함수
                 function enableInlineEdit() {
@@ -4496,16 +4529,6 @@
                     }
                 });
 
-                // 우클릭 이벤트
-                li.addEventListener('contextmenu', (e) => {
-                    e.preventDefault();
-                    const contextMenu = document.getElementById('checklist-detail-item-context-menu');
-                    contextMenu.style.display = 'block';
-                    contextMenu.style.position = 'fixed';
-                    contextMenu.style.left = e.clientX + 'px';
-                    contextMenu.style.top = e.clientY + 'px';
-                    contextMenu.dataset.itemIndex = index;
-                });
             });
         }
 
@@ -6001,7 +6024,38 @@
         detailChecklistContextDelete.addEventListener('click', () => {
             const itemIndex = parseInt(detailChecklistContextMenu.dataset.itemIndex);
             detailChecklistItems.splice(itemIndex, 1);
-            renderDetailChecklistItems();
+
+            // 현재 표시된 모드에 따라 다른 렌더링 함수 호출
+            const editArea = document.getElementById('checklist-detail-edit-area');
+            if (editArea.style.display === 'flex') {
+                // Edit 모드
+                renderDetailChecklistItems();
+            } else {
+                // View 모드
+                renderDetailChecklistViewItems();
+
+                // View 모드에서 자동 저장
+                if (currentEditingChecklistItem && currentEditingChecklistItem.liElement) {
+                    currentEditingChecklistItem.liElement.dataset.detail = JSON.stringify(detailChecklistItems);
+                    const clipboardIndex = currentEditingChecklistItem.clipboardIndex;
+                    const itemIndex = currentEditingChecklistItem.itemIndex;
+
+                    if (currentProject && allProjectsData && allProjectsData[currentProject]) {
+                        const projectData = allProjectsData[currentProject];
+                        const clipboardArray = projectData.clipboard || projectData.clipboards;
+
+                        if (clipboardArray && clipboardArray[clipboardIndex]) {
+                            const clipboard = clipboardArray[clipboardIndex];
+                            if (clipboard.items && clipboard.items[itemIndex]) {
+                                clipboard.items[itemIndex].detail = JSON.parse(JSON.stringify(detailChecklistItems));
+                            }
+                        }
+                    }
+
+                    saveToFirebase();
+                }
+            }
+
             detailChecklistContextMenu.style.display = 'none';
         });
 
@@ -6012,7 +6066,8 @@
         // 상세내용 컨텍스트 메뉴 - 다른 곳 클릭 시 닫기
         document.addEventListener('click', (e) => {
             if (!e.target.closest('#checklist-detail-item-context-menu') &&
-                !e.target.closest('#checklist-detail-items-list li')) {
+                !e.target.closest('#checklist-detail-items-list li') &&
+                !e.target.closest('#checklist-detail-view-items li')) {
                 detailChecklistContextMenu.style.display = 'none';
             }
         });
