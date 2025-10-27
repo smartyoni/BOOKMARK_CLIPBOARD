@@ -4311,7 +4311,7 @@
                 textContainer.style.cssText = 'flex: 1; display: flex; align-items: flex-start; cursor: pointer; min-height: 40px;';
 
                 const textSpan = document.createElement('div');
-                textSpan.style.cssText = 'flex: 1; white-space: pre-wrap; word-break: break-word; line-height: 1.5; ' + (item.checked ? 'text-decoration: line-through; color: #999;' : '');
+                textSpan.style.cssText = 'flex: 1; white-space: pre-wrap; word-break: break-word; line-height: 1.5; color: #333; ' + (item.checked ? 'text-decoration: line-through; color: #999;' : '');
                 textSpan.textContent = item.text;
 
                 li.appendChild(checkbox);
@@ -4420,7 +4420,7 @@
                 textContainer.style.cssText = 'flex: 1; display: flex; align-items: flex-start; cursor: pointer; min-height: 40px;';
 
                 const textSpan = document.createElement('div');
-                textSpan.style.cssText = 'flex: 1; white-space: pre-wrap; word-break: break-word; line-height: 1.5; ' + (item.checked ? 'text-decoration: line-through; color: #999;' : '');
+                textSpan.style.cssText = 'flex: 1; white-space: pre-wrap; word-break: break-word; line-height: 1.5; color: #333; ' + (item.checked ? 'text-decoration: line-through; color: #999;' : '');
                 textSpan.textContent = item.text;
 
                 li.appendChild(checkbox);
@@ -6137,6 +6137,27 @@
                 checklistDetailViewItemInput.value = '';
                 renderDetailChecklistViewItems();
 
+                // 자동 저장 (Firebase)
+                if (currentEditingChecklistItem && currentEditingChecklistItem.liElement) {
+                    currentEditingChecklistItem.liElement.dataset.detail = JSON.stringify(detailChecklistItems);
+                    const clipboardIndex = currentEditingChecklistItem.clipboardIndex;
+                    const itemIndex = currentEditingChecklistItem.itemIndex;
+
+                    if (currentProject && allProjectsData && allProjectsData[currentProject]) {
+                        const projectData = allProjectsData[currentProject];
+                        const clipboardArray = projectData.clipboard || projectData.clipboards;
+
+                        if (clipboardArray && clipboardArray[clipboardIndex]) {
+                            const clipboard = clipboardArray[clipboardIndex];
+                            if (clipboard.items && clipboard.items[itemIndex]) {
+                                clipboard.items[itemIndex].detail = JSON.parse(JSON.stringify(detailChecklistItems));
+                            }
+                        }
+                    }
+
+                    saveToFirebase();
+                }
+
                 // 자동 스크롤 (하단으로)
                 setTimeout(() => {
                     const list = document.getElementById('checklist-detail-view-items');
@@ -6167,6 +6188,27 @@
                 });
                 checklistDetailItemInput.value = '';
                 renderDetailChecklistItems();
+
+                // 자동 저장 (Firebase)
+                if (currentEditingChecklistItem && currentEditingChecklistItem.liElement) {
+                    currentEditingChecklistItem.liElement.dataset.detail = JSON.stringify(detailChecklistItems);
+                    const clipboardIndex = currentEditingChecklistItem.clipboardIndex;
+                    const itemIndex = currentEditingChecklistItem.itemIndex;
+
+                    if (currentProject && allProjectsData && allProjectsData[currentProject]) {
+                        const projectData = allProjectsData[currentProject];
+                        const clipboardArray = projectData.clipboard || projectData.clipboards;
+
+                        if (clipboardArray && clipboardArray[clipboardIndex]) {
+                            const clipboard = clipboardArray[clipboardIndex];
+                            if (clipboard.items && clipboard.items[itemIndex]) {
+                                clipboard.items[itemIndex].detail = JSON.parse(JSON.stringify(detailChecklistItems));
+                            }
+                        }
+                    }
+
+                    saveToFirebase();
+                }
 
                 // 자동 스크롤 (하단으로)
                 setTimeout(() => {
