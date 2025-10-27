@@ -5749,10 +5749,11 @@
 
                 const detailBtn = document.createElement('button');
                 detailBtn.type = 'button';
-                detailBtn.textContent = '📄';
+                const detailCount = Array.isArray(item.detail) ? item.detail.length : 0;
+                detailBtn.textContent = detailCount > 0 ? detailCount.toString() : '0';
                 detailBtn.dataset.index = index;
                 detailBtn.className = 'checklist-detail-btn';
-                detailBtn.style.cssText = 'background-color: transparent; border: none; cursor: pointer; font-size: 18px; padding: 0; flex-shrink: 0;';
+                detailBtn.style.cssText = 'background-color: #e8d9f0; border: 1px solid #c9b4d8; cursor: pointer; font-size: 14px; padding: 4px 8px; flex-shrink: 0; border-radius: 3px; color: #5a4a7a; font-weight: 600;';
 
                 li.appendChild(checkbox);
                 li.appendChild(textContainer);
