@@ -4830,8 +4830,9 @@
                                 newLabel.style.cssText = 'flex: 1; cursor: pointer; ' + (savedItem.checked ? 'text-decoration: line-through; color: #999;' : '');
 
                                 const newDocBtn = document.createElement('button');
-                                newDocBtn.textContent = '📄';
-                                newDocBtn.style.cssText = 'background: none; border: none; font-size: 16px; cursor: pointer; padding: 0; flex-shrink: 0;';
+                                const newDetailCount = Array.isArray(savedItem.detail) ? savedItem.detail.length : 0;
+                                newDocBtn.textContent = newDetailCount.toString();
+                                newDocBtn.style.cssText = 'background-color: #e8d9f0; border: 1px solid #c9b4d8; cursor: pointer; font-size: 14px; padding: 4px 8px; flex-shrink: 0; border-radius: 3px; color: #5a4a7a; font-weight: 600;';
 
                                 newLi.appendChild(newCheckbox);
                                 const newTextContainer = document.createElement('div');
@@ -4860,10 +4861,11 @@
                         }
                     });
 
-                    // 문서 이모지 버튼
+                    // 하위 체크리스트 개수 표시 버튼
                     const docBtn = document.createElement('button');
-                    docBtn.textContent = '📄';
-                    docBtn.style.cssText = 'background: none; border: none; font-size: 16px; cursor: pointer; padding: 0; flex-shrink: 0;';
+                    const detailCount = Array.isArray(checkItem.detail) ? checkItem.detail.length : 0;
+                    docBtn.textContent = detailCount.toString();
+                    docBtn.style.cssText = 'background-color: #e8d9f0; border: 1px solid #c9b4d8; cursor: pointer; font-size: 14px; padding: 4px 8px; flex-shrink: 0; border-radius: 3px; color: #5a4a7a; font-weight: 600;';
                     docBtn.dataset.itemIndex = itemIndex;
                     docBtn.addEventListener('click', (e) => {
                         e.stopPropagation();
