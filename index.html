@@ -2542,6 +2542,10 @@
                 <div id="view-checklist-container" style="flex: 1; display: none; flex-direction: column;">
                     <ul id="view-checklist-items" style="flex: 1; list-style: none; padding: 12px; border: 2px solid #000000; border-radius: 4px; background-color: #fafafa; margin: 0; overflow-y: auto;">
                     </ul>
+                    <div style="padding: 12px; border-top: 2px solid #000000; background-color: white; display: flex; gap: 8px; flex-shrink: 0;">
+                        <input id="view-checklist-item-input" type="text" placeholder="새 항목 추가..." style="flex: 1; padding: 10px 12px; border: 1px solid #ddd; border-radius: 3px; font-size: 14px; font-family: inherit;">
+                        <button id="view-checklist-add-btn" style="padding: 10px 16px; background-color: #5a4a7a; color: white; border: none; border-radius: 3px; cursor: pointer; font-weight: 600; font-size: 14px; flex-shrink: 0;">추가</button>
+                    </div>
                 </div>
             </div>
             <div class="modal-actions" style="padding: 20px 40px; border-top: 1px solid #e0e0e0; background-color: #fafafa; flex-shrink: 0; text-align: right;">
@@ -4890,6 +4894,56 @@
             } else {
                 viewChecklistItems.innerHTML = '<li style="padding: 12px; color: #999;">항목이 없습니다.</li>';
             }
+
+            // 항목 추가 기능
+            const addInput = document.getElementById('view-checklist-item-input');
+            const addBtn = document.getElementById('view-checklist-add-btn');
+
+            // 기존 이벤트 리스너 제거 후 재등록
+            const newAddBtn = addBtn.cloneNode(true);
+            addBtn.parentNode.replaceChild(newAddBtn, addBtn);
+
+            const newAddInput = addInput.cloneNode(true);
+            addInput.parentNode.replaceChild(newAddInput, addInput);
+
+            // 항목 추가 함수
+            function addNewItem() {
+                const newItemText = newAddInput.value.trim();
+                if (!newItemText) {
+                    alert('항목을 입력해주세요.');
+                    return;
+                }
+
+                // 새 항목 추가
+                const newItem = {
+                    id: Math.random().toString(36).substr(2, 9),
+                    text: newItemText,
+                    checked: false,
+                    detail: []
+                };
+                item.items.push(newItem);
+
+                // Firebase 저장
+                saveToFirebase();
+
+                // 입력 필드 초기화
+                newAddInput.value = '';
+                newAddInput.focus();
+
+                // 화면 새로고침
+                openChecklistModal(item, index);
+            }
+
+            // 추가 버튼 클릭 이벤트
+            newAddBtn.addEventListener('click', addNewItem);
+
+            // Enter 키 이벤트
+            newAddInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' && !e.shiftKey && !e.ctrlKey && !e.altKey && !e.metaKey) {
+                    e.preventDefault();
+                    addNewItem();
+                }
+            });
 
             editBtn.dataset.clipboardIndex = index;
             modal.style.display = 'flex';
