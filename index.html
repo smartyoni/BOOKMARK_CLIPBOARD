@@ -4793,7 +4793,8 @@
                         if (clickCount === 1) {
                             clickTimeout = setTimeout(() => {
                                 // 싱글클릭: 상세내용 모달 열기
-                                openSavedChecklistDetailModal(index, itemIndex);
+                                const currentItemIndex = parseInt(li.dataset.itemIndex);
+                                openSavedChecklistDetailModal(index, currentItemIndex);
                                 clickCount = 0;
                             }, 300);
                         } else if (clickCount === 2) {
@@ -4819,6 +4820,14 @@
                                 const newLi = document.createElement('li');
                                 newLi.style.cssText = 'padding: 12px; margin-bottom: 8px; background-color: white; border-radius: 3px; display: flex; align-items: center; border: 1px solid #ddd; gap: 12px; position: relative;';
                                 newLi.dataset.itemIndex = newIndex;
+                                // 상세내용 저장 (배열은 JSON 직렬화, 문자열은 그대로, 없으면 빈 배열)
+                                if (Array.isArray(savedItem.detail)) {
+                                    newLi.dataset.detail = JSON.stringify(savedItem.detail);
+                                } else if (typeof savedItem.detail === 'string' && savedItem.detail) {
+                                    newLi.dataset.detail = savedItem.detail;
+                                } else {
+                                    newLi.dataset.detail = JSON.stringify([]);
+                                }
 
                                 const newCheckbox = document.createElement('input');
                                 newCheckbox.type = 'checkbox';
@@ -4855,12 +4864,16 @@
                                     saveToFirebase();
                                 });
 
-                                newDocBtn.addEventListener('click', () => {
-                                    openSavedChecklistDetailModal(index, newIndex);
+                                newDocBtn.addEventListener('click', (e) => {
+                                    e.stopPropagation();
+                                    const currentItemIndex = parseInt(newLi.dataset.itemIndex);
+                                    openSavedChecklistDetailModal(index, currentItemIndex);
                                 });
 
-                                newCompletedBtn.addEventListener('click', () => {
-                                    openSavedChecklistDetailModal(index, newIndex);
+                                newCompletedBtn.addEventListener('click', (e) => {
+                                    e.stopPropagation();
+                                    const currentItemIndex = parseInt(newLi.dataset.itemIndex);
+                                    openSavedChecklistDetailModal(index, currentItemIndex);
                                 });
                             });
                         } else {
@@ -4879,7 +4892,8 @@
                     docBtn.dataset.itemIndex = itemIndex;
                     docBtn.addEventListener('click', (e) => {
                         e.stopPropagation();
-                        openSavedChecklistDetailModal(index, itemIndex);
+                        const currentItemIndex = parseInt(li.dataset.itemIndex);
+                        openSavedChecklistDetailModal(index, currentItemIndex);
                     });
 
                     // 완료된 하위 체크리스트 개수 표시 버튼
@@ -4890,7 +4904,8 @@
                     completedBtn.dataset.itemIndex = itemIndex;
                     completedBtn.addEventListener('click', (e) => {
                         e.stopPropagation();
-                        openSavedChecklistDetailModal(index, itemIndex);
+                        const currentItemIndex = parseInt(li.dataset.itemIndex);
+                        openSavedChecklistDetailModal(index, currentItemIndex);
                     });
 
                     textContainer.appendChild(label);
