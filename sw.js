@@ -58,11 +58,14 @@ self.addEventListener('fetch', event => {
         .then(response => {
           console.log('Service Worker: 네트워크에서 가져오기 -', event.request.url);
           // 네트워크에서 성공적으로 가져온 경우 캐시 업데이트
-          if (response && response.status === 200) {
+          if (response && response.status === 200 && (event.request.url.startsWith('http://') || event.request.url.startsWith('https://'))) {
             const responseToCache = response.clone();
             caches.open(CACHE_NAME)
               .then(cache => {
                 cache.put(event.request, responseToCache);
+              })
+              .catch(err => {
+                console.log('캐시 저장 실패:', err);
               });
           }
           return response;
