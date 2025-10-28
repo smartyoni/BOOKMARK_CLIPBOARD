@@ -4103,6 +4103,12 @@
                                     const downloadBtn = document.getElementById('view-clipboard-download-btn');
                                     const editBtn = document.getElementById('view-clipboard-edit-btn');
 
+                                    // 컨테이너 전환 (체크리스트 숨김, 일반 컨텐츠 표시)
+                                    const viewContentContainer = document.getElementById('view-content-container');
+                                    const viewChecklistContainer = document.getElementById('view-checklist-container');
+                                    viewContentContainer.style.display = 'flex';
+                                    viewChecklistContainer.style.display = 'none';
+
                                     titleEl.textContent = item.title || '';
 
                                     // 텍스트 내용 표시
@@ -7760,6 +7766,9 @@
 
         viewClipboardCloseBtn.addEventListener('click', () => {
             viewClipboardModal.style.display = 'none';
+            // 컨테이너 상태 초기화
+            document.getElementById('view-content-container').style.display = 'flex';
+            document.getElementById('view-checklist-container').style.display = 'none';
         });
 
         // Copy Confirmation Modal 이벤트
@@ -7775,6 +7784,9 @@
         viewClipboardModal.addEventListener('click', (e) => {
             if (e.target === viewClipboardModal) {
                 viewClipboardModal.style.display = 'none';
+                // 컨테이너 상태 초기화
+                document.getElementById('view-content-container').style.display = 'flex';
+                document.getElementById('view-checklist-container').style.display = 'none';
             }
         });
 
