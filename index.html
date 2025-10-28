@@ -2295,6 +2295,7 @@
     <!-- Checklist Detail Item Context Menu -->
     <div id="checklist-detail-item-context-menu" class="context-menu" style="z-index: 10002;">
         <ul>
+            <li id="checklist-detail-item-context-copy">복사</li>
             <li id="checklist-detail-item-context-delete">삭제</li>
             <li id="checklist-detail-item-context-cancel">취소</li>
         </ul>
@@ -6162,8 +6163,24 @@
 
         // 상세내용 체크리스트 항목 컨텍스트 메뉴 이벤트
         const detailChecklistContextMenu = document.getElementById('checklist-detail-item-context-menu');
+        const detailChecklistContextCopy = document.getElementById('checklist-detail-item-context-copy');
         const detailChecklistContextDelete = document.getElementById('checklist-detail-item-context-delete');
         const detailChecklistContextCancel = document.getElementById('checklist-detail-item-context-cancel');
+
+        detailChecklistContextCopy.addEventListener('click', () => {
+            const itemIndex = parseInt(detailChecklistContextMenu.dataset.itemIndex);
+            const itemText = detailChecklistItems[itemIndex].text;
+
+            copyToClipboard(itemText).then(success => {
+                if (success) {
+                    showCopyConfirmation();
+                } else {
+                    alert('복사에 실패했습니다.');
+                }
+            });
+
+            detailChecklistContextMenu.style.display = 'none';
+        });
 
         detailChecklistContextDelete.addEventListener('click', () => {
             const itemIndex = parseInt(detailChecklistContextMenu.dataset.itemIndex);
