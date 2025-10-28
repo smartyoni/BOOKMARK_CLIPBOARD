@@ -4861,7 +4861,7 @@
                                 if (newCompletedCount > 0) {
                                     const newCompletedBtn = document.createElement('button');
                                     newCompletedBtn.textContent = newCompletedCount.toString();
-                                    newCompletedBtn.style.cssText = 'background-color: #e0e0e0; border: 1px solid #bdbdbd; cursor: pointer; font-size: 14px; padding: 4px 8px; flex-shrink: 0; border-radius: 3px; color: #666; font-weight: 600; text-decoration: line-through;';
+                                    newCompletedBtn.style.cssText = 'background-color: #ffe8e8; border: 1px solid #ffcccc; cursor: pointer; font-size: 14px; padding: 4px 8px; flex-shrink: 0; border-radius: 3px; color: #ff4444; font-weight: 600; text-decoration: line-through;';
                                     newCompletedBtn.addEventListener('click', (e) => {
                                         e.stopPropagation();
                                         const currentItemIndex = parseInt(newLi.dataset.itemIndex);
@@ -4912,12 +4912,15 @@
                         openSavedChecklistDetailModal(index, currentItemIndex);
                     });
 
+                    textContainer.appendChild(label);
+                    textContainer.appendChild(docBtn);
+
                     // 완료된 하위 체크리스트 개수 표시 버튼
                     const completedCount = Array.isArray(checkItem.detail) ? checkItem.detail.filter(d => d.checked).length : 0;
                     if (completedCount > 0) {
                         const completedBtn = document.createElement('button');
                         completedBtn.textContent = completedCount.toString();
-                        completedBtn.style.cssText = 'background-color: #e0e0e0; border: 1px solid #bdbdbd; cursor: pointer; font-size: 14px; padding: 4px 8px; flex-shrink: 0; border-radius: 3px; color: #666; font-weight: 600; text-decoration: line-through;';
+                        completedBtn.style.cssText = 'background-color: #ffe8e8; border: 1px solid #ffcccc; cursor: pointer; font-size: 14px; padding: 4px 8px; flex-shrink: 0; border-radius: 3px; color: #ff4444; font-weight: 600; text-decoration: line-through;';
                         completedBtn.dataset.itemIndex = itemIndex;
                         completedBtn.addEventListener('click', (e) => {
                             e.stopPropagation();
@@ -4927,9 +4930,6 @@
 
                         textContainer.appendChild(completedBtn);
                     }
-
-                    textContainer.appendChild(label);
-                    textContainer.appendChild(docBtn);
 
                     li.appendChild(checkbox);
                     li.appendChild(textContainer);
